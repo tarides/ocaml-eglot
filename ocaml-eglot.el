@@ -103,6 +103,7 @@ If there is not valid hole, the first hole of the list is returned."
 (defun ocaml-eglot-prev-hole ()
   "Jump to the previous hole."
   (interactive)
+  (eglot--server-capable-or-lose :experimental :ocamllsp :handleTypedHoles)
   (let* ((current-pos (eglot--pos-to-lsp-position))
          (holes (reverse (ocaml-eglot-req--holes)))
          (hole (ocaml-eglot--first-hole-at holes current-pos '<)))
@@ -111,6 +112,7 @@ If there is not valid hole, the first hole of the list is returned."
 (defun ocaml-eglot-next-hole ()
   "Jump to the next hole."
   (interactive)
+  (eglot--server-capable-or-lose :experimental :ocamllsp :handleTypedHoles)
   (let* ((current-pos (eglot--pos-to-lsp-position))
          (holes (ocaml-eglot-req--holes))
          (hole (ocaml-eglot--first-hole-at holes current-pos '>)))
