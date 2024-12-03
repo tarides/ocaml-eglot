@@ -41,6 +41,29 @@
   "Moves the cursor to a position calculated by LSP."
   (goto-char (eglot--lsp-position-to-point lsp-position)))
 
+(defun ocaml-eglot-util--jump-to-range (lsp-range)
+  "Moves the cursor to the start of a range calculated by LSP."
+  (let ((start (cl-getf lsp-range :start)))
+    (goto-char (eglot--lsp-position-to-point start))))
+
+(defun ocaml-eglot-util--compare-position (a b)
+  "Comparison between two LSP positions."
+  (let ((char-a (cl-getf a :character))
+        (char-b (cl-getf b :character))
+        (line-a (cl-getf a :line))
+        (line-b (cl-getf b :line)))
+    (if (> line-a line-b) 1
+      (if (> line-b line-a) -1
+        (if (> char-a char-b) 1
+          (if (> char-b char-a) -1 0))))))
+
+(defun ocaml-eglot-util--position-increase-char (pos content)
+  "Calculates a new position after inserting text content."
+  (let* ((line (cl-getf pos :line))
+         (character (cl-getf pos :character))
+         (new-char (+ character (length content))))
+    `(:line ,line :character ,new-char)))
+
 ;; Jump features
 
 (defun ocaml-eglot-util--extract-jump-position (jump-result)
@@ -49,8 +72,6 @@
     (when (> (length target-vec) 0)
       (let ((real-target (aref target-vec 0)))
         (cl-getf real-target :position)))))
-
-;; Search by types utils
 
 (provide 'ocaml-eglot-util)
 ;;; ocaml-eglot-util ends here

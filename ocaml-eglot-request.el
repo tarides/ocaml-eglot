@@ -99,5 +99,10 @@
   (let ((params (ocaml-eglot-req--SearchParams query limit)))
     (ocaml-eglot-req--send :ocamllsp/typeSearch params)))
 
+(defun ocaml-eglot-req--holes ()
+  "Returns a list of all the typed holes in the document as an range list."
+  (let ((params (ocaml-eglot-req--TextDocumentIdentifier)))
+    (append (ocaml-eglot-req--send :ocamllsp/typedHoles params) nil)))
+
 (provide 'ocaml-eglot-request)
 ;;; ocaml-eglot-request ends here

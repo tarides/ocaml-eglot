@@ -67,6 +67,56 @@ Otherwise, `merlin-construct' only includes constructors."
   (interactive)
   (flymake-goto-prev-error))
 
+;; Holes
+
+;; TODO: It would probably be possible to improve the query to embed
+;; more logic at the `merlin-lib` level rather than calculating hole
+;; logic at the editor level.
+
+(defun ocaml-eglot--first-hole-aux (holes pos comparison)
+  "Returns the first HOLE of the list according to a comparison predicate."
+  (when (or holes (> 0 (length holes)))
+    (let* ((hd (car holes))
+           (tl (cdr holes))
+           (h-start (cl-getf hd :start))
+           (cmp (ocaml-eglot-util--compare-position h-start pos)))
+      (if (funcall comparison cmp 0) hd
+        (ocaml-eglot--first-hole-aux tl pos comparison)))))
+
+(defun ocaml-eglot--first-hole-at (holes pos comparison)
+  "Returns the first HOLE of the list according to a comparison predicate.
+If there is not valid hole, the first hole of the list is returned."
+  (let ((hole (ocaml-eglot--first-hole-aux holes pos comparison)))
+    (if hole hole (car holes))))
+
+(defun ocaml-eglot--first-hole-in (start end)
+  "Jump to the first hole in a given range."
+  (let* ((holes (ocaml-eglot-req--holes))
+         (hole (ocaml-eglot--first-hole-at holes start '>)))
+    (when hole
+      (let ((hole-start (cl-getf hole :start))
+            (hole-end (cl-getf hole :end)))
+        (when (and (>= (ocaml-eglot-util--compare-position hole-start start) 0)
+                   (<= (ocaml-eglot-util--compare-position hole-end end) 0))
+          (progn (ocaml-eglot-util--jump-to hole-start)))))))
+
+(defun ocaml-eglot-prev-hole ()
+  "Jump to the previous hole."
+  (interactive)
+  (eglot--server-capable-or-lose :experimental :ocamllsp :handleTypedHoles)
+  (let* ((current-pos (eglot--pos-to-lsp-position))
+         (holes (reverse (ocaml-eglot-req--holes)))
+         (hole (ocaml-eglot--first-hole-at holes current-pos '<)))
+    (when hole (ocaml-eglot-util--jump-to-range hole))))
+
+(defun ocaml-eglot-next-hole ()
+  "Jump to the next hole."
+  (interactive)
+  (eglot--server-capable-or-lose :experimental :ocamllsp :handleTypedHoles)
+  (let* ((current-pos (eglot--pos-to-lsp-position))
+         (holes (ocaml-eglot-req--holes))
+         (hole (ocaml-eglot--first-hole-at holes current-pos '>)))
+    (when hole (ocaml-eglot-util--jump-to-range hole))))
 
 ;; Jump to source elements
 
@@ -104,13 +154,18 @@ can be used to change the maximim number of result."
          (suggestions (append (cl-getf result :result) nil)))
     (when (= (length suggestions) 0)
       (eglot--error "No constructors for this hole"))
-    (cl-labels ((insert-construct-choice (subst)
-                  ;; TODO: Move to the next hole in the generated text
-                  (ocaml-eglot-util--replace-region range subst)))
+    (cl-labels
+        ((insert-construct-choice (subst)
+           (let* ((start (cl-getf range :start))
+                  (end (ocaml-eglot-util--position-increase-char
+                        start subst)))
+             (ocaml-eglot-util--replace-region range subst)
+             (ocaml-eglot--first-hole-in start end))))
       (if (= (length suggestions) 1)
           (insert-construct-choice (car suggestions))
         (let ((choice (completing-read "Constructor: " suggestions nil t)))
           (insert-construct-choice choice))))))
+
 
 ;;; Mode
 
