@@ -8,7 +8,7 @@
 ;; Version: 1.0
 ;; Keywords: ocaml languages
 ;; Package-Requires: ((emacs "29.0"))
-;; URL: https://github.com/xvw/ocaml-eglot
+;; URL: https://github.com/tarides/ocaml-eglot
 
 ;;; Commentary
 
@@ -37,7 +37,7 @@
   :group 'ocaml-eglot
   :type 'natnum)
 
-(defcustom ocaml-eglot-type-search-include-doc nil
+(defcustom ocaml-eglot-type-search-include-doc t
   "Include documentation in type search result."
   :group 'ocaml-eglot
   :type 'boolean)
@@ -52,6 +52,23 @@ Otherwise, `merlin-construct' only includes constructors."
   "Preferred markup format."
   :group 'ocaml-eglot
   :type 'string)
+
+;;; Faces
+
+(defface ocaml-eglot-value-name-face
+  '((t :inherit font-lock-function-name-face))
+  "Face describing the names of values (used for search for example)."
+  :group 'ocaml-eglot)
+
+(defface ocaml-eglot-value-type-face
+  '((t :inherit font-lock-doc-face))
+  "Face describing the types of values (used for search for example)."
+  :group 'ocaml-eglot)
+
+(defface ocaml-eglot-value-doc-face
+  '((t :inherit font-lock-comment-face))
+  "Face describing the doc of values (used for search for example)."
+  :group 'ocaml-eglot)
 
 ;;; Features
 
@@ -136,12 +153,63 @@ If there is not valid hole, the first hole of the list is returned."
 
 ;; Search by type or polarity
 
+(defun ocaml-eglot--search-as-key (value-name value-type value-doc)
+  "Format a search entry with the right colours."
+  (let ((name (propertize value-name 'face 'ocaml-eglot-value-name-face))
+        (type (propertize value-type 'face 'ocaml-eglot-value-type-face))
+        (doc (propertize value-doc 'face 'ocaml-eglot-value-doc-face)))
+    (concat name " : " type " " doc)))
+
+(defun ocaml-eglot--search-as-doc (docstring)
+  "If the documentation is present, keep only the first line."
+  (let* ((doc (or (and docstring (cl-getf docstring :value)) ""))
+         (line (split-string doc "[\r\n]+")))
+    (car line)))
+
+(defun ocaml-eglot--search-to-completion (entries)
+  "Transforms a list of entries into a search candidate (autocomplete)."
+  (mapcar
+   (lambda (entry)
+     (let* ((value-name (cl-getf entry :name))
+           (value-type (cl-getf entry :typ))
+           (value-hole (cl-getf entry :constructible))
+           (value-doc (ocaml-eglot--search-as-doc (cl-getf entry :doc)))
+           (key (ocaml-eglot--search-as-key value-name value-type value-doc)))
+       (cons key value-hole)))
+   entries))
+
+(defun ocaml-eglot--search-completion (choices selected)
+  "Hook completion for keeping entries ordered by score."
+  (alist-get selected choices nil nil #'equal))
+
+(defun ocaml-eglot--search-complete-sort (choices)
+  "Keeps returned search entries ordered by score."
+  (lambda (string pred action)
+    (if (eq action 'metadata)
+	'(metadata (display-sort-function . identity)
+		   (cycle-sort-function . identity))
+      (complete-with-action action choices string pred))))
+
 (defun ocaml-eglot-search (query &optional limit)
   "Search a value using his type (or polarity), the universal prefix argument
 can be used to change the maximim number of result."
   (interactive "sSearch query: \np")
   (eglot--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
-  (print (ocaml-eglot-req--search query limit)))
+  (let* ((start (eglot--pos-to-lsp-position))
+         (entries (ocaml-eglot-req--search query limit))
+         (choices (ocaml-eglot--search-to-completion entries))
+         (chosen  (ocaml-eglot--search-completion
+                   choices
+                   (completing-read
+                    "Candidates: "
+                    (ocaml-eglot--search-complete-sort choices)
+                    nil nil nil t)))
+         (result (concat "(" chosen ")"))
+         (end (ocaml-eglot-util--position-increase-char start result)))
+    (when (region-active-p)
+      (delete-region (region-beginning) (region-end)))
+    (insert result)
+    (ocaml-eglot--first-hole-in start end)))
 
 ;; Construct
 

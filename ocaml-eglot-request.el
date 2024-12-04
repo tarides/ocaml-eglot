@@ -8,7 +8,7 @@
 ;; Version: 1.0
 ;; Keywords: ocaml languages
 ;; Package-Requires: ((emacs "29.0"))
-;; URL: https://github.com/xvw/ocaml-eglot
+;; URL: https://github.com/tarides/ocaml-eglot
 
 ;;; Commentary
 
@@ -77,8 +77,7 @@
           `(:limit, (or
                      (if (> limit 1) limit nil)
                      ocaml-eglot-type-search-limit 25))
-          `(:with_doc, (if ocaml-eglot-type-search-include-doc
-                           :json-true :json-false))
+          `(:with_doc, (or ocaml-eglot-type-search-include-doc :json-false))
           `(:doc_dormat, ocaml-eglot-preferred-markupkind)))
 
 ;;; Concrete requests
@@ -97,7 +96,7 @@
 (defun ocaml-eglot-req--search (query limit)
   "Execute the `ocamllsp/typeSearch'."
   (let ((params (ocaml-eglot-req--SearchParams query limit)))
-    (ocaml-eglot-req--send :ocamllsp/typeSearch params)))
+    (append (ocaml-eglot-req--send :ocamllsp/typeSearch params) nil)))
 
 (defun ocaml-eglot-req--holes ()
   "Returns a list of all the typed holes in the document as an range list."
