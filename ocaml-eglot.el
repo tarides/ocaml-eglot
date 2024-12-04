@@ -115,7 +115,7 @@ If there is not valid hole, the first hole of the list is returned."
             (hole-end (cl-getf hole :end)))
         (when (and (>= (ocaml-eglot-util--compare-position hole-start start) 0)
                    (<= (ocaml-eglot-util--compare-position hole-end end) 0))
-          (progn (ocaml-eglot-util--jump-to hole-start)))))))
+          (ocaml-eglot-util--jump-to hole-start))))))
 
 (defun ocaml-eglot-prev-hole ()
   "Jump to the previous hole."
