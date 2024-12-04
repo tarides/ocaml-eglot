@@ -1,9 +1,14 @@
 ;;; ocaml-eglot.el --- An OCaml companion for Eglot   -*- coding: utf-8; lexical-binding: t -*-
 
-;; Copyright (C) 2024  Xavier Van de Woestyne
+;; Copyright (C) 2024  The OCaml-eglot Project Contributors
 ;; Licensed under the MIT license.
 
 ;; Author: Xavier Van de Woestyne <xaviervdw@gmail.com>
+;;         Frédéric Bour
+;;         Simon Castellan
+;;         Thomas Refis
+;;         Ulysse Gerard
+;; Maintainer: Xavier Van de Woestyne <xaviervdw@gmail.com>
 ;; Created: 20 September 2024
 ;; Version: 1.0
 ;; Keywords: ocaml languages
@@ -12,7 +17,17 @@
 
 ;;; Commentary
 
-;; TODO: Write a commentary
+;; Provides a development environment for writing OCaml code. Built on
+;; top of `ocaml-lsp-server`
+;; (https://ocaml.org/p/ocaml-lsp-server/latest) via Eglot
+;; (https://www.gnu.org/software/emacs/manual/html_mono/eglot.html)
+;; for LSP interactions. `ocaml-eglot` provides standard
+;; implementations of the various custom-requests exposed by
+;; `ocaml-lsp-server`.
+
+;; Under the bonnet, `ocaml-eglot` and `ocaml-lsp-server` take
+;; advantage of `merlin` (https://ocaml.org/p/merlin-lib/latest) as a
+;; library to provide advanced IDE services.
 
 ;;; Code
 
@@ -115,7 +130,7 @@ If there is not valid hole, the first hole of the list is returned."
             (hole-end (cl-getf hole :end)))
         (when (and (>= (ocaml-eglot-util--compare-position hole-start start) 0)
                    (<= (ocaml-eglot-util--compare-position hole-end end) 0))
-          (progn (ocaml-eglot-util--jump-to hole-start)))))))
+          (ocaml-eglot-util--jump-to hole-start))))))
 
 (defun ocaml-eglot-prev-hole ()
   "Jump to the previous hole."
@@ -246,7 +261,10 @@ can be used to change the maximim number of result."
 
 ;;;###autoload
 (define-minor-mode ocaml-eglot
-  "TODO: I will write a better documentation"
+  "Minor mode for interacting with an `ocaml-lsp-server' process
+using `eglot' as a main client. `ocaml-eglot' provides standard
+implementations of the various custom-requests exposed by
+`ocaml-lsp-server'."
   :init-value nil
   :lighter " ocaml-eglot"
   :keymap ocaml-eglot-map)
