@@ -8,7 +8,7 @@
 ;; Version: 1.0
 ;; Keywords: ocaml languages
 ;; Package-Requires: ((emacs "29.0"))
-;; URL: https://github.com/xvw/ocaml-eglot
+;; URL: https://github.com/tarides/ocaml-eglot
 
 ;;; Commentary
 
