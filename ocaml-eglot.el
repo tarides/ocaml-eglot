@@ -248,10 +248,10 @@ If there is not valid hole, the first hole of the list is returned."
   (mapcar
    (lambda (entry)
      (let* ((value-name (cl-getf entry :name))
-           (value-type (cl-getf entry :typ))
-           (value-hole (cl-getf entry :constructible))
-           (value-doc (ocaml-eglot--search-as-doc (cl-getf entry :doc)))
-           (key (ocaml-eglot--search-as-key value-name value-type value-doc)))
+            (value-type (cl-getf entry :typ))
+            (value-hole (cl-getf entry :constructible))
+            (value-doc (ocaml-eglot--search-as-doc (cl-getf entry :doc)))
+            (key (ocaml-eglot--search-as-key value-name value-type value-doc)))
        (cons key value-hole)))
    entries))
 
