@@ -32,12 +32,13 @@
 ;;; Code
 
 
+(require 'flymake)
+(require 'xref)
 (require 'cl-lib)
-(require 'eglot)
 (require 'ocaml-eglot-util)
 (require 'ocaml-eglot-request)
 (require 'tuareg)
-(require 'flymake)
+(require 'eglot)
 
 (defgroup ocaml-eglot nil
   "All interactions from Eglot to OCaml-lsp-server."
@@ -98,6 +99,67 @@ Otherwise, `merlin-construct' only includes constructors."
   "Jump to the previous error."
   (interactive)
   (flymake-goto-prev-error))
+
+;; Jump to definition
+
+;; TODO: At the moment, the locate is essentially based on
+;; `xref-find-definitions`, which isn't very smart:
+;;
+;; - We don't want to open a new window if the destination is the same
+;;   as the current document.
+;; - We want to control whether we want to jump to ML or MLI
+;; - We'd also like to be able to jump to the definition of a type
+
+(defun ocaml-eglot-locate ()
+  "Locate the identifier at point."
+  (interactive)
+  (call-interactively #'xref-find-definitions-other-window))
+
+;; Infer interface
+
+(defun ocaml-eglot--find-alternate-file (uri)
+  "Returns the alternative file for a given URI."
+  (let ((uris (ocaml-eglot-req--switch-file uri)))
+    (ocaml-eglot-util--vec-first-or-nil uris)))
+
+(defun ocaml-eglot-infer-interface ()
+  "Infer the interface for the current file"
+  (interactive)
+  (eglot--server-capable-or-lose :experimental :ocamllsp :handleInferIntf)
+  (ocaml-eglot-util--ensure-interface)
+  (let* ((current-uri (ocaml-eglot-util--current-uri))
+         (impl-uri (ocaml-eglot--find-alternate-file current-uri))
+         (result (ocaml-eglot-req--infer-intf impl-uri)))
+    (when (or
+           (= (buffer-size) 0)
+           (yes-or-no-p "The buffer is not empty, overwrite it? "))
+      (erase-buffer)
+      (insert result))))
+
+;; Find alternate file `ml<->mli'
+
+(defun ocaml-eglot-alternate-file ()
+  "Visit the alternative file (from the interface to the implementation
+and vice versa)."
+  (interactive)
+  ;; We don't relay on `tuareg-find-alternate-file‘ because the
+  ;; interface generation relies on `ocamlmerlin’.
+  (eglot--server-capable-or-lose :experimental :ocamllsp :handleSwitchImplIntf)
+  (when-let* ((current-uri (ocaml-eglot-util--current-uri))
+              (uri (ocaml-eglot--find-alternate-file current-uri))
+              (file (eglot--uri-to-path uri)))
+    (find-file file)))
+
+;; Hook when visiting new interface file
+
+(defun ocaml-eglot--file-hook ()
+  "One for visiting a new file (interface), offering to infer the
+interface on the basis of the implementation"
+  (when (and
+         (ocaml-eglot-util--on-interface)
+         (= (buffer-size) 0)
+         (yes-or-no-p "Try to generate interface? "))
+    (call-interactively #'ocaml-eglot-infer-interface)))
 
 ;; Holes
 
@@ -256,6 +318,8 @@ can be used to change the maximim number of result."
   (let ((ocaml-eglot-keymap (make-sparse-keymap)))
     (define-key ocaml-eglot-keymap (kbd "C-c C-x") #'ocaml-eglot-error-next)
     (define-key ocaml-eglot-keymap (kbd "C-c C-c") #'ocaml-eglot-error-prev)
+    (define-key ocaml-eglot-keymap (kbd "C-c C-l") #'ocaml-eglot-locate)
+    (define-key ocaml-eglot-keymap (kbd "C-c C-a") #'ocaml-eglot-alternate-file)
     ocaml-eglot-keymap)
   "Keymap for OCaml-eglot minor mode")
 
@@ -267,7 +331,8 @@ implementations of the various custom-requests exposed by
 `ocaml-lsp-server'."
   :init-value nil
   :lighter " ocaml-eglot"
-  :keymap ocaml-eglot-map)
+  :keymap ocaml-eglot-map
+  (add-hook 'find-file-hook #'ocaml-eglot--file-hook))
 
 
 (provide 'ocaml-eglot)
