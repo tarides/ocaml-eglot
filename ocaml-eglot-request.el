@@ -55,6 +55,10 @@
   "Compute `TextDocumentIdentifier' object for current buffer."
   (eglot--TextDocumentIdentifier))
 
+(defun ocaml-eglot-req--PlainUri ()
+  "A hack for requests that do not respect the URI parameter scheme."
+  (make-vector 1 (ocaml-eglot-util--current-uri)))
+
 (defun ocaml-eglot-req--TextDocumentPositionParams ()
   "Compute `TextDocumentPositionParams' object for the current buffer."
   (append
@@ -89,19 +93,30 @@
     (ocaml-eglot-req--send :ocamllsp/jump params)))
 
 (defun ocaml-eglot-req--construct (depth with-local-value)
-  "Execute the `ocamllsp/construct'."
+  "Execute the `ocamllsp/construct' request with a given depth
+and an include flag."
   (let ((params (ocaml-eglot-req--ConstructParams depth with-local-value)))
     (ocaml-eglot-req--send :ocamllsp/construct params)))
 
 (defun ocaml-eglot-req--search (query limit)
-  "Execute the `ocamllsp/typeSearch'."
+  "Execute the `ocamllsp/typeSearch' request with a query and a limit."
   (let ((params (ocaml-eglot-req--SearchParams query limit)))
     (append (ocaml-eglot-req--send :ocamllsp/typeSearch params) nil)))
 
 (defun ocaml-eglot-req--holes ()
-  "Returns a list of all the typed holes in the document as an range list."
+  "Execute the `ocamllsp/typedHoles' request."
   (let ((params (ocaml-eglot-req--TextDocumentIdentifier)))
     (append (ocaml-eglot-req--send :ocamllsp/typedHoles params) nil)))
+
+(defun ocaml-eglot-req--switch-file (uri)
+  "Execute the `ocamllsp/switchImplIntf' request with a given uri."
+  (let ((params (make-vector 1 uri)))
+    (ocaml-eglot-req--send :ocamllsp/switchImplIntf params)))
+
+(defun ocaml-eglot-req--infer-intf (uri)
+  "Execute the `ocamllsp/inferIntf' request with a given uri."
+  (let ((params (make-vector 1 uri)))
+    (ocaml-eglot-req--send :ocamllsp/inferIntf params)))
 
 (provide 'ocaml-eglot-request)
 ;;; ocaml-eglot-request ends here

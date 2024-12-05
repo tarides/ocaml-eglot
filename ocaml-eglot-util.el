@@ -30,6 +30,11 @@
 
 ;; Generic util
 
+(defun ocaml-eglot-util--vec-first-or-nil (vec)
+  "Returns the first element of a vector or `nil'."
+  (when (> (length vec) 0)
+    (aref vec 0)))
+
 (defun ocaml-eglot-util--replace-region (range content)
   "Replace a LSP region by a given content"
   (pcase-let ((`(,beg . ,end) (eglot--range-region range)))
@@ -63,6 +68,30 @@
          (character (cl-getf pos :character))
          (new-char (+ character (length content))))
     `(:line ,line :character ,new-char)))
+
+(defun ocaml-eglot-util--current-uri ()
+  "Returns the uri of the document currently being visited."
+  (cl-getf (eglot--TextDocumentIdentifier) :uri))
+
+(defun ocaml-eglot-util--is-interface (uri)
+  "Returns true if the given URI is an interface, false otherwise."
+  (let* ((file (eglot--uri-to-path uri)))
+    (string-match-p "\\.\\(mli\\|rei\\|eliomi\\)\\'" file)))
+
+(defun ocaml-eglot-util--on-interface ()
+  "Returns true if the current URI is an interface, false otherwise."
+  (let ((uri (ocaml-eglot-util--current-uri)))
+    (ocaml-eglot-util--is-interface uri)))
+
+(defun ocaml-eglot-util--ensure-is-interface (uri)
+  "Ensure that a function is called given an interface file."
+  (when (not (ocaml-eglot-util--is-interface uri))
+    (eglot--error "Function is only available for interfaces")))
+
+(defun ocaml-eglot-util--ensure-interface ()
+  "Ensure that a function is called on a interface file."
+  (when (not (ocaml-eglot-util--on-interface))
+    (eglot--error "Function is only available for interfaces")))
 
 ;; Jump features
 
