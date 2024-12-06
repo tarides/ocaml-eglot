@@ -329,11 +329,13 @@ can be used to change the maximim number of result."
 using `eglot' as a main client. `ocaml-eglot' provides standard
 implementations of the various custom-requests exposed by
 `ocaml-lsp-server'."
-  :init-value nil
   :lighter " ocaml-eglot"
   :keymap ocaml-eglot-map
+  :group 'ocaml-eglot
   (add-hook 'find-file-hook #'ocaml-eglot--file-hook))
 
+;;;###autoload
+(add-hook #'tuareg-mode-hook #'ocaml-eglot)
 
 (provide 'ocaml-eglot)
 ;;; ocaml-eglot ends here
