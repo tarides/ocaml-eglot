@@ -12,7 +12,7 @@
 ;; Created: 20 September 2024
 ;; Version: 1.0
 ;; Keywords: ocaml languages
-;; Package-Requires: ((emacs "29.0") (tuareg "2.2.0"))
+;; Package-Requires: ((emacs "29.1"))
 ;; URL: https://github.com/tarides/ocaml-eglot
 
 ;;; Commentary:
