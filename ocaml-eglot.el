@@ -113,7 +113,7 @@ Otherwise, `merlin-construct' only includes constructors."
 (defun ocaml-eglot-locate ()
   "Locate the identifier at point."
   (interactive)
-  (call-interactively #'xref-find-definitions-other-window))
+  (call-interactively #'xref-find-definitions))
 
 ;; Infer interface
 
