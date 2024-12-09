@@ -1,0 +1,32 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        emacs_version:
+          - 29.1
+          - 29.2
+          - 29.3
+          - 29.4
+    steps:
+      - name: Set up Emacs
+        uses: purcell/setup-emacs@master
+        with:
+          version: ${{matrix.emacs_version}}
+
+      - name: Check out the source code
+        uses: actions/checkout@v4
+
+      - name: Test
+        run: |
+          make ci-dependencies
+          emacs --version
+          make check
+

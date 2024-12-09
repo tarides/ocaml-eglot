@@ -10,10 +10,10 @@
 ;;         Ulysse Gerard
 ;; Maintainer: Xavier Van de Woestyne <xaviervdw@gmail.com>
 ;; Created: 20 September 2024
-;; Version: 1.0
 ;; Keywords: ocaml languages
-;; Package-Requires: ((emacs "29.1"))
 ;; URL: https://github.com/tarides/ocaml-eglot
+;; Package-Requires: ((emacs "29.1"))
+;; Package-Version: 0.1
 
 ;;; Commentary:
 
