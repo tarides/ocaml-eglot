@@ -12,16 +12,16 @@
 ;; Created: 20 September 2024
 ;; Version: 1.0
 ;; Keywords: ocaml languages
-;; Package-Requires: ((emacs "29.0"))
+;; Package-Requires: ((emacs "29.0") (tuareg "2.2.0"))
 ;; URL: https://github.com/tarides/ocaml-eglot
 
-;;; Commentary
+;;; Commentary:
 
-;; Provides a development environment for writing OCaml code. Built on
+;; Provides a development environment for writing OCaml code.  Built on
 ;; top of `ocaml-lsp-server`
 ;; (https://ocaml.org/p/ocaml-lsp-server/latest) via Eglot
 ;; (https://www.gnu.org/software/emacs/manual/html_mono/eglot.html)
-;; for LSP interactions. `ocaml-eglot` provides standard
+;; for LSP interactions.  `ocaml-eglot` provides standard
 ;; implementations of the various custom-requests exposed by
 ;; `ocaml-lsp-server`.
 
@@ -29,15 +29,13 @@
 ;; advantage of `merlin` (https://ocaml.org/p/merlin-lib/latest) as a
 ;; library to provide advanced IDE services.
 
-;;; Code
-
+;;; Code:
 
 (require 'flymake)
 (require 'xref)
 (require 'cl-lib)
 (require 'ocaml-eglot-util)
 (require 'ocaml-eglot-request)
-(require 'tuareg)
 (require 'eglot)
 
 (defgroup ocaml-eglot nil
@@ -118,12 +116,12 @@ Otherwise, `merlin-construct' only includes constructors."
 ;; Infer interface
 
 (defun ocaml-eglot--find-alternate-file (uri)
-  "Returns the alternative file for a given URI."
+  "Return the alternative file for a given URI."
   (let ((uris (ocaml-eglot-req--switch-file uri)))
     (ocaml-eglot-util--vec-first-or-nil uris)))
 
 (defun ocaml-eglot-infer-interface ()
-  "Infer the interface for the current file"
+  "Infer the interface for the current file."
   (interactive)
   (eglot--server-capable-or-lose :experimental :ocamllsp :handleInferIntf)
   (ocaml-eglot-util--ensure-interface)
@@ -139,8 +137,7 @@ Otherwise, `merlin-construct' only includes constructors."
 ;; Find alternate file `ml<->mli'
 
 (defun ocaml-eglot-alternate-file ()
-  "Visit the alternative file (from the interface to the implementation
-and vice versa)."
+  "Visit the alternative file (ml to mli and vice versa)."
   (interactive)
   ;; We don't relay on `tuareg-find-alternate-file‘ because the
   ;; interface generation relies on `ocamlmerlin’.
@@ -153,8 +150,7 @@ and vice versa)."
 ;; Hook when visiting new interface file
 
 (defun ocaml-eglot--file-hook ()
-  "One for visiting a new file (interface), offering to infer the
-interface on the basis of the implementation"
+  "Hook to try to generate interface on visiting new files.."
   (when (and
          (ocaml-eglot-util--on-interface)
          (= (buffer-size) 0)
@@ -168,7 +164,7 @@ interface on the basis of the implementation"
 ;; logic at the editor level.
 
 (defun ocaml-eglot--first-hole-aux (holes pos comparison)
-  "Returns the first HOLE of the list according to a comparison predicate."
+  "Return the first hole of the list HOLES since a POS using COMPARISON."
   (when (or holes (> 0 (length holes)))
     (let* ((hd (car holes))
            (tl (cdr holes))
@@ -178,13 +174,13 @@ interface on the basis of the implementation"
         (ocaml-eglot--first-hole-aux tl pos comparison)))))
 
 (defun ocaml-eglot--first-hole-at (holes pos comparison)
-  "Returns the first HOLE of the list according to a comparison predicate.
-If there is not valid hole, the first hole of the list is returned."
+  "Return the first hole of the list HOLES since a POS using COMPARISON.
+If there is no available holes, it returns the first one of HOLES."
   (let ((hole (ocaml-eglot--first-hole-aux holes pos comparison)))
     (if hole hole (car holes))))
 
 (defun ocaml-eglot--first-hole-in (start end)
-  "Jump to the first hole in a given range."
+  "Jump to the first hole in a given range denoted by START and END."
   (let* ((holes (ocaml-eglot-req--holes))
          (hole (ocaml-eglot--first-hole-at holes start '>)))
     (when hole
@@ -215,7 +211,8 @@ If there is not valid hole, the first hole of the list is returned."
 ;; Jump to source elements
 
 (defun ocaml-eglot-jump (target)
-  "Jumps to the begining of the closest fun/let/match/module/module-type"
+  "Jumps to the begining of the closest fun/let/match/module/module-type.
+The target is specified giving TARGET."
   (interactive
    (list (completing-read
           "target: "
@@ -231,20 +228,20 @@ If there is not valid hole, the first hole of the list is returned."
 ;; Search by type or polarity
 
 (defun ocaml-eglot--search-as-key (value-name value-type value-doc)
-  "Format a search entry with the right colours."
+  "Format a search entry given a VALUE-NAME, a VALUE-TYPE and a VALUE-DOC."
   (let ((name (propertize value-name 'face 'ocaml-eglot-value-name-face))
         (type (propertize value-type 'face 'ocaml-eglot-value-type-face))
         (doc (propertize value-doc 'face 'ocaml-eglot-value-doc-face)))
     (concat name " : " type " " doc)))
 
 (defun ocaml-eglot--search-as-doc (docstring)
-  "If the documentation is present, keep only the first line."
+  "If the documentation (using DOCSTRING) is present, keep only the first line."
   (let* ((doc (or (and docstring (cl-getf docstring :value)) ""))
          (line (split-string doc "[\r\n]+")))
     (car line)))
 
 (defun ocaml-eglot--search-to-completion (entries)
-  "Transforms a list of entries into a search candidate (autocomplete)."
+  "Transforms a list of ENTRIES into a search candidate (autocomplete)."
   (mapcar
    (lambda (entry)
      (let* ((value-name (cl-getf entry :name))
@@ -256,11 +253,11 @@ If there is not valid hole, the first hole of the list is returned."
    entries))
 
 (defun ocaml-eglot--search-completion (choices selected)
-  "Hook completion for keeping entries ordered by score."
+  "Hook completion (SELECTED) for keeping CHOICES ordered by score."
   (alist-get selected choices nil nil #'equal))
 
 (defun ocaml-eglot--search-complete-sort (choices)
-  "Keeps returned search entries ordered by score."
+  "Keep returned search entries (CHOICES) ordered by score."
   (lambda (string pred action)
     (if (eq action 'metadata)
 	'(metadata (display-sort-function . identity)
@@ -268,8 +265,9 @@ If there is not valid hole, the first hole of the list is returned."
       (complete-with-action action choices string pred))))
 
 (defun ocaml-eglot-search (query &optional limit)
-  "Search a value using his type (or polarity), the universal prefix argument
-can be used to change the maximim number of result."
+  "Search a value using his type (or polarity) by a QUERY.
+the universal prefix argument can be used to change the maximim number
+of result (LIMIT)."
   (interactive "sSearch query: \np")
   (eglot--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
   (let* ((start (eglot--pos-to-lsp-position))
@@ -290,11 +288,12 @@ can be used to change the maximim number of result."
 
 ;; Construct
 
-(defun ocaml-eglot-construct (&optional prefix-arg)
-  "Construct over the current hole."
+(defun ocaml-eglot-construct (&optional arg)
+  "Construct over the current hole.
+It use the ARG to use local values or not."
   (interactive "P")
   (eglot--server-capable-or-lose :experimental :ocamllsp :handleConstruct)
-  (let* ((result (ocaml-eglot-req--construct 0 prefix-arg))
+  (let* ((result (ocaml-eglot-req--construct 0 arg))
          (range (cl-getf result :position))
          (suggestions (append (cl-getf result :result) nil)))
     (when (= (length suggestions) 0)
@@ -321,21 +320,17 @@ can be used to change the maximim number of result."
     (define-key ocaml-eglot-keymap (kbd "C-c C-l") #'ocaml-eglot-locate)
     (define-key ocaml-eglot-keymap (kbd "C-c C-a") #'ocaml-eglot-alternate-file)
     ocaml-eglot-keymap)
-  "Keymap for OCaml-eglot minor mode")
+  "Keymap for OCaml-eglot minor mode.")
 
 ;;;###autoload
 (define-minor-mode ocaml-eglot
-  "Minor mode for interacting with an `ocaml-lsp-server' process
-using `eglot' as a main client. `ocaml-eglot' provides standard
-implementations of the various custom-requests exposed by
-`ocaml-lsp-server'."
+  "Minor mode for interacting with `ocaml-lsp-server' using `eglot' as a client.
+`ocaml-eglot' provides standard implementations of the various custom-requests
+ exposed by `ocaml-lsp-server'."
   :lighter " ocaml-eglot"
   :keymap ocaml-eglot-map
   :group 'ocaml-eglot
   (add-hook 'find-file-hook #'ocaml-eglot--file-hook))
 
-;;;###autoload
-(add-hook #'tuareg-mode-hook #'ocaml-eglot)
-
 (provide 'ocaml-eglot)
-;;; ocaml-eglot ends here
+;;; ocaml-eglot.el ends here
