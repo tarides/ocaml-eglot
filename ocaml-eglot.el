@@ -35,7 +35,7 @@
 (require 'xref)
 (require 'cl-lib)
 (require 'ocaml-eglot-util)
-(require 'ocaml-eglot-request)
+(require 'ocaml-eglot-req)
 (require 'eglot)
 
 (defgroup ocaml-eglot nil
@@ -43,6 +43,7 @@
   :link '(url-link "https://ocaml.org")
   :group 'languages
   :prefix "ocaml-eglot-")
+
 
 ;;; Customizable variables
 
@@ -271,7 +272,11 @@ of result (LIMIT)."
   (interactive "sSearch query: \np")
   (eglot--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
   (let* ((start (eglot--pos-to-lsp-position))
-         (entries (ocaml-eglot-req--search query limit))
+         (limit (or(if (> limit 1) limit nil)
+                   ocaml-eglot-type-search-limit 25))
+         (markup-kind ocaml-eglot-preferred-markupkind)
+         (with-doc (or ocaml-eglot-type-search-include-doc :json-false))
+         (entries (ocaml-eglot-req--search query limit with-doc markup-kind))
          (choices (ocaml-eglot--search-to-completion entries))
          (chosen  (ocaml-eglot--search-completion
                    choices
@@ -288,12 +293,19 @@ of result (LIMIT)."
 
 ;; Construct
 
+(defun ocaml-eglot--construct-local-values (with-local-value)
+  "Constructs WITH-LOCAL-VALUE parameter for the `construct’ query."
+  (if (or with-local-value ocaml-eglot-construct-with-local-values)
+      "local"
+    "none"))
+
 (defun ocaml-eglot-construct (&optional arg)
   "Construct over the current hole.
 It use the ARG to use local values or not."
   (interactive "P")
   (eglot--server-capable-or-lose :experimental :ocamllsp :handleConstruct)
-  (let* ((result (ocaml-eglot-req--construct 0 arg))
+  (let* ((with-local-value (ocaml-eglot--construct-local-values arg))
+         (result (ocaml-eglot-req--construct 1 with-local-value))
          (range (cl-getf result :position))
          (suggestions (append (cl-getf result :result) nil)))
     (when (= (length suggestions) 0)
