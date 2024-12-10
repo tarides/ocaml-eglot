@@ -114,3 +114,19 @@ navigate between pattern matching cases:
 - `ocaml-eglot-jump`: jumps to the referenced expression
 
 ![Construct with prefix-arg Example](media/jump.gif)
+
+### Search for values
+
+Search for values using a _by polarity_ query or a type expression. A
+polarity query prefixes the function arguments with `-` and the return
+with `+`. For example, to search for a function of this type: `int ->
+string`. Search for `-int +string`. Searching by polarity does not
+support type parameters. A search by type (modulo isomorphisms) uses a
+query closer to what you would write to describe a type. For example,
+to find the function `int_of_string_opt`, search for `string -> int
+option`:
+
+- `ocaml-eglot-search` searches for a value by its type or polarity
+  (the search type is defined by the input query)
+
+![Search Example](media/search.gif)
