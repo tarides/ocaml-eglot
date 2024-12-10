@@ -191,7 +191,7 @@ If there is no available holes, it returns the first one of HOLES."
                    (<= (ocaml-eglot-util--compare-position hole-end end) 0))
           (ocaml-eglot-util--jump-to hole-start))))))
 
-(defun ocaml-eglot-prev-hole ()
+(defun ocaml-eglot-hole-prev ()
   "Jump to the previous hole."
   (interactive)
   (eglot--server-capable-or-lose :experimental :ocamllsp :handleTypedHoles)
@@ -200,7 +200,7 @@ If there is no available holes, it returns the first one of HOLES."
          (hole (ocaml-eglot--first-hole-at holes current-pos '<)))
     (when hole (ocaml-eglot-util--jump-to-range hole))))
 
-(defun ocaml-eglot-next-hole ()
+(defun ocaml-eglot-hole-next ()
   "Jump to the next hole."
   (interactive)
   (eglot--server-capable-or-lose :experimental :ocamllsp :handleTypedHoles)
