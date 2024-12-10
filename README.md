@@ -31,9 +31,21 @@ Eglot relies on
 for error diagnosis. OCaml-eglot offers two functions for quickly
 navigating through errors:
 
-- `ocaml-eglot-error-next` (<kbd>C-c</kbd> <kbd>C-x</kbd>) To jump to
+- `ocaml-eglot-error-next` (<kbd>C-c</kbd> <kbd>C-x</kbd>): to jump to
   the next error
-- `ocaml-eglot-error-prev` (<kbd>C-c</kbd> <kbd>C-c</kbd>) To jump to
+- `ocaml-eglot-error-prev` (<kbd>C-c</kbd> <kbd>C-c</kbd>): to jump to
   the previous error
 
 ![Error navigation example](media/error-navigation.gif)
+
+### Jump to definition
+
+Eglot relies on
+[Xref](https://www.gnu.org/software/emacs/manual/html_node/emacs/Xref.html)
+to index cross-references. OCaml-eglot provides a shortcut to quickly
+jump to the definition:
+
+- `ocaml-eglot-locate` (<kbd>C-c</kbd> <kbd>C-l</kbd>): to jump to
+  definition
+
+![Jump to definition example](media/locate.gif)
