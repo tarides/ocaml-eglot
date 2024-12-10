@@ -63,7 +63,7 @@ Otherwise, `merlin-construct' only includes constructors."
   :group 'ocaml-eglot
   :type 'boolean)
 
-(defcustom ocaml-eglot-preferred-markupkind "plaintext"
+(defcustom ocaml-eglot-preferred-markupkind "markdown"
   "Preferred markup format."
   :group 'ocaml-eglot
   :type 'string)
@@ -274,9 +274,10 @@ of result (LIMIT)."
   (let* ((start (eglot--pos-to-lsp-position))
          (limit (or(if (> limit 1) limit nil)
                    ocaml-eglot-type-search-limit 25))
-         (markup-kind ocaml-eglot-preferred-markupkind)
          (with-doc (or ocaml-eglot-type-search-include-doc :json-false))
-         (entries (ocaml-eglot-req--search query limit with-doc markup-kind))
+         ;; We use plaintext because the result of the documentation may
+         ;; be truncated
+         (entries (ocaml-eglot-req--search query limit with-doc "plaintext"))
          (choices (ocaml-eglot--search-to-completion entries))
          (chosen  (ocaml-eglot--search-completion
                    choices
@@ -323,6 +324,26 @@ It use the ARG to use local values or not."
           (insert-construct-choice choice))))))
 
 
+;; Get Documentation
+
+(defun ocaml-eglot--document-aux (identifier)
+  "Displays the OCaml documentation for the IDENTIFIER under the cursor."
+  (when-let* ((result (ocaml-eglot-req--get-documentation
+                       identifier ocaml-eglot-preferred-markupkind))
+              (doc-value (cl-getf result :doc))
+              (formated-value (ocaml-eglot-util--format-markup doc-value)))
+    (message "%s" formated-value)))
+
+(defun ocaml-eglot-document ()
+  "Displays the OCaml documentation for the identifier under the cursor."
+  (interactive)
+  (ocaml-eglot--document-aux nil))
+
+(defun ocaml-eglot-document-identifier (identifier)
+  "Displays the OCaml documentation for a given IDENTIFIER."
+  (interactive "sIdentifier: ")
+  (ocaml-eglot--document-aux identifier))
+
 ;;; Mode
 
 (defvar ocaml-eglot-map
@@ -331,6 +352,7 @@ It use the ARG to use local values or not."
     (define-key ocaml-eglot-keymap (kbd "C-c C-c") #'ocaml-eglot-error-prev)
     (define-key ocaml-eglot-keymap (kbd "C-c C-l") #'ocaml-eglot-locate)
     (define-key ocaml-eglot-keymap (kbd "C-c C-a") #'ocaml-eglot-alternate-file)
+    (define-key ocaml-eglot-keymap (kbd "C-c C-d") #'ocaml-eglot-document)
     ocaml-eglot-keymap)
   "Keymap for OCaml-eglot minor mode.")
 

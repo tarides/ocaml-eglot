@@ -89,6 +89,10 @@
   (when (not (ocaml-eglot-util--on-interface))
     (eglot--error "Function is only available for interfaces")))
 
+(defun ocaml-eglot-util--format-markup (markup)
+  "Format MARKUP according to LSP's spec."
+  (eglot--format-markup markup))
+
 ;; Jump features
 
 (defun ocaml-eglot-util--extract-jump-position (jump-result)

@@ -84,6 +84,14 @@ included and the documentation output can be set using MARKUP-KIND."
           `(:with_doc, with-doc)
           `(:doc_dormat, markup-kind)))
 
+(defun ocaml-eglot-req--GetDocumentationParam (identifier markup-kind)
+  "Compute the `GetDocumentationParam'.
+A potential IDENTIFIER can be given and MARKUP-KIND can be parametrized."
+  (let ((params (append (ocaml-eglot-req--TextDocumentPositionParams)
+                        `(:contentFormat, markup-kind))))
+    (if identifier (append params `(:identifier, identifier))
+      params)))
+
 ;;; Concrete requests
 
 (defun ocaml-eglot-req--jump (target)
@@ -120,6 +128,15 @@ The markup used to format documentation can be set using MARKUP-KIND."
   "Execute the `ocamllsp/inferIntf' request with a given URI."
   (let ((params (make-vector 1 uri)))
     (ocaml-eglot-req--send :ocamllsp/inferIntf params)))
+
+(defun ocaml-eglot-req--get-documentation (identifier markup-kind)
+  "Execute the `ocamllsp/getDocumentation'.
+If IDENTIFIER is non-nil, it documents it, otherwise, it use the identifier
+under the cursor.  The MARKUP-KIND can also be configured."
+  (let ((params (ocaml-eglot-req--GetDocumentationParam
+                 identifier
+                 markup-kind)))
+    (ocaml-eglot-req--send :ocamllsp/getDocumentation params)))
 
 (provide 'ocaml-eglot-req)
 ;;; ocaml-eglot-req.el ends here
