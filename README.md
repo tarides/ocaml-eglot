@@ -60,4 +60,18 @@ exist, a prompt can be used to generate it (using type inference).
   switch from the implementation file to the interface file and _vice
   versa_
 
-![Jump to definition example](media/alternate-file.gif)
+![Find Alternate File example](media/alternate-file.gif)
+
+### Get Documentation
+
+Although the `Hover` primitive in the LSP protocol can be used to
+conveiniently display value documentation, it is possible to invoke it
+manually:
+
+- `ocaml-eglot-document` (<kbd>C-c</kbd> <kbd>C-d</kbd>): documents
+  the expression below the cursor.
+- `ocaml-eglot-document-identifier`: enables you to enter an
+  identifier (present in the environment) and return its
+  documentation.
+
+![Get Documentation Example](media/document.gif)
