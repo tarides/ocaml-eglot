@@ -49,3 +49,15 @@ jump to the definition:
   definition
 
 ![Jump to definition example](media/locate.gif)
+
+### Find Alternate file
+
+OCaml-eglot allows you to quickly switch from the implementation file
+to the interface file and _vice versa_. If the interface file does not
+exist, a prompt can be used to generate it (using type inference).
+
+- `ocaml-eglot-alternate-file` (<kbd>C-c</kbd> <kbd>C-a</kbd>): to
+  switch from the implementation file to the interface file and _vice
+  versa_
+
+![Jump to definition example](media/alternate-file.gif)
