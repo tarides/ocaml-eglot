@@ -103,3 +103,14 @@ If the `ocaml-eglot-construct` command is prefixed by an argument, ie:
 valid candidates in the current environment:
 
 ![Construct with prefix-arg Example](media/construct2.gif)
+
+### Source Browsing
+
+OCaml-eglot allows you to navigate semantically in a buffer, passing
+from an expression to the parent `let`, the parent `module`, the
+parent `fun` and the parent `match` expression. It is also possible to
+navigate between pattern matching cases:
+
+- `ocaml-eglot-jump`: jumps to the referenced expression
+
+![Construct with prefix-arg Example](media/jump.gif)
