@@ -31,9 +31,9 @@ Eglot relies on
 for error diagnosis. OCaml-eglot offers two functions for quickly
 navigating through errors:
 
-- `ocaml-eglot-error-next` (<kbd>C-c</kbd> <kbd>C-x</kbd>): to jump to
+- `ocaml-eglot-error-next` (<kbd>C-c</kbd> <kbd>C-x</kbd>): jump to
   the next error
-- `ocaml-eglot-error-prev` (<kbd>C-c</kbd> <kbd>C-c</kbd>): to jump to
+- `ocaml-eglot-error-prev` (<kbd>C-c</kbd> <kbd>C-c</kbd>): jump to
   the previous error
 
 ![Error navigation example](media/error-navigation.gif)
@@ -45,7 +45,7 @@ Eglot relies on
 to index cross-references. OCaml-eglot provides a shortcut to quickly
 jump to the definition:
 
-- `ocaml-eglot-locate` (<kbd>C-c</kbd> <kbd>C-l</kbd>): to jump to
+- `ocaml-eglot-locate` (<kbd>C-c</kbd> <kbd>C-l</kbd>): jump to
   definition
 
 ![Jump to definition example](media/locate.gif)
@@ -56,7 +56,7 @@ Used to infer the type of an interface file. If the buffer is not
 empty, a prompt will ask for confirmation to overwrite the buffer
 contents:
 
-- `ocaml-eglot-infer-interface`: to infer the current interface file
+- `ocaml-eglot-infer-interface`: infer the current interface file
 
 ![Infer Interface example](media/infer-interface.gif)
 
@@ -67,9 +67,8 @@ to the interface file and _vice versa_. If the interface file does not
 exist, a prompt can be used to generate it (using type inference,
 based on `ocaml-eglot-infer-inteface`):
 
-- `ocaml-eglot-alternate-file` (<kbd>C-c</kbd> <kbd>C-a</kbd>): to
-  switch from the implementation file to the interface file and _vice
-  versa_
+- `ocaml-eglot-alternate-file` (<kbd>C-c</kbd> <kbd>C-a</kbd>): switch
+  from the implementation file to the interface file and _vice versa_
 
 ![Find Alternate File example](media/alternate-file.gif)
 
@@ -86,3 +85,21 @@ manually:
   documentation.
 
 ![Get Documentation Example](media/document.gif)
+
+### Construct Expression
+
+Enables you to navigate between the different types of holes in a
+document and interactively subsitute them:
+
+- `ocaml-eglot-hole-next`: jump to the next hole
+- `ocaml-eglot-hole-prev`: jump to the previous hole
+- `ocaml-eglot-construct`: Opens up a list of valid substitutions to
+  fill the hole
+
+![Construct Example](media/construct.gif)
+
+If the `ocaml-eglot-construct` command is prefixed by an argument, ie:
+`C-u M-x ocaml-eglot-construct`, the command will also search for
+valid candidates in the current environment:
+
+![Construct with prefix-arg Example](media/construct2.gif)
