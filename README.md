@@ -56,7 +56,7 @@ Used to infer the type of an interface file. If the buffer is not
 empty, a prompt will ask for confirmation to overwrite the buffer
 contents:
 
-- `ocaml-eglot-infer-interface`: infer the current interface file
+- `ocaml-eglot-infer-interface`: infer the interface for the current implementation file
 
 ![Infer Interface example](media/infer-interface.gif)
 
@@ -75,8 +75,8 @@ based on `ocaml-eglot-infer-inteface`):
 ### Get Documentation
 
 Although the `Hover` primitive in the LSP protocol can be used to
-conveiniently display value documentation, it is possible to invoke it
-manually:
+conveniently display value documentation, it is also possible to query for it
+specifically:
 
 - `ocaml-eglot-document` (<kbd>C-c</kbd> <kbd>C-d</kbd>): documents
   the expression below the cursor.
@@ -88,12 +88,12 @@ manually:
 
 ### Construct Expression
 
-Enables you to navigate between the different types of holes in a
-document and interactively subsitute them:
+Enables you to navigate between the different typed-holes (`_`) in a
+document and interactively substitute them:
 
 - `ocaml-eglot-hole-next`: jump to the next hole
 - `ocaml-eglot-hole-prev`: jump to the previous hole
-- `ocaml-eglot-construct`: Opens up a list of valid substitutions to
+- `ocaml-eglot-construct`: open up a list of valid substitutions to
   fill the hole
 
 ![Construct Example](media/construct.gif)
