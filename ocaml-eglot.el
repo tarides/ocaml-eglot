@@ -211,20 +211,25 @@ If there is no available holes, it returns the first one of HOLES."
 
 ;; Jump to source elements
 
-(defun ocaml-eglot-jump (target)
-  "Jumps to the begining of the closest fun/let/match/module/module-type.
-The target is specified giving TARGET."
-  (interactive
-   (list (completing-read
-          "target: "
-          '("fun" "let" "match" "module"
-            "module-type" "match-next-case"
-            "match-prev-case"))))
+(defun ocaml-eglot-jump ()
+  "Jumps to the the closest fun/let/match/module/module-type/match-case."
+  (interactive)
   (eglot--server-capable-or-lose :experimental :ocamllsp :handleJump)
-  (let* ((jumps (ocaml-eglot-req--jump target))
-         (position (ocaml-eglot-util--extract-jump-position jumps)))
-    (unless position (eglot--error "No matching target"))
-    (ocaml-eglot-util--jump-to position)))
+  (let ((jumps-result (cl-getf (ocaml-eglot-req--jump) :jumps)))
+    (when (<= (length jumps-result) 0)
+      (eglot--error "No matching target"))
+    (let* ((jumps
+            (mapcar
+             (lambda (jump)
+               (let ((key (cl-getf jump :target))
+                     (value (cl-getf jump :position)))
+                 (cons key value)))
+             jumps-result))
+           (selected (completing-read "Target: " jumps))
+           (position (alist-get selected jumps nil nil #'string-equal)))
+      (if position
+          (ocaml-eglot-util--jump-to position)
+        (eglot--error "Target not found")))))
 
 ;; Search by type or polarity
 

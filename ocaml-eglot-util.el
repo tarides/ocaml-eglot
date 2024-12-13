@@ -93,14 +93,6 @@
   "Format MARKUP according to LSP's spec."
   (eglot--format-markup markup))
 
-;; Jump features
-
-(defun ocaml-eglot-util--extract-jump-position (jump-result)
-  "Extracts the position of a JUMP-RESULT of the LSP server."
-  (let ((target-vec (cl-getf jump-result :jumps)))
-    (when (> (length target-vec) 0)
-      (let ((real-target (aref target-vec 0)))
-        (cl-getf real-target :position)))))
 
 (provide 'ocaml-eglot-util)
 ;;; ocaml-eglot-util.el ends here
