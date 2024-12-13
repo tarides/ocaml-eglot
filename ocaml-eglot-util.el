@@ -93,6 +93,16 @@
   "Format MARKUP according to LSP's spec."
   (eglot--format-markup markup))
 
+(defun ocaml-eglot-util--current-range ()
+  "Return the current active range."
+  (if (region-active-p)
+      (let ((region-start (region-beginning))
+            (region-stop  (region-end)))
+        (list :start (eglot--pos-to-lsp-position region-start)
+              :end (eglot--pos-to-lsp-position region-stop)))
+    (let ((start (eglot--pos-to-lsp-position)))
+      (list :start start
+            :end (ocaml-eglot-util--position-increase-char start "_")))))
 
 (provide 'ocaml-eglot-util)
 ;;; ocaml-eglot-util.el ends here

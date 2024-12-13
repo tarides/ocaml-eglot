@@ -65,11 +65,19 @@ CANCEL-ON-INPUT-RETVAL are hooks for cancellation."
    (eglot--TextDocumentPositionParams)
    (ocaml-eglot-req--TextDocumentIdentifier)))
 
-(defun ocaml-eglot-req--ConstructParams (depth with-local-values)
+(defun ocaml-eglot-req--TextDocumentPositionParamsWithPos (position)
+  "Compute `TextDocumentPositionParams' object for the current buffer.
+With a given POSITION"
+  (append (list :textDocument (ocaml-eglot-req--TextDocumentIdentifier)
+                :position position)
+          (ocaml-eglot-req--TextDocumentIdentifier)))
+
+(defun ocaml-eglot-req--ConstructParams (position depth with-local-values)
   "Compute `ConstructParams' object for current buffer.
+POSITION the position of the hole.
 DEPTH is the depth of the search (default is 1).
 WITH-LOCAL-VALUES is a flag for including local values in construction."
-  (append (ocaml-eglot-req--TextDocumentPositionParams)
+  (append (ocaml-eglot-req--TextDocumentPositionParamsWithPos position)
           `(:depth, depth)
           `(:withValues, with-local-values)))
 
@@ -99,10 +107,11 @@ A potential IDENTIFIER can be given and MARKUP-KIND can be parametrized."
   (let ((params (ocaml-eglot-req--TextDocumentPositionParams)))
     (ocaml-eglot-req--send :ocamllsp/jump params)))
 
-(defun ocaml-eglot-req--construct (depth with-local-value)
-  "Execute the `ocamllsp/construct' request.
+(defun ocaml-eglot-req--construct (position depth with-local-value)
+  "Execute the `ocamllsp/construct' request for a given POSITION.
 DEPTH and WITH-LOCAL-VALUE can be parametrized."
-  (let ((params (ocaml-eglot-req--ConstructParams depth with-local-value)))
+  (let ((params (ocaml-eglot-req--ConstructParams
+                 position depth with-local-value)))
     (ocaml-eglot-req--send :ocamllsp/construct params)))
 
 (defun ocaml-eglot-req--search (query limit with-doc markup-kind)
