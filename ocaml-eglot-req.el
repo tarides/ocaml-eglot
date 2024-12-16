@@ -21,12 +21,6 @@
 (require 'ocaml-eglot-util)
 (require 'jsonrpc)
 
-(defgroup ocaml-eglot-req nil
-  "All custom requests supported by ocaml-lsp-server."
-  :link '(url-link "https://ocaml.org")
-  :group 'languages
-  :prefix "ocaml-eglot-req-")
-
 ;;; Low-level plumbing to execute a request
 
 (defun ocaml-eglot-req--current-server ()

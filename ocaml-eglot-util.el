@@ -19,12 +19,6 @@
 (require 'eglot)
 (require 'cl-lib)
 
-(defgroup ocaml-eglot-util nil
-  "OCaml-eglot plugin standard library."
-  :link '(url-link "https://ocaml.org")
-  :group 'languages
-  :prefix "ocaml-eglot-util-")
-
 ;; Generic util
 
 (defun ocaml-eglot-util--vec-first-or-nil (vec)
