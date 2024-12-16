@@ -14,6 +14,7 @@
 ;; URL: https://github.com/tarides/ocaml-eglot
 ;; Package-Requires: ((emacs "29.1"))
 ;; Package-Version: 0.1
+;; SPDX-License-Identifier: MIT
 
 ;;; Commentary:
 

@@ -5,6 +5,7 @@
 
 ;; Author: Xavier Van de Woestyne <xaviervdw@gmail.com>
 ;; Created: 20 September 2024
+;; SPDX-License-Identifier: MIT
 
 ;;; Commentary:
 
