@@ -180,16 +180,22 @@ If there is no available holes, it returns the first one of HOLES."
   (let ((hole (ocaml-eglot--first-hole-aux holes pos comparison)))
     (if hole hole (car holes))))
 
-(defun ocaml-eglot--first-hole-in (start end)
-  "Jump to the first hole in a given range denoted by START and END."
+(defun ocaml-eglot--get-first-hole-in (start end)
+  "Return the first hole in a given range denoted by START and END."
   (let* ((holes (ocaml-eglot-req--holes))
-         (hole (ocaml-eglot--first-hole-at holes start '>)))
+         (hole (ocaml-eglot--first-hole-at holes start '>=)))
     (when hole
       (let ((hole-start (cl-getf hole :start))
             (hole-end (cl-getf hole :end)))
         (when (and (>= (ocaml-eglot-util--compare-position hole-start start) 0)
                    (<= (ocaml-eglot-util--compare-position hole-end end) 0))
-          (ocaml-eglot-util--jump-to hole-start))))))
+          hole)))))
+
+(defun ocaml-eglot--first-hole-in (start end)
+  "Jump to the first hole in a given range denoted by START and END."
+  (when-let ((hole (ocaml-eglot--get-first-hole-in start end))
+             (hole-start (cl-getf hole :start)))
+    (ocaml-eglot-util--jump-to hole-start)))
 
 (defun ocaml-eglot-hole-prev ()
   "Jump to the previous hole."
@@ -310,24 +316,31 @@ of result (LIMIT)."
 It use the ARG to use local values or not."
   (interactive "P")
   (eglot--server-capable-or-lose :experimental :ocamllsp :handleConstruct)
-  (let* ((with-local-value (ocaml-eglot--construct-local-values arg))
-         (result (ocaml-eglot-req--construct 1 with-local-value))
-         (range (cl-getf result :position))
-         (suggestions (append (cl-getf result :result) nil)))
-    (when (= (length suggestions) 0)
-      (eglot--error "No constructors for this hole"))
-    (cl-labels
-        ((insert-construct-choice (subst)
-           (let* ((start (cl-getf range :start))
-                  (end (ocaml-eglot-util--position-increase-char
-                        start subst)))
-             (ocaml-eglot-util--replace-region range subst)
-             (ocaml-eglot--first-hole-in start end))))
-      (if (= (length suggestions) 1)
-          (insert-construct-choice (car suggestions))
-        (let ((choice (completing-read "Constructor: " suggestions nil t)))
-          (insert-construct-choice choice))))))
-
+  (let* ((_with-local-values (ocaml-eglot--construct-local-values arg))
+         (current-range (ocaml-eglot-util--current-range))
+         (start (cl-getf current-range :start))
+         (end (cl-getf current-range :end))
+         (hole (ocaml-eglot--get-first-hole-in start end)))
+    (if (not hole)
+        (eglot--error "Not a hole")
+      (let* ((with-local-value (ocaml-eglot--construct-local-values arg))
+             (hole-start (cl-getf hole :start))
+             (result (ocaml-eglot-req--construct hole-start 1 with-local-value))
+             (range (cl-getf result :position))
+             (suggestions (append (cl-getf result :result) nil)))
+        (when (= (length suggestions) 0)
+          (eglot--error "No constructors for this hole"))
+        (cl-labels
+            ((insert-construct-choice (subst)
+               (let* ((start (cl-getf range :start))
+                      (end (ocaml-eglot-util--position-increase-char
+                            start subst)))
+                 (ocaml-eglot-util--replace-region range subst)
+                 (ocaml-eglot--first-hole-in start end))))
+          (if (= (length suggestions) 1)
+              (insert-construct-choice (car suggestions))
+            (let ((choice (completing-read "Constructor: " suggestions nil t)))
+              (insert-construct-choice choice))))))))
 
 ;; Get Documentation
 
