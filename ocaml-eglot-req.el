@@ -94,10 +94,9 @@ A potential IDENTIFIER can be given and MARKUP-KIND can be parametrized."
 
 ;;; Concrete requests
 
-(defun ocaml-eglot-req--jump (target)
-  "Execute the `ocamllsp/jump' request with a given TARGET."
-  (let ((params (append (ocaml-eglot-req--TextDocumentPositionParams)
-                        `(:target, target))))
+(defun ocaml-eglot-req--jump ()
+  "Execute the `ocamllsp/jump' request."
+  (let ((params (ocaml-eglot-req--TextDocumentPositionParams)))
     (ocaml-eglot-req--send :ocamllsp/jump params)))
 
 (defun ocaml-eglot-req--construct (depth with-local-value)
