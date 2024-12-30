@@ -93,12 +93,12 @@ Otherwise, `merlin-construct' only includes constructors."
 (defun ocaml-eglot-error-next ()
   "Jump to the next error."
   (interactive)
-  (flymake-goto-next-error))
+  (call-interactively #'flymake-goto-next-error))
 
 (defun ocaml-eglot-error-prev ()
   "Jump to the previous error."
   (interactive)
-  (flymake-goto-prev-error))
+  (call-interactively #'flymake-goto-prev-error))
 
 ;; Jump to definition
 
