@@ -99,5 +99,15 @@
       (list :start start
             :end (ocaml-eglot-util--position-increase-char start "_")))))
 
+(defun ocaml-eglot-util--visit-file (strategy current-file new-file range)
+  "Visits a referenced document, NEW-FILE at position  start of RANGE.
+The STRATEGY can be `'new' `'current' or `'smart'.  CURRENT-FILE is used
+as a smart strategy."
+  (cond ((eq strategy 'new) (find-file-other-window new-file))
+        ((eq strategy 'current) (find-file new-file))
+        ((string= current-file new-file) (find-file new-file))
+        (t (find-file-other-window new-file)))
+  (ocaml-eglot-util--jump-to-range range))
+
 (provide 'ocaml-eglot-util)
 ;;; ocaml-eglot-util.el ends here

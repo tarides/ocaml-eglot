@@ -141,5 +141,15 @@ under the cursor.  The MARKUP-KIND can also be configured."
                  markup-kind)))
     (ocaml-eglot-req--send :ocamllsp/getDocumentation params)))
 
+(defun ocaml-eglot-req--definition ()
+  "Execute the `textDocument/definition' request for the current point."
+  (let ((params (ocaml-eglot-req--TextDocumentPositionParams)))
+    (ocaml-eglot-req--send :textDocument/definition params)))
+
+(defun ocaml-eglot-req--type-definition ()
+  "Execute the `textDocument/typeDefinition' request for the current point."
+  (let ((params (ocaml-eglot-req--TextDocumentPositionParams)))
+    (ocaml-eglot-req--send :textDocument/typeDefinition params)))
+
 (provide 'ocaml-eglot-req)
 ;;; ocaml-eglot-req.el ends here

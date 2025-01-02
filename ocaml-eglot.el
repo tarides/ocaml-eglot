@@ -102,18 +102,45 @@ Otherwise, `merlin-construct' only includes constructors."
 
 ;; Jump to definition
 
-;; TODO: At the moment, the locate is essentially based on
-;; `xref-find-definitions`, which isn't very smart:
-;;
-;; - We don't want to open a new window if the destination is the same
-;;   as the current document.
-;; - We want to control whether we want to jump to ML or MLI
-;; - We'd also like to be able to jump to the definition of a type
+(defun ocaml-eglot--value-or-type-definition ()
+  "Find the definition (or type definition) to identify it under the cursor."
+  (let ((result (ocaml-eglot-req--definition)))
+    (if (not result)
+        (ocaml-eglot-req--type-definition)
+      result)))
+
+(defun ocaml-eglot--locate-definition (strategy)
+  "Locate the identifier at point and jump to it using STRATEGY."
+  (let* ((query-result (ocaml-eglot--value-or-type-definition))
+         (result (ocaml-eglot-util--vec-first-or-nil query-result)))
+    (if result
+        (let* ((uri (cl-getf result :uri))
+               (range (cl-getf result :range))
+               (file (eglot--uri-to-path uri)))
+          (ocaml-eglot-util--visit-file strategy (buffer-file-name) file range))
+      (eglot--error "Not in environment"))))
 
 (defun ocaml-eglot-locate ()
   "Locate the identifier at point."
   (interactive)
-  (call-interactively #'xref-find-definitions))
+  (ocaml-eglot--locate-definition 'smart))
+
+(defun ocaml-eglot-find-definition ()
+  "Locate the identifier at point."
+  (interactive)
+  (ocaml-eglot--locate-definition 'smart))
+
+(defun ocaml-eglot-find-definition-in-new-window ()
+  "Locate the identifier at point (into a new window)."
+  (interactive)
+  (ocaml-eglot--locate-definition 'new))
+
+(defun ocaml-eglot-find-definition-in-current-window ()
+  "Locate the identifier at point (into a the current window)."
+  (interactive)
+  (ocaml-eglot--locate-definition 'current))
+
+;; Jump to declaration
 
 ;; Infer interface
 
