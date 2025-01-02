@@ -110,7 +110,7 @@ Otherwise, `merlin-construct' only includes constructors."
       result)))
 
 (defun ocaml-eglot--locate-definition (strategy)
-  "Locate the identifier at point and jump to it using STRATEGY."
+  "Locate the definition at point and jump to it using STRATEGY."
   (let* ((query-result (ocaml-eglot--value-or-type-definition))
          (result (ocaml-eglot-util--vec-first-or-nil query-result)))
     (if result
@@ -120,27 +120,53 @@ Otherwise, `merlin-construct' only includes constructors."
           (ocaml-eglot-util--visit-file strategy (buffer-file-name) file range))
       (eglot--error "Not in environment"))))
 
-(defun ocaml-eglot-locate ()
-  "Locate the identifier at point."
-  (interactive)
-  (ocaml-eglot--locate-definition 'smart))
-
 (defun ocaml-eglot-find-definition ()
-  "Locate the identifier at point."
+  "Locate the definition identifier at point."
   (interactive)
   (ocaml-eglot--locate-definition 'smart))
 
 (defun ocaml-eglot-find-definition-in-new-window ()
-  "Locate the identifier at point (into a new window)."
+  "Locate the definition of identifier at point.
+Into a new window."
   (interactive)
   (ocaml-eglot--locate-definition 'new))
 
 (defun ocaml-eglot-find-definition-in-current-window ()
-  "Locate the identifier at point (into a the current window)."
+  "Locate the definition of the identifier at point.
+Into the current window)."
   (interactive)
   (ocaml-eglot--locate-definition 'current))
 
 ;; Jump to declaration
+
+(defun ocaml-eglot--locate-declaration (strategy)
+  "Locate the declaration at point and jump to it using STRATEGY."
+  ; We do not need a special case for type declaration here.
+  (let* ((query-result (ocaml-eglot-req--declaration))
+         (result (ocaml-eglot-util--vec-first-or-nil query-result)))
+    (if result
+        (let* ((uri (cl-getf result :uri))
+               (range (cl-getf result :range))
+               (file (eglot--uri-to-path uri)))
+          (ocaml-eglot-util--visit-file strategy (buffer-file-name) file range))
+      (eglot--error "Not in environment"))))
+
+(defun ocaml-eglot-find-declaration ()
+  "Locate the identifier declaration at point."
+  (interactive)
+  (ocaml-eglot--locate-declaration 'smart))
+
+(defun ocaml-eglot-find-declaration-in-new-window ()
+  "Locate the declaration identifier declaration at point.
+Into a new window."
+  (interactive)
+  (ocaml-eglot--locate-declaration 'new))
+
+(defun ocaml-eglot-find-declaration-in-current-window ()
+  "Locate the declaration identifier declaration at point.
+Into the current window."
+  (interactive)
+  (ocaml-eglot--locate-declaration 'current))
 
 ;; Infer interface
 
@@ -396,11 +422,13 @@ It use the ARG to use local values or not."
   (let ((ocaml-eglot-keymap (make-sparse-keymap)))
     (define-key ocaml-eglot-keymap (kbd "C-c C-x") #'ocaml-eglot-error-next)
     (define-key ocaml-eglot-keymap (kbd "C-c C-c") #'ocaml-eglot-error-prev)
-    (define-key ocaml-eglot-keymap (kbd "C-c C-l") #'ocaml-eglot-locate)
+    (define-key ocaml-eglot-keymap (kbd "C-c C-l") #'ocaml-eglot-find-definition)
+    (define-key ocaml-eglot-keymap (kbd "C-c C-i") #'ocaml-eglot-find-declaration)
     (define-key ocaml-eglot-keymap (kbd "C-c C-a") #'ocaml-eglot-alternate-file)
     (define-key ocaml-eglot-keymap (kbd "C-c C-d") #'ocaml-eglot-document)
     ocaml-eglot-keymap)
   "Keymap for OCaml-eglot minor mode.")
+
 
 ;;;###autoload
 (define-minor-mode ocaml-eglot
@@ -414,3 +442,4 @@ It use the ARG to use local values or not."
 
 (provide 'ocaml-eglot)
 ;;; ocaml-eglot.el ends here
+
