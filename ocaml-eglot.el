@@ -102,16 +102,9 @@ Otherwise, `merlin-construct' only includes constructors."
 
 ;; Jump to definition
 
-(defun ocaml-eglot--value-or-type-definition ()
-  "Find the definition (or type definition) to identify it under the cursor."
-  (let ((result (ocaml-eglot-req--definition)))
-    (if (not result)
-        (ocaml-eglot-req--type-definition)
-      result)))
-
 (defun ocaml-eglot--find-definition (strategy)
   "Locate the definition at point and jump to it using STRATEGY."
-  (let* ((query-result (ocaml-eglot--value-or-type-definition))
+  (let* ((query-result (ocaml-eglot-req--definition))
          (result (ocaml-eglot-util--vec-first-or-nil query-result)))
     (if result
         (let* ((uri (cl-getf result :uri))
