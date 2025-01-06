@@ -41,7 +41,7 @@ navigating through errors:
 ### Jump to definition/declaration
 
 OCaml-eglot provides a shortcut to quickly jump to the definition or
-declaration:
+declaration of an identifier:
 
 - `ocaml-eglot-find-definition` (<kbd>C-c</kbd> <kbd>C-l</kbd>): jump to
   definition (the implementation)
@@ -64,7 +64,7 @@ are provided:
 
 ### Jump to type definition  of an expression
 
-You can also jump to the type definition of the at point expression.
+You can also jump to the type definition of the expression at point.
 
 ![Jump to type definition example](media/find-type-decl.gif)
 

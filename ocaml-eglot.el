@@ -126,19 +126,19 @@ Otherwise, `merlin-construct' only includes constructors."
   (ocaml-eglot--find-definition ocaml-eglot-open-window-strategy))
 
 (defun ocaml-eglot-find-definition-in-new-window ()
-  "Find the definition identifier at point into a new window."
+  "Find the definition of the identifier at point and show it in a new window."
   (interactive)
   (ocaml-eglot--find-definition 'new))
 
 (defun ocaml-eglot-find-definition-in-current-window ()
-  "Find the definition identifier at point into the current window."
+  "Find the definition of the identifier and show it in the current window."
   (interactive)
   (ocaml-eglot--find-definition 'current))
 
 ;; Jump to declaration
 
 (defun ocaml-eglot--find-declaration (strategy)
-  "Find the declaration at point and jump to it using STRATEGY."
+  "Find the declaration of the identifier at point and jump to it using STRATEGY."
   (let* ((query-result (ocaml-eglot-req--declaration))
          (result (ocaml-eglot-util--vec-first-or-nil query-result)))
     (if result
@@ -149,24 +149,24 @@ Otherwise, `merlin-construct' only includes constructors."
       (eglot--error "Not in environment"))))
 
 (defun ocaml-eglot-find-declaration ()
-  "Find the identifier declaration at point."
+  "Find the declaration of the identifier at point."
   (interactive)
   (ocaml-eglot--find-declaration ocaml-eglot-open-window-strategy))
 
 (defun ocaml-eglot-find-declaration-in-new-window ()
-  "Find the identifier declaration at point into a new window."
+  "Find the declaration of the identifier at point and show it in a new window."
   (interactive)
   (ocaml-eglot--find-declaration 'new))
 
 (defun ocaml-eglot-find-declaration-in-current-window ()
-  "Find the identifier declaration at point into the current window."
+  "Find the declaration of the identifier at point and show it the current window."
   (interactive)
   (ocaml-eglot--find-declaration 'current))
 
 ;; Jump type declaration of expression
 
 (defun ocaml-eglot--find-type-definition (strategy)
-  "Find the type definition of the expression at point using STRATEGY."
+  "Find the definition of the type of the expression at point using STRATEGY."
   (let* ((query-result (ocaml-eglot-req--type-definition))
          (result (ocaml-eglot-util--vec-first-or-nil query-result)))
     (if result
@@ -177,17 +177,17 @@ Otherwise, `merlin-construct' only includes constructors."
       (eglot--error "Not in environment"))))
 
 (defun ocaml-eglot-find-type-definition ()
-  "Find the type of the identifier at point."
+  "Find the definition of the type of the expression at point."
   (interactive)
   (ocaml-eglot--find-type-definition ocaml-eglot-open-window-strategy))
 
 (defun ocaml-eglot-find-type-definition-in-new-window ()
-  "Find the type of the identifier at point into a new window."
+  "Find the definition of the type of the expression at point and show it in a new window."
   (interactive)
   (ocaml-eglot--find-type-definition 'new))
 
 (defun ocaml-eglot-find-type-definition-in-current-window ()
-  "Find the type of the identifier at point into the current window."
+  "Find the definition of the type of the expression at point and show it in the current window."
   (interactive)
   (ocaml-eglot--find-type-definition 'current))
 
