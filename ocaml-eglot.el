@@ -69,6 +69,13 @@ Otherwise, `merlin-construct' only includes constructors."
   :group 'ocaml-eglot
   :type 'string)
 
+(defcustom ocaml-eglot-open-window-strategy 'smart
+  "Defines window opening strategy."
+  :group 'ocaml-eglot
+  :type '(choice (const :tag "Open a new window only if the target differs" smart)
+                 (const :tag "Always open in a new window" new)
+                 (const :tag "Always open in the current window" current)))
+
 ;;; Faces
 
 (defface ocaml-eglot-value-name-face
@@ -116,7 +123,7 @@ Otherwise, `merlin-construct' only includes constructors."
 (defun ocaml-eglot-find-definition ()
   "Find the definition identifier at point."
   (interactive)
-  (ocaml-eglot--find-definition 'smart))
+  (ocaml-eglot--find-definition ocaml-eglot-open-window-strategy))
 
 (defun ocaml-eglot-find-definition-in-new-window ()
   "Find the definition identifier at point into a new window."
@@ -144,7 +151,7 @@ Otherwise, `merlin-construct' only includes constructors."
 (defun ocaml-eglot-find-declaration ()
   "Find the identifier declaration at point."
   (interactive)
-  (ocaml-eglot--find-declaration 'smart))
+  (ocaml-eglot--find-declaration ocaml-eglot-open-window-strategy))
 
 (defun ocaml-eglot-find-declaration-in-new-window ()
   "Find the identifier declaration at point into a new window."
@@ -172,7 +179,7 @@ Otherwise, `merlin-construct' only includes constructors."
 (defun ocaml-eglot-find-type-definition ()
   "Find the type of the identifier at point."
   (interactive)
-  (ocaml-eglot--find-type-definition 'smart))
+  (ocaml-eglot--find-type-definition ocaml-eglot-open-window-strategy))
 
 (defun ocaml-eglot-find-type-definition-in-new-window ()
   "Find the type of the identifier at point into a new window."
