@@ -62,6 +62,18 @@ are provided:
 - `ocaml-eglot-find-definition-in-current-window`
 - `ocaml-eglot-find-declaration-in-current-window`
 
+### Jump to type definition  of an expression
+
+You can also jump to the type definition of the at point expression.
+
+![Jump to type definition example](media/find-type-decl.gif)
+
+Auxiliary functions for controlling the placement of a result are
+provided:
+
+- `ocaml-eglot-find-type-definition-in-new-window`
+- `ocaml-eglot-find-type-definition-in-current-window`
+
 ### Infer Interface
 
 Used to infer the type of an interface file. If the buffer is not
