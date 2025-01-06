@@ -101,8 +101,9 @@
 
 (defun ocaml-eglot-util--visit-file (strategy current-file new-file range)
   "Visits a referenced document, NEW-FILE at position  start of RANGE.
-The STRATEGY can be `'new' `'current' or `'smart'.  CURRENT-FILE is used
-as a smart strategy."
+The STRATEGY can be `'new' `'current' or `'smart'.  The later opens a
+new buffer if the destination is not in the CURRENT-FILE, ans uses the 
+current buffer otherwise."
   (push-mark)
   (cond ((eq strategy 'new) (find-file-other-window new-file))
         ((eq strategy 'current) (find-file new-file))
