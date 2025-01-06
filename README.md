@@ -38,17 +38,44 @@ navigating through errors:
 
 ![Error navigation example](media/error-navigation.gif)
 
-### Jump to definition
+### Jump to definition/declaration
 
-Eglot relies on
-[Xref](https://www.gnu.org/software/emacs/manual/html_node/emacs/Xref.html)
-to index cross-references. OCaml-eglot provides a shortcut to quickly
-jump to the definition:
+OCaml-eglot provides a shortcut to quickly jump to the definition or
+declaration of an identifier:
 
-- `ocaml-eglot-locate` (<kbd>C-c</kbd> <kbd>C-l</kbd>): jump to
-  definition
+- `ocaml-eglot-find-definition` (<kbd>C-c</kbd> <kbd>C-l</kbd>): jump to
+  definition (the implementation)
+  
+- `ocaml-eglot-find-declaration` (<kbd>C-c</kbd> <kbd>C-i</kbd>): jump to
+  declaration (the signature)
 
-![Jump to definition example](media/locate.gif)
+![Jump to definition example](media/find-def-decl.gif)
+
+The default calculation for the window containing the jump result is
+_smart_: if the target is on the same file, the command uses the same
+window; if the target is on another file, the command opens a new
+window. Auxiliary functions for controlling the placement of a result
+are provided:
+
+- `ocaml-eglot-find-definition-in-new-window`
+- `ocaml-eglot-find-declaration-in-new-window`
+- `ocaml-eglot-find-definition-in-current-window`
+- `ocaml-eglot-find-declaration-in-current-window`
+
+The default behavior can also be configured using the
+`ocaml-eglot-open-window-strategy` variable.
+
+### Jump to type definition  of an expression
+
+You can also jump to the type definition of the expression at point.
+
+![Jump to type definition example](media/find-type-decl.gif)
+
+Auxiliary functions for controlling the placement of a result are
+provided:
+
+- `ocaml-eglot-find-type-definition-in-new-window`
+- `ocaml-eglot-find-type-definition-in-current-window`
 
 ### Infer Interface
 

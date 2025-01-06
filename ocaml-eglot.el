@@ -69,6 +69,13 @@ Otherwise, `merlin-construct' only includes constructors."
   :group 'ocaml-eglot
   :type 'string)
 
+(defcustom ocaml-eglot-open-window-strategy 'smart
+  "Defines window opening strategy."
+  :group 'ocaml-eglot
+  :type '(choice (const :tag "Open a new window only if the target differs" smart)
+                 (const :tag "Always open in a new window" new)
+                 (const :tag "Always open in the current window" current)))
+
 ;;; Faces
 
 (defface ocaml-eglot-value-name-face
@@ -102,18 +109,90 @@ Otherwise, `merlin-construct' only includes constructors."
 
 ;; Jump to definition
 
-;; TODO: At the moment, the locate is essentially based on
-;; `xref-find-definitions`, which isn't very smart:
-;;
-;; - We don't want to open a new window if the destination is the same
-;;   as the current document.
-;; - We want to control whether we want to jump to ML or MLI
-;; - We'd also like to be able to jump to the definition of a type
+(defun ocaml-eglot--find-definition (strategy)
+  "Find the definition at point and jump to it using STRATEGY."
+  (let* ((query-result (ocaml-eglot-req--definition))
+         (result (ocaml-eglot-util--vec-first-or-nil query-result)))
+    (if result
+        (let* ((uri (cl-getf result :uri))
+               (range (cl-getf result :range))
+               (file (eglot--uri-to-path uri)))
+          (ocaml-eglot-util--visit-file strategy (buffer-file-name) file range))
+      (eglot--error "Not in environment"))))
 
-(defun ocaml-eglot-locate ()
-  "Locate the identifier at point."
+(defun ocaml-eglot-find-definition ()
+  "Find the definition identifier at point."
   (interactive)
-  (call-interactively #'xref-find-definitions))
+  (ocaml-eglot--find-definition ocaml-eglot-open-window-strategy))
+
+(defun ocaml-eglot-find-definition-in-new-window ()
+  "Find the definition of the identifier at point and show it in a new window."
+  (interactive)
+  (ocaml-eglot--find-definition 'new))
+
+(defun ocaml-eglot-find-definition-in-current-window ()
+  "Find the definition of the identifier and show it in the current window."
+  (interactive)
+  (ocaml-eglot--find-definition 'current))
+
+;; Jump to declaration
+
+(defun ocaml-eglot--find-declaration (strategy)
+  "Find the declaration of the identifier at point and jump to it using STRATEGY."
+  (let* ((query-result (ocaml-eglot-req--declaration))
+         (result (ocaml-eglot-util--vec-first-or-nil query-result)))
+    (if result
+        (let* ((uri (cl-getf result :uri))
+               (range (cl-getf result :range))
+               (file (eglot--uri-to-path uri)))
+          (ocaml-eglot-util--visit-file strategy (buffer-file-name) file range))
+      (eglot--error "Not in environment"))))
+
+(defun ocaml-eglot-find-declaration ()
+  "Find the declaration of the identifier at point."
+  (interactive)
+  (ocaml-eglot--find-declaration ocaml-eglot-open-window-strategy))
+
+(defun ocaml-eglot-find-declaration-in-new-window ()
+  "Find the declaration of the identifier at point and show it in a new window."
+  (interactive)
+  (ocaml-eglot--find-declaration 'new))
+
+(defun ocaml-eglot-find-declaration-in-current-window ()
+  "Find the declaration of the identifier at point.
+Show it the current window."
+  (interactive)
+  (ocaml-eglot--find-declaration 'current))
+
+;; Jump type declaration of expression
+
+(defun ocaml-eglot--find-type-definition (strategy)
+  "Find the definition of the type of the expression at point using STRATEGY."
+  (let* ((query-result (ocaml-eglot-req--type-definition))
+         (result (ocaml-eglot-util--vec-first-or-nil query-result)))
+    (if result
+        (let* ((uri (cl-getf result :uri))
+               (range (cl-getf result :range))
+               (file (eglot--uri-to-path uri)))
+          (ocaml-eglot-util--visit-file strategy (buffer-file-name) file range))
+      (eglot--error "Not in environment"))))
+
+(defun ocaml-eglot-find-type-definition ()
+  "Find the definition of the type of the expression at point."
+  (interactive)
+  (ocaml-eglot--find-type-definition ocaml-eglot-open-window-strategy))
+
+(defun ocaml-eglot-find-type-definition-in-new-window ()
+  "Find the definition of the type of the expression at point.
+Show it in a new window."
+  (interactive)
+  (ocaml-eglot--find-type-definition 'new))
+
+(defun ocaml-eglot-find-type-definition-in-current-window ()
+  "Find the definition of the type of the expression at point.
+Show it in the current window."
+  (interactive)
+  (ocaml-eglot--find-type-definition 'current))
 
 ;; Infer interface
 
@@ -369,11 +448,13 @@ It use the ARG to use local values or not."
   (let ((ocaml-eglot-keymap (make-sparse-keymap)))
     (define-key ocaml-eglot-keymap (kbd "C-c C-x") #'ocaml-eglot-error-next)
     (define-key ocaml-eglot-keymap (kbd "C-c C-c") #'ocaml-eglot-error-prev)
-    (define-key ocaml-eglot-keymap (kbd "C-c C-l") #'ocaml-eglot-locate)
+    (define-key ocaml-eglot-keymap (kbd "C-c C-l") #'ocaml-eglot-find-definition)
+    (define-key ocaml-eglot-keymap (kbd "C-c C-i") #'ocaml-eglot-find-declaration)
     (define-key ocaml-eglot-keymap (kbd "C-c C-a") #'ocaml-eglot-alternate-file)
     (define-key ocaml-eglot-keymap (kbd "C-c C-d") #'ocaml-eglot-document)
     ocaml-eglot-keymap)
   "Keymap for OCaml-eglot minor mode.")
+
 
 ;;;###autoload
 (define-minor-mode ocaml-eglot
@@ -387,3 +468,4 @@ It use the ARG to use local values or not."
 
 (provide 'ocaml-eglot)
 ;;; ocaml-eglot.el ends here
+
