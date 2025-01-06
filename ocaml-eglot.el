@@ -109,7 +109,7 @@ Otherwise, `merlin-construct' only includes constructors."
         (ocaml-eglot-req--type-definition)
       result)))
 
-(defun ocaml-eglot--locate-definition (strategy)
+(defun ocaml-eglot--find-definition (strategy)
   "Locate the definition at point and jump to it using STRATEGY."
   (let* ((query-result (ocaml-eglot--value-or-type-definition))
          (result (ocaml-eglot-util--vec-first-or-nil query-result)))
@@ -123,23 +123,23 @@ Otherwise, `merlin-construct' only includes constructors."
 (defun ocaml-eglot-find-definition ()
   "Locate the definition identifier at point."
   (interactive)
-  (ocaml-eglot--locate-definition 'smart))
+  (ocaml-eglot--find-definition 'smart))
 
 (defun ocaml-eglot-find-definition-in-new-window ()
   "Locate the definition of identifier at point.
 Into a new window."
   (interactive)
-  (ocaml-eglot--locate-definition 'new))
+  (ocaml-eglot--find-definition 'new))
 
 (defun ocaml-eglot-find-definition-in-current-window ()
   "Locate the definition of the identifier at point.
 Into the current window)."
   (interactive)
-  (ocaml-eglot--locate-definition 'current))
+  (ocaml-eglot--find-definition 'current))
 
 ;; Jump to declaration
 
-(defun ocaml-eglot--locate-declaration (strategy)
+(defun ocaml-eglot--find-declaration (strategy)
   "Locate the declaration at point and jump to it using STRATEGY."
   ; We do not need a special case for type declaration here.
   (let* ((query-result (ocaml-eglot-req--declaration))
@@ -154,19 +154,19 @@ Into the current window)."
 (defun ocaml-eglot-find-declaration ()
   "Locate the identifier declaration at point."
   (interactive)
-  (ocaml-eglot--locate-declaration 'smart))
+  (ocaml-eglot--find-declaration 'smart))
 
 (defun ocaml-eglot-find-declaration-in-new-window ()
   "Locate the declaration identifier declaration at point.
 Into a new window."
   (interactive)
-  (ocaml-eglot--locate-declaration 'new))
+  (ocaml-eglot--find-declaration 'new))
 
 (defun ocaml-eglot-find-declaration-in-current-window ()
   "Locate the declaration identifier declaration at point.
 Into the current window."
   (interactive)
-  (ocaml-eglot--locate-declaration 'current))
+  (ocaml-eglot--find-declaration 'current))
 
 ;; Infer interface
 
