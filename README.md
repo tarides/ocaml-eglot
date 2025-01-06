@@ -62,6 +62,9 @@ are provided:
 - `ocaml-eglot-find-definition-in-current-window`
 - `ocaml-eglot-find-declaration-in-current-window`
 
+The default behavior can also be configured using the
+`ocaml-eglot-open-window-strategy` variable.
+
 ### Jump to type definition  of an expression
 
 You can also jump to the type definition of the expression at point.

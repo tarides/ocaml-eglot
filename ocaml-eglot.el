@@ -159,7 +159,8 @@ Otherwise, `merlin-construct' only includes constructors."
   (ocaml-eglot--find-declaration 'new))
 
 (defun ocaml-eglot-find-declaration-in-current-window ()
-  "Find the declaration of the identifier at point and show it the current window."
+  "Find the declaration of the identifier at point.
+Show it the current window."
   (interactive)
   (ocaml-eglot--find-declaration 'current))
 
@@ -182,12 +183,14 @@ Otherwise, `merlin-construct' only includes constructors."
   (ocaml-eglot--find-type-definition ocaml-eglot-open-window-strategy))
 
 (defun ocaml-eglot-find-type-definition-in-new-window ()
-  "Find the definition of the type of the expression at point and show it in a new window."
+  "Find the definition of the type of the expression at point.
+Show it in a new window."
   (interactive)
   (ocaml-eglot--find-type-definition 'new))
 
 (defun ocaml-eglot-find-type-definition-in-current-window ()
-  "Find the definition of the type of the expression at point and show it in the current window."
+  "Find the definition of the type of the expression at point.
+Show it in the current window."
   (interactive)
   (ocaml-eglot--find-type-definition 'current))
 
