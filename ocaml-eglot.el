@@ -103,7 +103,7 @@ Otherwise, `merlin-construct' only includes constructors."
 ;; Jump to definition
 
 (defun ocaml-eglot--find-definition (strategy)
-  "Locate the definition at point and jump to it using STRATEGY."
+  "Find the definition at point and jump to it using STRATEGY."
   (let* ((query-result (ocaml-eglot-req--definition))
          (result (ocaml-eglot-util--vec-first-or-nil query-result)))
     (if result
@@ -114,27 +114,24 @@ Otherwise, `merlin-construct' only includes constructors."
       (eglot--error "Not in environment"))))
 
 (defun ocaml-eglot-find-definition ()
-  "Locate the definition identifier at point."
+  "Find the definition identifier at point."
   (interactive)
   (ocaml-eglot--find-definition 'smart))
 
 (defun ocaml-eglot-find-definition-in-new-window ()
-  "Locate the definition of identifier at point.
-Into a new window."
+  "Find the definition identifier at point into a new window."
   (interactive)
   (ocaml-eglot--find-definition 'new))
 
 (defun ocaml-eglot-find-definition-in-current-window ()
-  "Locate the definition of the identifier at point.
-Into the current window)."
+  "Find the definition identifier at point into the current window."
   (interactive)
   (ocaml-eglot--find-definition 'current))
 
 ;; Jump to declaration
 
 (defun ocaml-eglot--find-declaration (strategy)
-  "Locate the declaration at point and jump to it using STRATEGY."
-  ; We do not need a special case for type declaration here.
+  "Find the declaration at point and jump to it using STRATEGY."
   (let* ((query-result (ocaml-eglot-req--declaration))
          (result (ocaml-eglot-util--vec-first-or-nil query-result)))
     (if result
@@ -145,21 +142,47 @@ Into the current window)."
       (eglot--error "Not in environment"))))
 
 (defun ocaml-eglot-find-declaration ()
-  "Locate the identifier declaration at point."
+  "Find the identifier declaration at point."
   (interactive)
   (ocaml-eglot--find-declaration 'smart))
 
 (defun ocaml-eglot-find-declaration-in-new-window ()
-  "Locate the declaration identifier declaration at point.
-Into a new window."
+  "Find the identifier declaration at point into a new window."
   (interactive)
   (ocaml-eglot--find-declaration 'new))
 
 (defun ocaml-eglot-find-declaration-in-current-window ()
-  "Locate the declaration identifier declaration at point.
-Into the current window."
+  "Find the identifier declaration at point into the current window."
   (interactive)
   (ocaml-eglot--find-declaration 'current))
+
+;; Jump type declaration of expression
+
+(defun ocaml-eglot--find-type-definition (strategy)
+  "Find the type definition of the expression at point using STRATEGY."
+  (let* ((query-result (ocaml-eglot-req--type-definition))
+         (result (ocaml-eglot-util--vec-first-or-nil query-result)))
+    (if result
+        (let* ((uri (cl-getf result :uri))
+               (range (cl-getf result :range))
+               (file (eglot--uri-to-path uri)))
+          (ocaml-eglot-util--visit-file strategy (buffer-file-name) file range))
+      (eglot--error "Not in environment"))))
+
+(defun ocaml-eglot-find-type-definition ()
+  "Find the type of the identifier at point."
+  (interactive)
+  (ocaml-eglot--find-type-definition 'smart))
+
+(defun ocaml-eglot-find-type-definition-in-new-window ()
+  "Find the type of the identifier at point into a new window."
+  (interactive)
+  (ocaml-eglot--find-type-definition 'new))
+
+(defun ocaml-eglot-find-type-definition-in-current-window ()
+  "Find the type of the identifier at point into the current window."
+  (interactive)
+  (ocaml-eglot--find-type-definition 'current))
 
 ;; Infer interface
 
