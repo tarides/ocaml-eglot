@@ -27,14 +27,17 @@
 
 ;;; Internal variables
 
-(defvar-local ocaml-eglot-enclosing-types nil
+(defvar-local ocaml-eglot-type-enclosing-types nil
   "Current list of enclosings related to types.")
 
-(defvar-local ocaml-eglot-current-type nil
+(defvar-local ocaml-eglot-type-enclosing-current-type nil
   "Current type for the current enclosing.")
 
-(defvar-local ocaml-eglot-enclosing-offset 0
+(defvar-local ocaml-eglot-type-enclosing-offset 0
   "The offset of the requested enclosings.")
+
+(defvar-local ocaml-eglot-type-enclosing-verbosity nil
+  "The verbosity of the current enclosing request.")
 
 ;;; Key mapping for type enclosing
 
@@ -43,45 +46,60 @@
     (define-key keymap (kbd "C-<up>") #'ocaml-eglot-type-enclosing-grow)
     (define-key keymap (kbd "C-<down>") #'ocaml-eglot-type-enclosing-shrink)
     (define-key keymap (kbd "C-w") #'ocaml-eglot-type-enclosing-copy)
-    keymap))
+    (define-key keymap (kbd "C-c C-t") #'ocaml-eglot-type-enclosing-increase-verbosity)
+    keymap)
+  "Keymap for OCaml-eglot's type enclosing transient mode.")
 
 ;;; Internal functions
 
 (defun ocaml-eglot-type-enclosing-copy ()
   "Copy the type of the current enclosing to the Kill-ring."
   (interactive)
-  (when ocaml-eglot-current-type
-    (eglot--message "Copied `%s' to kill-ring" ocaml-eglot-current-type)
-    (kill-new ocaml-eglot-current-type)))
+  (when ocaml-eglot-type-enclosing-current-type
+    (eglot--message "Copied `%s' to kill-ring"
+                    ocaml-eglot-type-enclosing-current-type)
+    (kill-new ocaml-eglot-type-enclosing-current-type)))
 
 (defun ocaml-eglot-type-enclosing--with-fixed-offset ()
   "Compute the type enclosing for a dedicated offset."
-  (let* ((verbosity nil)
-         (index ocaml-eglot-enclosing-offset)
+  (let* ((verbosity ocaml-eglot-type-enclosing-verbosity)
+         (index ocaml-eglot-type-enclosing-offset)
          (at (ocaml-eglot-util--current-position-or-range))
          (result (ocaml-eglot-req--type-enclosings at index verbosity))
          (type (cl-getf result :type)))
-    (setq ocaml-eglot-current-type type)
+    (setq ocaml-eglot-type-enclosing-current-type type)
+    (setq ocaml-eglot-type-enclosing-verbosity nil)
     (ocaml-eglot-type-enclosing--display type)))
+
+(defun ocaml-eglot-type-enclosing-increase-verbosity ()
+  "Increase the verbosity of the current request."
+  (interactive)
+  (if ocaml-eglot-type-enclosing-verbosity
+      (setq ocaml-eglot-type-enclosing-verbosity
+            (1+ ocaml-eglot-type-enclosing-verbosity))
+    (setq ocaml-eglot-type-enclosing-verbosity 1))
+  (ocaml-eglot-type-enclosing--with-fixed-offset))
 
 (defun ocaml-eglot-type-enclosing-grow ()
   "Growing of the type enclosing."
   (interactive)
-  (when ocaml-eglot-enclosing-types
-    (if (>= ocaml-eglot-enclosing-offset
-            (1- (length ocaml-eglot-enclosing-types)))
-        (setq ocaml-eglot-enclosing-offset 0)
-      (setq ocaml-eglot-enclosing-offset (1+ ocaml-eglot-enclosing-offset)))
+  (when ocaml-eglot-type-enclosing-types
+    (if (>= ocaml-eglot-type-enclosing-offset
+            (1- (length ocaml-eglot-type-enclosing-types)))
+        (setq ocaml-eglot-type-enclosing-offset 0)
+      (setq ocaml-eglot-type-enclosing-offset
+            (1+ ocaml-eglot-type-enclosing-offset)))
     (ocaml-eglot-type-enclosing--with-fixed-offset)))
 
 (defun ocaml-eglot-type-enclosing-shrink ()
   "Shrinking of the type enclosing."
   (interactive)
-  (when ocaml-eglot-enclosing-types
-    (if (<= ocaml-eglot-enclosing-offset 0)
-        (setq ocaml-eglot-enclosing-offset
-              (1- (length ocaml-eglot-enclosing-types)))
-      (setq ocaml-eglot-enclosing-offset (1- ocaml-eglot-enclosing-offset)))
+  (when ocaml-eglot-type-enclosing-types
+    (if (<= ocaml-eglot-type-enclosing-offset 0)
+        (setq ocaml-eglot-type-enclosing-offset
+              (1- (length ocaml-eglot-type-enclosing-types)))
+      (setq ocaml-eglot-type-enclosing-offset
+            (1- ocaml-eglot-type-enclosing-offset)))
     (ocaml-eglot-type-enclosing--with-fixed-offset)))
 
 (defun ocaml-eglot-type-enclosing--type-buffer (type-expr)
@@ -99,8 +117,8 @@
 
 (defun ocaml-eglot-type-enclosing--display (type-expr)
   "Display the type-enclosing for TYPE-EXPR in a dedicated buffer."
-  (let ((current-enclosing (aref ocaml-eglot-enclosing-types
-                                 ocaml-eglot-enclosing-offset)))
+  (let ((current-enclosing (aref ocaml-eglot-type-enclosing-types
+                                 ocaml-eglot-type-enclosing-offset)))
     (ocaml-eglot-type-enclosing--type-buffer type-expr)
     (if (ocaml-eglot-util--text-less-than type-expr 8)
         (message "%s" (with-current-buffer ocaml-eglot-type-buffer-name
@@ -112,9 +130,10 @@
 
 (defun ocaml-eglot-type-enclosing--reset ()
   "Reset local variables defined by the enclosing query."
-  (setq ocaml-eglot-current-type nil)
-  (setq ocaml-eglot-enclosing-types nil)
-  (setq ocaml-eglot-enclosing-offset 0))
+  (setq ocaml-eglot-type-enclosing-current-type nil)
+  (setq ocaml-eglot-type-enclosing-verbosity nil)
+  (setq ocaml-eglot-type-enclosing-types nil)
+  (setq ocaml-eglot-type-enclosing-offset 0))
 
 (defun ocaml-eglot-type-enclosing--call ()
   "Prepare the type-enclosings computation request."
@@ -125,9 +144,9 @@
          (result (ocaml-eglot-req--type-enclosings at index verbosity))
          (type (cl-getf result :type))
          (enclosings (cl-getf result :enclosings)))
-    (setq ocaml-eglot-enclosing-offset index)
-    (setq ocaml-eglot-enclosing-types enclosings)
-    (setq ocaml-eglot-current-type type)
+    (setq ocaml-eglot-type-enclosing-offset index)
+    (setq ocaml-eglot-type-enclosing-types enclosings)
+    (setq ocaml-eglot-type-enclosing-current-type type)
     (ocaml-eglot-type-enclosing--display type)
     (set-transient-map ocaml-eglot-type-enclosing-map t
                        'ocaml-eglot-type-enclosing--reset)))
