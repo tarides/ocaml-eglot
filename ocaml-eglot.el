@@ -1,6 +1,6 @@
 ;;; ocaml-eglot.el --- An OCaml companion for Eglot   -*- coding: utf-8; lexical-binding: t -*-
 
-;; Copyright (C) 2024  The OCaml-eglot Project Contributors
+;; Copyright (C) 2024-2025  The OCaml-eglot Project Contributors
 ;; Licensed under the MIT license.
 
 ;; Author: Xavier Van de Woestyne <xaviervdw@gmail.com>

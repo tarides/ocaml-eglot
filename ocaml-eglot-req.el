@@ -1,6 +1,6 @@
 ;;; ocaml-eglot-req.el --- LSP custom request   -*- coding: utf-8; lexical-binding: t -*-
 
-;; Copyright (C) 2024  Xavier Van de Woestyne
+;; Copyright (C) 2024-2025  Xavier Van de Woestyne
 ;; Licensed under the MIT license.
 
 ;; Author: Xavier Van de Woestyne <xaviervdw@gmail.com>
