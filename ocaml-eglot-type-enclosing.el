@@ -30,6 +30,9 @@
 (defvar-local ocaml-eglot-enclosing-types nil
   "Current list of enclosings related to types.")
 
+(defvar-local ocaml-eglot-current-type nil
+  "Current type for the current enclosing.")
+
 (defvar-local ocaml-eglot-enclosing-offset 0
   "The offset of the requested enclosings.")
 
@@ -39,9 +42,17 @@
   (let ((keymap (make-sparse-keymap)))
     (define-key keymap (kbd "C-<up>") #'ocaml-eglot-type-enclosing-grow)
     (define-key keymap (kbd "C-<down>") #'ocaml-eglot-type-enclosing-shrink)
+    (define-key keymap (kbd "C-w") #'ocaml-eglot-type-enclosing-copy)
     keymap))
 
 ;;; Internal functions
+
+(defun ocaml-eglot-type-enclosing-copy ()
+  "Copy the type of the current enclosing to the Kill-ring."
+  (interactive)
+  (when ocaml-eglot-current-type
+    (eglot--message "Copied `%s' to kill-ring" ocaml-eglot-current-type)
+    (kill-new ocaml-eglot-current-type)))
 
 (defun ocaml-eglot-type-enclosing--with-fixed-offset ()
   "Compute the type enclosing for a dedicated offset."
@@ -50,6 +61,7 @@
          (at (ocaml-eglot-util--current-position-or-range))
          (result (ocaml-eglot-req--type-enclosings at index verbosity))
          (type (cl-getf result :type)))
+    (setq ocaml-eglot-current-type type)
     (ocaml-eglot-type-enclosing--display type)))
 
 (defun ocaml-eglot-type-enclosing-grow ()
@@ -100,6 +112,7 @@
 
 (defun ocaml-eglot-type-enclosing--reset ()
   "Reset local variables defined by the enclosing query."
+  (setq ocaml-eglot-current-type nil)
   (setq ocaml-eglot-enclosing-types nil)
   (setq ocaml-eglot-enclosing-offset 0))
 
@@ -114,11 +127,10 @@
          (enclosings (cl-getf result :enclosings)))
     (setq ocaml-eglot-enclosing-offset index)
     (setq ocaml-eglot-enclosing-types enclosings)
+    (setq ocaml-eglot-current-type type)
     (ocaml-eglot-type-enclosing--display type)
     (set-transient-map ocaml-eglot-type-enclosing-map t
                        'ocaml-eglot-type-enclosing--reset)))
-
-
 
 (provide 'ocaml-eglot-type-enclosing)
 ;;; ocaml-eglot-type-enclosing.el ends here
