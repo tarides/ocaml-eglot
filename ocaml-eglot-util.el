@@ -21,6 +21,17 @@
 
 ;; Generic util
 
+(defun ocaml-eglot-util--text-less-than (text limit)
+  "Return non-nil if TEXT is less than LIMIT."
+  (let ((count 0)
+        (pos   0))
+    (save-match-data
+      (while (and (<= count limit)
+                  (string-match "\n" text pos))
+        (setq pos (match-end 0))
+        (setq count (1+ count))))
+    (<= count limit)))
+
 (defun ocaml-eglot-util--vec-first-or-nil (vec)
   "Return the first element of VEC or nil."
   (when (> (length vec) 0)
@@ -110,6 +121,14 @@
       (list :start start
             :end (ocaml-eglot-util--position-increase-char start "_")))))
 
+(defun ocaml-eglot-util--current-position-or-range ()
+  "Return the current position or a range if the region is active."
+  (if (region-active-p)
+      (let ((beg (eglot--pos-to-lsp-position (region-beginning)))
+            (end (eglot--pos-to-lsp-position (region-end))))
+        `(:start ,beg :end ,end))
+    (eglot--pos-to-lsp-position)))
+
 (defun ocaml-eglot-util--visit-file (strategy current-file new-file range)
   "Visits a referenced document, NEW-FILE at position  start of RANGE.
 The STRATEGY can be `'new' `'current' or `'smart'.  The later opens a
@@ -121,6 +140,16 @@ current window otherwise."
         ((string= current-file new-file) (find-file new-file))
         (t (find-file-other-window new-file)))
   (ocaml-eglot-util--jump-to-range range))
+
+(defun ocaml-eglot-util--highlight-range (range face)
+  "Highlight a given RANGE using a given FACE."
+  (remove-overlays nil nil 'ocaml-eglot-highlight 'highlight)
+  (let* ((beg (eglot--lsp-position-to-point (cl-getf range :start)))
+        (end (eglot--lsp-position-to-point (cl-getf range :end)))
+        (overlay (make-overlay beg end)))
+    (overlay-put overlay 'face face)
+    (overlay-put overlay 'ocaml-eglot-highlight 'highlight)
+    (unwind-protect (sit-for 60) (delete-overlay overlay))))
 
 (provide 'ocaml-eglot-util)
 ;;; ocaml-eglot-util.el ends here
