@@ -69,7 +69,7 @@
          (type (cl-getf result :type)))
     (setq ocaml-eglot-type-enclosing-current-type type)
     (setq ocaml-eglot-type-enclosing-verbosity nil)
-    (ocaml-eglot-type-enclosing--display type)))
+    (ocaml-eglot-type-enclosing--display type t)))
 
 (defun ocaml-eglot-type-enclosing-increase-verbosity ()
   "Increase the verbosity of the current request."
@@ -115,18 +115,20 @@
       (read-only-mode 1)
       (setq default-directory curr-dir))))
 
-(defun ocaml-eglot-type-enclosing--display (type-expr)
-  "Display the type-enclosing for TYPE-EXPR in a dedicated buffer."
-  (let ((current-enclosing (aref ocaml-eglot-type-enclosing-types
-                                 ocaml-eglot-type-enclosing-offset)))
-    (ocaml-eglot-type-enclosing--type-buffer type-expr)
-    (if (ocaml-eglot-util--text-less-than type-expr 8)
-        (message "%s" (with-current-buffer ocaml-eglot-type-buffer-name
-                        (font-lock-fontify-region (point-min) (point-max))
-                        (buffer-string)))
-      (display-buffer ocaml-eglot-type-buffer-name))
-    (ocaml-eglot-util--highlight-range current-enclosing
-                                       'ocaml-eglot-highlight-region-face)))
+(defun ocaml-eglot-type-enclosing--display (type-expr &optional current-enclosing)
+  "Display the type-enclosing for TYPE-EXPR in a dedicated buffer.
+If CURRENT-ENCLOSING is set, the range of the enclosing will be highlighted."
+  (ocaml-eglot-type-enclosing--type-buffer type-expr)
+  (if (ocaml-eglot-util--text-less-than type-expr 8)
+      (message "%s" (with-current-buffer ocaml-eglot-type-buffer-name
+                      (font-lock-fontify-region (point-min) (point-max))
+                      (buffer-string)))
+    (display-buffer ocaml-eglot-type-buffer-name))
+  (when current-enclosing
+    (let ((current-enclosing (aref ocaml-eglot-type-enclosing-types
+                                   ocaml-eglot-type-enclosing-offset)))
+      (ocaml-eglot-util--highlight-range current-enclosing
+                                         'ocaml-eglot-highlight-region-face))))
 
 (defun ocaml-eglot-type-enclosing--reset ()
   "Reset local variables defined by the enclosing query."
@@ -147,7 +149,7 @@
     (setq ocaml-eglot-type-enclosing-offset index)
     (setq ocaml-eglot-type-enclosing-types enclosings)
     (setq ocaml-eglot-type-enclosing-current-type type)
-    (ocaml-eglot-type-enclosing--display type)
+    (ocaml-eglot-type-enclosing--display type t)
     (set-transient-map ocaml-eglot-type-enclosing-map t
                        'ocaml-eglot-type-enclosing--reset)))
 
