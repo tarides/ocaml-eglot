@@ -48,7 +48,10 @@ increases or decreases the enclosings of the expression or verbosity:
 And when a type is displayed, additional commands are possible:
 
 - `ocaml-eglot-type-enclosing-increase-verbosity` (<kbd>C-c</kbd>
-  <kbd>C-t</kbd>): to increase the verbosity of the type observed
+  <kbd>C-t</kbd> or <kbd>C-→</kbd>): to increase the verbosity of the
+  type observed
+- `ocaml-eglot-type-enclosing-decrease-verbosity` (<kbd>C-←</kbd>): to
+  decrease verbosity of the type observed
 - `ocaml-eglot-type-enclosing-grow` (<kbd>C-↑</kbd>): to grow the
   expression
 - `ocaml-eglot-type-enclosing-shrink` (<kbd>C-↓</kbd>): to shrink the
