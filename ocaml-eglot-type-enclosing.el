@@ -47,6 +47,8 @@
     (define-key keymap (kbd "C-<down>") #'ocaml-eglot-type-enclosing-shrink)
     (define-key keymap (kbd "C-w") #'ocaml-eglot-type-enclosing-copy)
     (define-key keymap (kbd "C-c C-t") #'ocaml-eglot-type-enclosing-increase-verbosity)
+    (define-key keymap (kbd "C-<right>") #'ocaml-eglot-type-enclosing-increase-verbosity)
+    (define-key keymap (kbd "C-<left>") #'ocaml-eglot-type-enclosing-decrease-verbosity)
     keymap)
   "Keymap for OCaml-eglot's type enclosing transient mode.")
 
@@ -68,7 +70,6 @@
          (result (ocaml-eglot-req--type-enclosings at index verbosity))
          (type (cl-getf result :type)))
     (setq ocaml-eglot-type-enclosing-current-type type)
-    (setq ocaml-eglot-type-enclosing-verbosity nil)
     (ocaml-eglot-type-enclosing--display type t)))
 
 (defun ocaml-eglot-type-enclosing-increase-verbosity ()
@@ -78,6 +79,18 @@
       (setq ocaml-eglot-type-enclosing-verbosity
             (1+ ocaml-eglot-type-enclosing-verbosity))
     (setq ocaml-eglot-type-enclosing-verbosity 1))
+  (ocaml-eglot-type-enclosing--with-fixed-offset))
+
+(defun ocaml-eglot-type-enclosing-decrease-verbosity ()
+  "Decrease the verbosity of the current request."
+  (interactive)
+  (if ocaml-eglot-type-enclosing-verbosity
+      (progn
+        (setq ocaml-eglot-type-enclosing-verbosity
+              (1- ocaml-eglot-type-enclosing-verbosity))
+        (when (< ocaml-eglot-type-enclosing-verbosity 1)
+          (setq ocaml-eglot-type-enclosing-verbosity nil)))
+    (setq ocaml-eglot-type-enclosing-verbosity nil))
   (ocaml-eglot-type-enclosing--with-fixed-offset))
 
 (defun ocaml-eglot-type-enclosing-grow ()
@@ -124,7 +137,7 @@ If CURRENT-ENCLOSING is set, the range of the enclosing will be highlighted."
                       (font-lock-fontify-region (point-min) (point-max))
                       (buffer-string)))
     (display-buffer ocaml-eglot-type-buffer-name))
-  (when current-enclosing
+  (when (and current-enclosing (> (length ocaml-eglot-type-enclosing-types) 0))
     (let ((current-enclosing (aref ocaml-eglot-type-enclosing-types
                                    ocaml-eglot-type-enclosing-offset)))
       (ocaml-eglot-util--highlight-range current-enclosing
@@ -146,6 +159,7 @@ If CURRENT-ENCLOSING is set, the range of the enclosing will be highlighted."
          (result (ocaml-eglot-req--type-enclosings at index verbosity))
          (type (cl-getf result :type))
          (enclosings (cl-getf result :enclosings)))
+    (setq ocaml-eglot-type-enclosing-verbosity nil)
     (setq ocaml-eglot-type-enclosing-offset index)
     (setq ocaml-eglot-type-enclosing-types enclosings)
     (setq ocaml-eglot-type-enclosing-current-type type)
