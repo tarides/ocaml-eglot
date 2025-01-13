@@ -151,7 +151,7 @@ If CURRENT-ENCLOSING is set, the range of the enclosing will be highlighted."
   (setq ocaml-eglot-type-enclosing-offset 0))
 
 (defun ocaml-eglot-type-enclosing--call ()
-  "Prepare the type-enclosings computation request."
+  "Print the type of the expression under point."
   (ocaml-eglot-type-enclosing--reset)
   (let* ((verbosity nil)
          (index 0)

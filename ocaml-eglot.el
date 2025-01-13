@@ -95,7 +95,7 @@ Otherwise, `merlin-construct' only includes constructors."
 
 (defface ocaml-eglot-highlight-region-face
   '((t (:inherit highlight)))
-  "Face for highlighting a region.")
+  "Face used when highlighting a region.")
 
 ;;; Features
 
@@ -453,7 +453,8 @@ It use the ARG to use local values or not."
 ;; Type Enclosings
 
 (defun ocaml-eglot-type-enclosing ()
-  "A needed documentation."
+  "Print the type of the expression under point (or of the region, if it exists).
+If called repeatedly, increase the verbosity of the type shown."
   (interactive)
   (ocaml-eglot-type-enclosing--call))
 
