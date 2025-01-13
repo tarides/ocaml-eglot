@@ -105,7 +105,7 @@
     (ocaml-eglot-type-enclosing--with-fixed-offset)))
 
 (defun ocaml-eglot-type-enclosing-shrink ()
-  "Shrinking of the type enclosing."
+  "Display the type enclosing of a smaller enclosing if possible."
   (interactive)
   (when ocaml-eglot-type-enclosing-types
     (if (<= ocaml-eglot-type-enclosing-offset 0)

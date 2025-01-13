@@ -40,12 +40,13 @@ navigating through errors:
 
 ### Type Enclosings
 
-`ocaml-eglot` displays the type of expression below the cursor and
-increases or decreases the enclosings of the expression or verbosity:
+In `ocaml-eglot` one can display the type of the expression below the cursor and
+navigate the enclosing nodes while increasing or decreasing verbosity:
 
 - `ocaml-eglot-type-enclosing` (<kbd>C-c</kbd> <kbd>C-t</kbd>)
+Display the type of the selection and start a "type enclosing" session.
 
-And when a type is displayed, additional commands are possible:
+During a "type enclosing" session the following commands are available:
 
 - `ocaml-eglot-type-enclosing-increase-verbosity` (<kbd>C-c</kbd>
   <kbd>C-t</kbd> or <kbd>C-→</kbd>): to increase the verbosity of the
