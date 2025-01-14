@@ -209,7 +209,7 @@ If NEED-CONFIRMATION is set to non-nil, it will prompt a confirmation."
   (ocaml-eglot-util--ensure-interface)
   (let* ((current-uri (ocaml-eglot-util--current-uri))
          (impl-uri (ocaml-eglot--find-alternate-file current-uri)))
-    (if (ocaml-eglot-util--uri-is-loaded impl-uri)
+    (if (ocaml-eglot-util--load-uri impl-uri)
       (when (or (not need-confirmation)
                 (y-or-n-p "Try to generate interface? ") )
         (let ((result (ocaml-eglot-req--infer-intf impl-uri)))
