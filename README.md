@@ -38,6 +38,30 @@ navigating through errors:
 
 ![Error navigation example](media/error-navigation.gif)
 
+### Type Enclosings
+
+In `ocaml-eglot` one can display the type of the expression below the cursor and
+navigate the enclosing nodes while increasing or decreasing verbosity:
+
+- `ocaml-eglot-type-enclosing` (<kbd>C-c</kbd> <kbd>C-t</kbd>)
+Display the type of the selection and start a "type enclosing" session.
+
+During a "type enclosing" session the following commands are available:
+
+- `ocaml-eglot-type-enclosing-increase-verbosity` (<kbd>C-c</kbd>
+  <kbd>C-t</kbd> or <kbd>C-→</kbd>): to increase the verbosity of the
+  type observed
+- `ocaml-eglot-type-enclosing-decrease-verbosity` (<kbd>C-←</kbd>): to
+  decrease verbosity of the type observed
+- `ocaml-eglot-type-enclosing-grow` (<kbd>C-↑</kbd>): to grow the
+  expression
+- `ocaml-eglot-type-enclosing-shrink` (<kbd>C-↓</kbd>): to shrink the
+  expression
+- `ocaml-eglot-type-enclosing-copy` (<kbd>C-w</kbd>): to copy the
+  type expression to the _kill-ring_ (clipboard)
+
+![Type Enclosings example](media/type-enclosing.gif)
+
 ### Jump to definition/declaration
 
 OCaml-eglot provides a shortcut to quickly jump to the definition or

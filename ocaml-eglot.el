@@ -1,6 +1,6 @@
 ;;; ocaml-eglot.el --- An OCaml companion for Eglot   -*- coding: utf-8; lexical-binding: t -*-
 
-;; Copyright (C) 2024  The OCaml-eglot Project Contributors
+;; Copyright (C) 2024-2025  The OCaml-eglot Project Contributors
 ;; Licensed under the MIT license.
 
 ;; Author: Xavier Van de Woestyne <xaviervdw@gmail.com>
@@ -33,10 +33,10 @@
 ;;; Code:
 
 (require 'flymake)
-(require 'xref)
 (require 'cl-lib)
 (require 'ocaml-eglot-util)
 (require 'ocaml-eglot-req)
+(require 'ocaml-eglot-type-enclosing)
 (require 'eglot)
 
 (defgroup ocaml-eglot nil
@@ -92,6 +92,10 @@ Otherwise, `merlin-construct' only includes constructors."
   '((t :inherit font-lock-comment-face))
   "Face describing the doc of values (used for search for example)."
   :group 'ocaml-eglot)
+
+(defface ocaml-eglot-highlight-region-face
+  '((t (:inherit highlight)))
+  "Face used when highlighting a region.")
 
 ;;; Features
 
@@ -446,6 +450,14 @@ It use the ARG to use local values or not."
   (interactive "sIdentifier: ")
   (ocaml-eglot--document-aux identifier))
 
+;; Type Enclosings
+
+(defun ocaml-eglot-type-enclosing ()
+  "Print the type of the expression under point (or of the region, if it exists).
+If called repeatedly, increase the verbosity of the type shown."
+  (interactive)
+  (ocaml-eglot-type-enclosing--call))
+
 ;;; Mode
 
 (defvar ocaml-eglot-map
@@ -456,6 +468,7 @@ It use the ARG to use local values or not."
     (define-key ocaml-eglot-keymap (kbd "C-c C-i") #'ocaml-eglot-find-declaration)
     (define-key ocaml-eglot-keymap (kbd "C-c C-a") #'ocaml-eglot-alternate-file)
     (define-key ocaml-eglot-keymap (kbd "C-c C-d") #'ocaml-eglot-document)
+    (define-key ocaml-eglot-keymap (kbd "C-c C-t") #'ocaml-eglot-type-enclosing)
     ocaml-eglot-keymap)
   "Keymap for OCaml-eglot minor mode.")
 

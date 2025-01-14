@@ -1,6 +1,6 @@
 ;;; ocaml-eglot-req.el --- LSP custom request   -*- coding: utf-8; lexical-binding: t -*-
 
-;; Copyright (C) 2024  Xavier Van de Woestyne
+;; Copyright (C) 2024-2025  Xavier Van de Woestyne
 ;; Licensed under the MIT license.
 
 ;; Author: Xavier Van de Woestyne <xaviervdw@gmail.com>
@@ -95,6 +95,17 @@ A potential IDENTIFIER can be given and MARKUP-KIND can be parametrized."
     (if identifier (append params `(:identifier, identifier))
       params)))
 
+(defun ocaml-eglot-req--TypeEnclosingParams (at index verbosity)
+  "Compute the `TypeEnclosingParams'.
+AT is the range or the position.
+INDEX is the index of the enclosing.
+VERBOSITY is a potential verbosity index."
+  (append (list :textDocument (ocaml-eglot-req--TextDocumentIdentifier))
+          (ocaml-eglot-req--TextDocumentIdentifier)
+          `(:at, at)
+          `(:index, index)
+          `(:verbosity, verbosity)))
+
 ;;; Concrete requests
 
 (defun ocaml-eglot-req--jump ()
@@ -155,6 +166,14 @@ under the cursor.  The MARKUP-KIND can also be configured."
   "Execute the `textDocument/declaration' request for the current point."
   (let ((params (ocaml-eglot-req--TextDocumentPositionParams)))
     (ocaml-eglot-req--send :textDocument/declaration params)))
+
+(defun ocaml-eglot-req--type-enclosings (at index verbosity)
+  "Execute the `ocamllsp/typeEnclosing' request for the current point.
+AT is the range or the position.
+INDEX is the index of the enclosing.
+VERBOSITY is a potential verbosity index."
+  (let ((params (ocaml-eglot-req--TypeEnclosingParams at index verbosity)))
+    (ocaml-eglot-req--send :ocamllsp/typeEnclosing params)))
 
 (provide 'ocaml-eglot-req)
 ;;; ocaml-eglot-req.el ends here
