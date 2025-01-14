@@ -26,6 +26,12 @@
   (when (> (length vec) 0)
     (aref vec 0)))
 
+(defun ocaml-eglot-util--uri-is-loaded (uri)
+  "Check if URI is available for typechecking."
+  (let ((path (eglot--uri-to-path uri)))
+    (and (file-exists-p path)
+         (member path (mapcar #'buffer-file-name (buffer-list))))))
+
 (defun ocaml-eglot-util--replace-region (range content)
   "Replace a LSP region (RANGE) by a given CONTENT."
   (pcase-let ((`(,beg . ,end) (eglot--range-region range)))
