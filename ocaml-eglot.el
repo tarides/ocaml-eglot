@@ -201,19 +201,24 @@ Show it in the current window."
   (let ((uris (ocaml-eglot-req--switch-file uri)))
     (ocaml-eglot-util--vec-first-or-nil uris)))
 
-(defun ocaml-eglot-infer-interface ()
-  "Infer the interface for the current file."
+(defun ocaml-eglot-infer-interface (&optional need-confirmation)
+  "Infer the interface for the current file.
+If NEED-CONFIRMATION is set to non-nil, it will prompt a confirmation."
   (interactive)
   (eglot--server-capable-or-lose :experimental :ocamllsp :handleInferIntf)
   (ocaml-eglot-util--ensure-interface)
   (let* ((current-uri (ocaml-eglot-util--current-uri))
-         (impl-uri (ocaml-eglot--find-alternate-file current-uri))
-         (result (ocaml-eglot-req--infer-intf impl-uri)))
-    (when (or
-           (= (buffer-size) 0)
-           (yes-or-no-p "The buffer is not empty, overwrite it? "))
-      (erase-buffer)
-      (insert result))))
+         (impl-uri (ocaml-eglot--find-alternate-file current-uri)))
+    (if (ocaml-eglot-util--load-uri impl-uri)
+      (when (or (not need-confirmation)
+                (y-or-n-p "Try to generate interface? ") )
+        (let ((result (ocaml-eglot-req--infer-intf impl-uri)))
+          (when (or (= (buffer-size) 0)
+                    (y-or-n-p "The buffer is not empty, overwrite it? "))
+            (erase-buffer)
+            (insert result))))
+      (when (not need-confirmation)
+        (eglot--error "%s is not loaded" impl-uri)))))
 
 ;; Find alternate file `ml<->mli'
 
@@ -234,9 +239,8 @@ Show it in the current window."
   "Hook to try to generate interface on visiting new files.."
   (when (and
          (ocaml-eglot-util--on-interface)
-         (= (buffer-size) 0)
-         (yes-or-no-p "Try to generate interface? "))
-    (call-interactively #'ocaml-eglot-infer-interface)))
+         (= (buffer-size) 0))
+    (ocaml-eglot-infer-interface t )))
 
 ;; Holes
 
