@@ -93,30 +93,29 @@
     (setq ocaml-eglot-type-enclosing-verbosity nil))
   (ocaml-eglot-type-enclosing--with-fixed-offset))
 
+
 (defun ocaml-eglot-type-enclosing-grow ()
   "Growing of the type enclosing."
   (interactive)
   (when ocaml-eglot-type-enclosing-types
-    (if (>= ocaml-eglot-type-enclosing-offset
-            (1- (length ocaml-eglot-type-enclosing-types)))
-        (setq ocaml-eglot-type-enclosing-offset 0)
-      (setq ocaml-eglot-type-enclosing-offset
-            (1+ ocaml-eglot-type-enclosing-offset)))
+    (setq ocaml-eglot-type-enclosing-offset
+          (mod (1+ ocaml-eglot-type-enclosing-offset)
+               (length ocaml-eglot-type-enclosing-types)))
     (ocaml-eglot-type-enclosing--with-fixed-offset)))
 
 (defun ocaml-eglot-type-enclosing-shrink ()
   "Display the type enclosing of a smaller enclosing if possible."
   (interactive)
   (when ocaml-eglot-type-enclosing-types
-    (if (<= ocaml-eglot-type-enclosing-offset 0)
-        (setq ocaml-eglot-type-enclosing-offset
-              (1- (length ocaml-eglot-type-enclosing-types)))
-      (setq ocaml-eglot-type-enclosing-offset
-            (1- ocaml-eglot-type-enclosing-offset)))
+    (setq ocaml-eglot-type-enclosing-offset
+          (mod (1- ocaml-eglot-type-enclosing-offset)
+               (length ocaml-eglot-type-enclosing-types)))
     (ocaml-eglot-type-enclosing--with-fixed-offset)))
 
 (defun ocaml-eglot-type-enclosing--type-buffer (type-expr)
   "Create buffer with content TYPE-EXPR of the enclosing type buffer."
+  ; We store the current major mode to be used in the type buffer for
+  ; syntax highlighting.
   (let ((curr-dir default-directory)
         (current-major-mode major-mode))
     (with-current-buffer (get-buffer-create ocaml-eglot-type-buffer-name)
@@ -159,8 +158,6 @@ If CURRENT-ENCLOSING is set, the range of the enclosing will be highlighted."
          (result (ocaml-eglot-req--type-enclosings at index verbosity))
          (type (cl-getf result :type))
          (enclosings (cl-getf result :enclosings)))
-    (setq ocaml-eglot-type-enclosing-verbosity nil)
-    (setq ocaml-eglot-type-enclosing-offset index)
     (setq ocaml-eglot-type-enclosing-types enclosings)
     (setq ocaml-eglot-type-enclosing-current-type type)
     (ocaml-eglot-type-enclosing--display type t)
