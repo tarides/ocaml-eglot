@@ -84,15 +84,11 @@
 (defun ocaml-eglot-type-enclosing-decrease-verbosity ()
   "Decrease the verbosity of the current request."
   (interactive)
-  (if ocaml-eglot-type-enclosing-verbosity
-      (progn
-        (setq ocaml-eglot-type-enclosing-verbosity
-              (1- ocaml-eglot-type-enclosing-verbosity))
-        (when (< ocaml-eglot-type-enclosing-verbosity 1)
-          (setq ocaml-eglot-type-enclosing-verbosity nil)))
-    (setq ocaml-eglot-type-enclosing-verbosity nil))
+  (when (and ocaml-eglot-type-enclosing-verbosity
+             (> ocaml-eglot-type-enclosing-verbosity 0))
+    (setq ocaml-eglot-type-enclosing-verbosity
+          (1- ocaml-eglot-type-enclosing-verbosity)))
   (ocaml-eglot-type-enclosing--with-fixed-offset))
-
 
 (defun ocaml-eglot-type-enclosing-grow ()
   "Growing of the type enclosing."
@@ -127,19 +123,19 @@
       (read-only-mode 1)
       (setq default-directory curr-dir))))
 
-(defun ocaml-eglot-type-enclosing--display (type-expr &optional current-enclosing)
+(defun ocaml-eglot-type-enclosing--display (type-expr &optional current)
   "Display the type-enclosing for TYPE-EXPR in a dedicated buffer.
-If CURRENT-ENCLOSING is set, the range of the enclosing will be highlighted."
+If CURRENT is set, the range of the enclosing will be highlighted."
   (ocaml-eglot-type-enclosing--type-buffer type-expr)
   (if (ocaml-eglot-util--text-less-than type-expr 8)
       (message "%s" (with-current-buffer ocaml-eglot-type-buffer-name
                       (font-lock-fontify-region (point-min) (point-max))
                       (buffer-string)))
     (display-buffer ocaml-eglot-type-buffer-name))
-  (when (and current-enclosing (> (length ocaml-eglot-type-enclosing-types) 0))
-    (let ((current-enclosing (aref ocaml-eglot-type-enclosing-types
+  (when (and current (> (length ocaml-eglot-type-enclosing-types) 0))
+    (let ((current (aref ocaml-eglot-type-enclosing-types
                                    ocaml-eglot-type-enclosing-offset)))
-      (ocaml-eglot-util--highlight-range current-enclosing
+      (ocaml-eglot-util--highlight-range current
                                          'ocaml-eglot-highlight-region-face))))
 
 (defun ocaml-eglot-type-enclosing--reset ()
