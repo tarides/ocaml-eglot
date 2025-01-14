@@ -36,7 +36,7 @@
 (defvar-local ocaml-eglot-type-enclosing-offset 0
   "The offset of the requested enclosings.")
 
-(defvar-local ocaml-eglot-type-enclosing-verbosity nil
+(defvar-local ocaml-eglot-type-enclosing-verbosity 0
   "The verbosity of the current enclosing request.")
 
 ;;; Key mapping for type enclosing
@@ -75,17 +75,14 @@
 (defun ocaml-eglot-type-enclosing-increase-verbosity ()
   "Increase the verbosity of the current request."
   (interactive)
-  (if ocaml-eglot-type-enclosing-verbosity
-      (setq ocaml-eglot-type-enclosing-verbosity
-            (1+ ocaml-eglot-type-enclosing-verbosity))
-    (setq ocaml-eglot-type-enclosing-verbosity 1))
+  (setq ocaml-eglot-type-enclosing-verbosity
+        (1+ ocaml-eglot-type-enclosing-verbosity))
   (ocaml-eglot-type-enclosing--with-fixed-offset))
 
 (defun ocaml-eglot-type-enclosing-decrease-verbosity ()
   "Decrease the verbosity of the current request."
   (interactive)
-  (when (and ocaml-eglot-type-enclosing-verbosity
-             (> ocaml-eglot-type-enclosing-verbosity 0))
+  (when (> ocaml-eglot-type-enclosing-verbosity 0)
     (setq ocaml-eglot-type-enclosing-verbosity
           (1- ocaml-eglot-type-enclosing-verbosity)))
   (ocaml-eglot-type-enclosing--with-fixed-offset))
@@ -141,15 +138,15 @@ If CURRENT is set, the range of the enclosing will be highlighted."
 (defun ocaml-eglot-type-enclosing--reset ()
   "Reset local variables defined by the enclosing query."
   (setq ocaml-eglot-type-enclosing-current-type nil)
-  (setq ocaml-eglot-type-enclosing-verbosity nil)
+  (setq ocaml-eglot-type-enclosing-verbosity 0)
   (setq ocaml-eglot-type-enclosing-types nil)
   (setq ocaml-eglot-type-enclosing-offset 0))
 
 (defun ocaml-eglot-type-enclosing--call ()
   "Print the type of the expression under point."
   (ocaml-eglot-type-enclosing--reset)
-  (let* ((verbosity nil)
-         (index 0)
+  (let* ((verbosity ocaml-eglot-type-enclosing-verbosity)
+         (index ocaml-eglot-type-enclosing-offset)
          (at (ocaml-eglot-util--current-position-or-range))
          (result (ocaml-eglot-req--type-enclosings at index verbosity))
          (type (cl-getf result :type))
