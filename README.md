@@ -149,7 +149,7 @@ document and interactively substitute them:
 
 ![Construct Example](media/construct.gif)
 
-If the `ocaml-eglot-construct` (<kbd>C-c</kbd> <kbd>\</kbd>) command
+If the `ocaml-eglot-construct` (<kbd>C-c</kbd> <kbd>\\</kbd>) command
 is prefixed by an argument, ie: `C-u M-x ocaml-eglot-construct`, the
 command will also search for valid candidates in the current
 environment:
