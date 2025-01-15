@@ -101,6 +101,17 @@ provided:
 - `ocaml-eglot-find-type-definition-in-new-window`
 - `ocaml-eglot-find-type-definition-in-current-window`
 
+### Find occurences
+
+`ocaml-eglot-occurences` returns all occurrences of the
+identifier under the cursor. To find all occurrences in the entire
+project, it requires an index. This index can be created by running
+`dune build @ocaml-index --watch` when developing.  Requires OCaml
+`5.2` and Dune `3.16.0`. See the
+[announcement](https://discuss.ocaml.org/t/ann-project-wide-occurrences-in-merlin-and-lsp/14847/1).
+
+![Occurences example](media/occurences.gif)
+
 ### Infer Interface
 
 Used to infer the type of an interface file. If the buffer is not

@@ -33,6 +33,7 @@
 ;;; Code:
 
 (require 'flymake)
+(require 'xref)
 (require 'cl-lib)
 (require 'ocaml-eglot-util)
 (require 'ocaml-eglot-req)
@@ -463,6 +464,13 @@ If called repeatedly, increase the verbosity of the type shown."
   "Perform case-analysis at the current point."
   (interactive)
   (ocaml-eglot-req--destruct))
+
+;; Occurences
+
+(defun ocaml-eglot-occurences ()
+  "Find all occurrences of the identifier under the cursor."
+  (interactive)
+  (call-interactively #'xref-find-references))
 
 ;;; Mode
 
