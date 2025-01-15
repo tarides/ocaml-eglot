@@ -175,5 +175,14 @@ VERBOSITY is a potential verbosity index."
   (let ((params (ocaml-eglot-req--TypeEnclosingParams at index verbosity)))
     (ocaml-eglot-req--send :ocamllsp/typeEnclosing params)))
 
+(defun ocaml-eglot-req--call-code-action (action-kind)
+  "Call ACTION-KIND promptly."
+  (eglot-code-actions nil nil action-kind t))
+
+(defun ocaml-eglot-req--destruct ()
+  "Call code-action `destruct' for a given position."
+  (let ((action-kind "destruct (enumerate cases)"))
+    (ocaml-eglot-req--call-code-action action-kind)))
+
 (provide 'ocaml-eglot-req)
 ;;; ocaml-eglot-req.el ends here
