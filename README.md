@@ -149,11 +149,27 @@ document and interactively substitute them:
 
 ![Construct Example](media/construct.gif)
 
-If the `ocaml-eglot-construct` command is prefixed by an argument, ie:
-`C-u M-x ocaml-eglot-construct`, the command will also search for
-valid candidates in the current environment:
+If the `ocaml-eglot-construct` (<kbd>C-c</kbd> <kbd>\</kbd>) command
+is prefixed by an argument, ie: `C-u M-x ocaml-eglot-construct`, the
+command will also search for valid candidates in the current
+environment:
 
 ![Construct with prefix-arg Example](media/construct2.gif)
+
+### Destruct (or case-anlysis)
+
+Destruct, `ocaml-eglot-destruct` (<kbd>C-c</kbd> <kbd>|</kbd>) is a
+powerful feature that allows one to generate and manipulate pattern
+matching expressions. It behaves differently depending on the cursor’s
+context:
+
+- on an expression: it replaces it by a pattern matching over it’s
+  constructors
+- on a wildcard pattern: it will refine it if possible
+- on a pattern of a non-exhaustive matching: it will make the pattern
+  matching exhaustive by adding missing cases
+
+![Destruct Example](media/destruct.gif)
 
 ### Source Browsing
 
