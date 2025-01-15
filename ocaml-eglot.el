@@ -404,8 +404,7 @@ of result (LIMIT)."
 It use the ARG to use local values or not."
   (interactive "P")
   (eglot--server-capable-or-lose :experimental :ocamllsp :handleConstruct)
-  (let* ((_with-local-values (ocaml-eglot--construct-local-values arg))
-         (current-range (ocaml-eglot-util--current-range))
+  (let* ((current-range (ocaml-eglot-util--current-range))
          (start (cl-getf current-range :start))
          (end (cl-getf current-range :end))
          (hole (ocaml-eglot--get-first-hole-in start end)))
@@ -458,6 +457,13 @@ If called repeatedly, increase the verbosity of the type shown."
   (interactive)
   (ocaml-eglot-type-enclosing--call))
 
+;; Case Analysis
+
+(defun ocaml-eglot-destruct ()
+  "Perform case-analysis at the current point."
+  (interactive)
+  (ocaml-eglot-req--destruct))
+
 ;;; Mode
 
 (defvar ocaml-eglot-map
@@ -469,6 +475,8 @@ If called repeatedly, increase the verbosity of the type shown."
     (define-key ocaml-eglot-keymap (kbd "C-c C-a") #'ocaml-eglot-alternate-file)
     (define-key ocaml-eglot-keymap (kbd "C-c C-d") #'ocaml-eglot-document)
     (define-key ocaml-eglot-keymap (kbd "C-c C-t") #'ocaml-eglot-type-enclosing)
+    (define-key ocaml-eglot-keymap (kbd "C-c |") #'ocaml-eglot-destruct)
+    (define-key ocaml-eglot-keymap (kbd "C-c \\") #'ocaml-eglot-construct)
     ocaml-eglot-keymap)
   "Keymap for OCaml-eglot minor mode.")
 
