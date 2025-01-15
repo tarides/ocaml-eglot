@@ -103,9 +103,9 @@ provided:
 
 ### Find occurences
 
-Returns all occurrences using `ocaml-eglot-occurences` of the
+`ocaml-eglot-occurences` returns all occurrences of the
 identifier under the cursor. To find all occurrences in the entire
-project, it requires indexing the project. This can be done by running
+project, it requires an index. This index can be created by running
 `dune build @ocaml-index --watch` when developing.  Requires OCaml
 `5.2` and Dune `3.16.0`. See the
 [announcement](https://discuss.ocaml.org/t/ann-project-wide-occurrences-in-merlin-and-lsp/14847/1).
