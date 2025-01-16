@@ -184,5 +184,22 @@ VERBOSITY is a potential verbosity index."
   (let ((action-kind "destruct (enumerate cases)"))
     (ocaml-eglot-req--call-code-action action-kind)))
 
+(defun ocaml-eglot-req--merlin-call (command argv)
+  "Use tunneling `ocamllsp/merlinCallCompatible'.
+COMMAND is the command of the Merlin Protocol.
+ARGV is the list of arguments."
+  (let ((params (append (ocaml-eglot-req--TextDocumentIdentifier)
+                        `(:command, command)
+                        `(:resultAsSexp, :json-false)
+                        `(:args, argv))))
+    (ocaml-eglot-req--send :ocamllsp/merlinCallCompatible params)))
+
+(defun ocaml-eglot-req--phrase (target)
+  "Compute the beginning of the phrase referenced by TARGET."
+  ; TODO: use a dedicated custom request instead of tunneling
+  (let ((argv (vector "-position" (ocaml-eglot-util-point-as-arg (point))
+                      "-target" target)))
+    (ocaml-eglot-req--merlin-call "phrase" argv)))
+
 (provide 'ocaml-eglot-req)
 ;;; ocaml-eglot-req.el ends here

@@ -326,6 +326,27 @@ If there is no available holes, it returns the first one of HOLES."
           (ocaml-eglot-util--jump-to position)
         (eglot--error "Target not found")))))
 
+(defun ocaml-eglot--phrase (direction)
+  "Move to the next or previous phrase using DIRECTION."
+  (let* ((result (ocaml-eglot-req--phrase direction))
+         (json-result (ocaml-eglot-util--merlin-call-result result))
+         (pos (cl-getf json-result :pos)))
+    (when pos
+      (let* ((line (cl-getf pos :line))
+             (col (cl-getf pos :col))
+             (target (ocaml-eglot-util--point-by-pos line col)))
+        (ocaml-eglot-util--goto-char target)))))
+
+(defun ocaml-eglot-phrase-next ()
+  "Go to the beginning of the next phrase."
+  (interactive)
+  (ocaml-eglot--phrase "next"))
+
+(defun ocaml-eglot-phrase-prev ()
+  "Go to the beginning of the previous phrase."
+  (interactive)
+  (ocaml-eglot--phrase "prev"))
+
 ;; Search by type or polarity
 
 (defun ocaml-eglot--search-as-key (value-name value-type value-doc)
@@ -485,6 +506,8 @@ If called repeatedly, increase the verbosity of the type shown."
     (define-key ocaml-eglot-keymap (kbd "C-c C-t") #'ocaml-eglot-type-enclosing)
     (define-key ocaml-eglot-keymap (kbd "C-c |") #'ocaml-eglot-destruct)
     (define-key ocaml-eglot-keymap (kbd "C-c \\") #'ocaml-eglot-construct)
+    (define-key ocaml-eglot-keymap (kbd "C-c C-p") #'ocaml-eglot-phrase-prev)
+    (define-key ocaml-eglot-keymap (kbd "C-c C-n") #'ocaml-eglot-phrase-next)
     ocaml-eglot-keymap)
   "Keymap for OCaml-eglot minor mode.")
 

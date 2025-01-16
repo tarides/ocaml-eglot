@@ -100,6 +100,10 @@ provided:
 
 - `ocaml-eglot-find-type-definition-in-new-window`
 - `ocaml-eglot-find-type-definition-in-current-window`
+- `ocaml-eglot-phrase-prev` (<kbd>C-c</kbd> <kbd>C-p</kbd>): jump to
+  the beginning of the previous phrase
+- `ocaml-eglot-phrase-next` (<kbd>C-c</kbd> <kbd>C-n</kbd>): jump to
+  the beginning of the next phrase
 
 ### Find occurences
 

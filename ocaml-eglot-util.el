@@ -16,10 +16,18 @@
 
 ;;; Code:
 
+(require 'json)
 (require 'eglot)
 (require 'cl-lib)
 
 ;; Generic util
+
+(defun ocaml-eglot-util--goto-char (target)
+  "Goto the point TARGET."
+  (when (or (< target (point-min))
+            (> target (point-max)))
+    (widen))
+  (goto-char target))
 
 (defun ocaml-eglot-util--text-less-than (text limit)
   "Return non-nil if TEXT is less than LIMIT."
@@ -48,21 +56,44 @@
           (switch-to-buffer buf)
           t)))))
 
+(defun ocaml-eglot-util-point-as-arg (point)
+  "Compute POINT as a valid Merlin position."
+  (save-excursion
+    (save-restriction
+      (widen)
+      (goto-char point)
+      (let ((line (line-number-at-pos))
+            (column (- (position-bytes (point))
+                       (position-bytes (line-beginning-position)))))
+        (format "%d:%d" line column)))))
+
+(defun ocaml-eglot-util--point-by-pos (line col)
+  "Compute LINE and COL as a point."
+  (save-excursion
+    (save-restriction
+      (widen)
+      (goto-char (point-min))
+      (forward-line (1- line))
+      (let* ((offset-l (position-bytes (point)))
+             (offset-c (max 0 col))
+             (target (+ offset-l offset-c)))
+        (byte-to-position target)))))
+
 (defun ocaml-eglot-util--replace-region (range content)
   "Replace a LSP region (RANGE) by a given CONTENT."
   (pcase-let ((`(,beg . ,end) (eglot--range-region range)))
     (delete-region beg end)
-    (goto-char beg)
+    (ocaml-eglot-util--goto-char beg)
     (insert content)))
 
 (defun ocaml-eglot-util--jump-to (position)
   "Move the cursor to a POSITION calculated by LSP."
-  (goto-char (eglot--lsp-position-to-point position)))
+  (ocaml-eglot-util--goto-char (eglot--lsp-position-to-point position)))
 
 (defun ocaml-eglot-util--jump-to-range (range)
   "Move the cursor to the start of a RANGE calculated by LSP."
   (let ((start (cl-getf range :start)))
-    (goto-char (eglot--lsp-position-to-point start))))
+    (ocaml-eglot-util--goto-char (eglot--lsp-position-to-point start))))
 
 (defun ocaml-eglot-util--compare-position (a b)
   "Comparison between two LSP positions, A and B."
@@ -150,6 +181,19 @@ current window otherwise."
     (overlay-put overlay 'face face)
     (overlay-put overlay 'ocaml-eglot-highlight 'highlight)
     (unwind-protect (sit-for 60) (delete-overlay overlay))))
+
+(defun ocaml-eglot-util--as-json (str)
+  "Parse a string STR as a Json object."
+  (json-parse-string str :object-type 'plist))
+
+(defun ocaml-eglot-util--merlin-call-result (result)
+  "Extract the RESULT of a Merlin Call Compatible request."
+  (let* ((result (cl-getf result :result))
+         (json-result (ocaml-eglot-util--as-json result))
+         (result-class (cl-getf json-result :class)))
+    (if (string= result-class "return")
+        (cl-getf json-result :value)
+      (eglot--error "Invalid result class %s" result-class))))
 
 (provide 'ocaml-eglot-util)
 ;;; ocaml-eglot-util.el ends here
