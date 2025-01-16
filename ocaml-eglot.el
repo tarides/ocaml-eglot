@@ -473,11 +473,23 @@ It use the ARG to use local values or not."
 
 ;; Type Enclosings
 
-(defun ocaml-eglot-type-enclosing ()
+(defun ocaml-eglot-type-expression (expression)
+  "Prompt the user for expression EXPRESSION and print its type."
+  (interactive "sExpression: ")
+  (let* ((result (ocaml-eglot-req--type-expression expression))
+         (type-expr (ocaml-eglot-util--merlin-call-result result)))
+    (ocaml-eglot-type-enclosing--display type-expr nil)))
+
+(defun ocaml-eglot-type-enclosing (&optional prefix)
   "Print the type of the expression under point (or of the region, if it exists).
-If called repeatedly, increase the verbosity of the type shown."
-  (interactive)
-  (ocaml-eglot-type-enclosing--call))
+If called repeatedly, increase the verbosity of the type shown.
+if PREFIX is given, prompt the user for expression EXPRESSION
+and print its type."
+  (interactive "P")
+  (if prefix
+      (call-interactively #'ocaml-eglot-type-expression)
+    (ocaml-eglot-type-enclosing--call)))
+
 
 ;; Case Analysis
 

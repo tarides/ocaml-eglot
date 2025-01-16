@@ -196,10 +196,17 @@ ARGV is the list of arguments."
 
 (defun ocaml-eglot-req--phrase (target)
   "Compute the beginning of the phrase referenced by TARGET."
-  ; TODO: use a dedicated custom request instead of tunneling
+  ;; TODO: use a dedicated custom request instead of tunneling
   (let ((argv (vector "-position" (ocaml-eglot-util-point-as-arg (point))
                       "-target" target)))
     (ocaml-eglot-req--merlin-call "phrase" argv)))
+
+(defun ocaml-eglot-req--type-expression (expression)
+  "Get the type of EXPRESSION inside the local context."
+  ;; TODO: use a dedicated custom request instead of tunneling
+  (let ((argv (vector "-position" (ocaml-eglot-util-point-as-arg (point))
+                      "-expression" expression)))
+    (ocaml-eglot-req--merlin-call "type-expression" argv)))
 
 (provide 'ocaml-eglot-req)
 ;;; ocaml-eglot-req.el ends here

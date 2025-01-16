@@ -43,8 +43,8 @@ navigating through errors:
 In `ocaml-eglot` one can display the type of the expression below the cursor and
 navigate the enclosing nodes while increasing or decreasing verbosity:
 
-- `ocaml-eglot-type-enclosing` (<kbd>C-c</kbd> <kbd>C-t</kbd>)
-Display the type of the selection and start a "type enclosing" session.
+- `ocaml-eglot-type-enclosing` (<kbd>C-c</kbd> <kbd>C-t</kbd>):
+display the type of the selection and start a "type enclosing" session.
 
 During a "type enclosing" session the following commands are available:
 
@@ -59,6 +59,12 @@ During a "type enclosing" session the following commands are available:
   expression
 - `ocaml-eglot-type-enclosing-copy` (<kbd>C-w</kbd>): to copy the
   type expression to the _kill-ring_ (clipboard)
+  
+You can also enter an expression in the mini-buffer for which you want
+to display the type:
+  
+- `ocaml-eglot-type-expression` (<kbd>C-u</kbd> <kbd>C-c</kbd> <kbd>C-t</kbd>)
+  
 
 ![Type Enclosings example](media/type-enclosing.gif)
 
