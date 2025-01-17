@@ -25,12 +25,17 @@ user experience as close as possible to that offered by the Emacs mode
 
 `ocaml-eglot` is distributed as a [MELPA
 package](https://melpa.org/#/ocaml-eglot). `ocaml-eglot` is only an
-interface between `eglot` and Emacs, a major mode dedicated to OCaml
-editing must be installed (e.g. [caml-mode](https://melpa.org/#/caml)
-or [tuareg](https://melpa.org/#/tuareg)). Then, for example, you can
-use
+interface between `eglot` (available _out of the box_ since `emacs >=
+29.1`) and Emacs, a major mode dedicated to OCaml editing must be
+installed (e.g. [caml-mode](https://melpa.org/#/caml) or
+[tuareg](https://melpa.org/#/tuareg)). Then, for example, you can use
 [`use-package`](https://www.gnu.org/software/emacs/manual/html_node/use-package/Lisp-Configuration.html)
-to install OCaml-eglot. Here's an example with Tuareg:
+to install OCaml-eglot. You will also need
+`https://ocaml.org/p/ocaml-lsp-server/latest` in the [current
+switch](https://ocaml.org/docs/opam-switch-introduction).
+
+
+Here's an example with Tuareg already installed:
 
 ```scheme
 (use-package ocaml-eglot
@@ -274,7 +279,7 @@ option`:
 |  ❌ | `ocaml-eglot-find-type-definition` | Available in Merlin by configuration |
 | `merlin-locate-ident` |  ❌ |  |
 | `merlin-occurences` |  `ocaml-eglot-occurences` |  |
-| `merlin-project-occurences` |  — | Handle by `ocaml-eglot-occurences`  |
+| `merlin-project-occurences` |  — | Handle by `ocaml-eglot-occurences` (if `ocaml-version  >= 5.2` and need an index, `dune build @ocaml-index`)  |
 | `merlin-iedit-occurrences` |  `ocaml-eglot-rename` |  |
 | `merlin-document` | `ocaml-eglot-document` | also `ocaml-eglot-document-identifier`
 | `merlin-phrase-next` | `ocaml-eglot-phrase-next` | |
