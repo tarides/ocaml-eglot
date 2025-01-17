@@ -157,6 +157,12 @@ project, it requires an index. This index can be created by running
 
 ![Occurences example](media/occurences.gif)
 
+### Renaming
+
+`ocaml-eglot-rename` to rename the symbol under the cursor:
+
+![Rename example](media/rename.gif)
+
 ### Infer Interface
 
 Used to infer the type of an interface file. If the buffer is not
@@ -269,6 +275,7 @@ option`:
 | `merlin-locate-ident` |  ❌ |  |
 | `merlin-occurences` |  `ocaml-eglot-occurences` |  |
 | `merlin-project-occurences` |  — | Handle by `ocaml-eglot-occurences`  |
+| `merlin-iedit-occurrences` |  `ocaml-eglot-rename` |  |
 | `merlin-document` | `ocaml-eglot-document` | also `ocaml-eglot-document-identifier`
 | `merlin-phrase-next` | `ocaml-eglot-phrase-next` | |
 | `merlin-phrase-prev` | `ocaml-eglot-phrase-prev` | |

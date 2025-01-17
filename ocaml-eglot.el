@@ -514,6 +514,11 @@ and print its type."
   (interactive)
   (call-interactively #'xref-find-references))
 
+(defun ocaml-eglot-rename ()
+  "Rename the symbol at point."
+  (interactive)
+  (call-interactively #'eglot-rename))
+
 ;;; Mode
 
 (defvar ocaml-eglot-map
