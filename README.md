@@ -164,7 +164,7 @@ project, it requires an index. This index can be created by running
 
 ### Renaming
 
-`ocaml-eglot-rename` to rename the symbol under the cursor:
+Use `ocaml-eglot-rename` to rename the symbol under the cursor. Starting with OCaml 5.3 it is possible to rename a symbol across multiple files after building an up-to-date index with `dune build @ocaml-index`.
 
 ![Rename example](media/rename.gif)
 
