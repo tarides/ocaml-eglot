@@ -218,3 +218,31 @@ option`:
   (the search type is defined by the input query)
 
 ![Search Example](media/search.gif)
+
+## Comparison of Merlin and OCaml-eglot commands
+
+| `merlin` | `ocaml-eglot` | Note |
+| --- | --- | --- |
+| `merlin-error-check` | ❌ | The functionality is supported by `eglot` diagnostics (via LSP).
+| `merlin-error-next` | `ocaml-eglot-error-next` | |
+| `merlin-error-prev` | `ocaml-eglot-error-prev` | |
+| `merlin-type-enclosing` | `ocaml-eglot-type-enclosing` | |
+| `merlin-type-expr` | `ocaml-eglot-type-expression` | |
+| `merlin-locate` | `ocaml-eglot-find-declaration` | |
+|  ❌ | `ocaml-eglot-find-definition` | |
+|  ❌ | `ocaml-eglot-find-type-definition` | |
+| `merlin-locate-ident` |  ❌ |  |
+| `merlin-occurences` |  `ocaml-eglot-occurences` |  |
+| `merlin-project-occurences` |  ❌ | Handle by `ocaml-eglot-occurences`  |
+| `merlin-document` | `ocaml-eglot-document` | also `ocaml-eglot-document-identifier`
+| `merlin-phrase-next` | `ocaml-eglot-phrase-next` | |
+| `merlin-phrase-prev` | `ocaml-eglot-phrase-prev` | |
+| `merlin-switch-to-ml` | `ocaml-eglot-alternate-file` |  |
+| `merlin-switch-to-mli` | `ocaml-eglot-alternate-file` |  |
+|  ❌ | `ocaml-eglot-infer-interface` | It was supported by `Tuareg` (and a bit ad-hoc) |
+| `merlin-jump` | `ocaml-eglot-jump` | |
+| `merlin-destruct` | `ocaml-eglot-destruct` | |
+| `merlin-construct` | `ocaml-eglot-construct` | |
+| `merlin-next-hole` | `ocaml-eglot-hole-next` | |
+| `merlin-previous-hole` | `ocaml-eglot-hole-prev` | |
+| `merlin-toggle-view-errors` |  ❌ | An `eglot` configuration  |
