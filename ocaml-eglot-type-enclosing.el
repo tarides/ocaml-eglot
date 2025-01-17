@@ -62,22 +62,27 @@
                     ocaml-eglot-type-enclosing-current-type)
     (kill-new ocaml-eglot-type-enclosing-current-type)))
 
-(defun ocaml-eglot-type-enclosing--with-fixed-offset ()
-  "Compute the type enclosing for a dedicated offset."
+(defun ocaml-eglot-type-enclosing--with-fixed-offset (&optional prev-verb)
+  "Compute the type enclosing for a dedicated offset.
+If PREV-VERB is given, the verbosity change ensure that the type is different."
   (let* ((verbosity ocaml-eglot-type-enclosing-verbosity)
          (index ocaml-eglot-type-enclosing-offset)
          (at (ocaml-eglot-util--current-position-or-range))
          (result (ocaml-eglot-req--type-enclosings at index verbosity))
          (type (cl-getf result :type)))
+    (when (and prev-verb
+               (string= type ocaml-eglot-type-enclosing-current-type))
+      (setq ocaml-eglot-type-enclosing-verbosity prev-verb))
     (setq ocaml-eglot-type-enclosing-current-type type)
     (ocaml-eglot-type-enclosing--display type t)))
 
 (defun ocaml-eglot-type-enclosing-increase-verbosity ()
   "Increase the verbosity of the current request."
   (interactive)
-  (setq ocaml-eglot-type-enclosing-verbosity
-        (1+ ocaml-eglot-type-enclosing-verbosity))
-  (ocaml-eglot-type-enclosing--with-fixed-offset))
+  (let ((prev-verbosity ocaml-eglot-type-enclosing-verbosity))
+    (setq ocaml-eglot-type-enclosing-verbosity
+          (1+ ocaml-eglot-type-enclosing-verbosity))
+    (ocaml-eglot-type-enclosing--with-fixed-offset prev-verbosity)))
 
 (defun ocaml-eglot-type-enclosing-decrease-verbosity ()
   "Decrease the verbosity of the current request."

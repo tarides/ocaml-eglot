@@ -1,8 +1,3 @@
-> [!WARNING]
-> `ocaml-eglot` is **highly experimental** and at a very early stage
-> of development. While we're very happy to collect user feedback,
-> **don't overwhelm your OCaml development** environment just yet.
-
 # ocaml-eglot
 
 **`ocaml-eglot`** is a lightweight
@@ -15,12 +10,57 @@ client. This tool specifically caters to the OCaml ecosystem by
 implementing canonical custom requests and commands exposed by the
 [**`ocaml-lsp-server`**](https://github.com/ocaml/ocaml-lsp).
 
+> [!WARNING]
+> `ocaml-eglot` is **experimental** and at an early stage
+> of development. While we're very happy to collect user feedback.
+
 `ocaml-eglot` bridges the gap between generic LSP support and the
 **specific needs of OCaml developers**. Its tight coupling with Eglot
 ensures a lightweight experience without sacrificing the advanced
 features made available by `ocaml-lsp-server`. Its aim is to offer a
 user experience as close as possible to that offered by the Emacs mode
 [Merlin](https://ocaml.github.io/merlin/editor/emacs/).
+
+## Installation
+
+`ocaml-eglot` is distributed as a [MELPA
+package](https://melpa.org/#/ocaml-eglot). `ocaml-eglot` is only an
+interface between `eglot` (available _out of the box_ since `emacs >=
+29.1`) and Emacs, a major mode dedicated to OCaml editing must be
+installed (e.g. [caml-mode](https://melpa.org/#/caml) or
+[tuareg](https://melpa.org/#/tuareg)). Then, for example, you can use
+[`use-package`](https://www.gnu.org/software/emacs/manual/html_node/use-package/Lisp-Configuration.html)
+to install OCaml-eglot. You will also need
+`https://ocaml.org/p/ocaml-lsp-server/latest` in the [current
+switch](https://ocaml.org/docs/opam-switch-introduction).
+
+
+Here's an example with Tuareg already installed:
+
+```scheme
+(use-package ocaml-eglot
+  :ensure t
+  :after tuareg
+  :hook
+  (tuareg-mode . ocaml-eglot)
+  (ocaml-eglot . eglot-ensure))
+```
+
+### Activating `format-on-save`
+
+Eglot provides a hook to format the buffer on saving:
+
+```diff
+ (use-package ocaml-eglot
+   :ensure t
+   :after tuareg
+   :hook
+   (tuareg-mode . ocaml-eglot)
+-  (ocaml-eglot . eglot-ensure))
++  (ocaml-eglot . eglot-ensure)
++  :config
++  (add-hook #'after-save-hook #'eglot-format))
+```
 
 ## Features
 
@@ -122,6 +162,12 @@ project, it requires an index. This index can be created by running
 
 ![Occurences example](media/occurences.gif)
 
+### Renaming
+
+Use `ocaml-eglot-rename` to rename the symbol under the cursor. Starting with OCaml 5.3 it is possible to rename a symbol across multiple files after building an up-to-date index with `dune build @ocaml-index`.
+
+![Rename example](media/rename.gif)
+
 ### Infer Interface
 
 Used to infer the type of an interface file. If the buffer is not
@@ -218,3 +264,32 @@ option`:
   (the search type is defined by the input query)
 
 ![Search Example](media/search.gif)
+
+## Comparison of Merlin and OCaml-eglot commands
+
+| `merlin`                    | `ocaml-eglot`                      | Note                                                                                                         |
+|-----------------------------|------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| `merlin-error-check`        | —                                  | The functionality is supported by `eglot` diagnostics (via LSP).                                             |
+| `merlin-error-next`         | `ocaml-eglot-error-next`           |                                                                                                              |
+| `merlin-error-prev`         | `ocaml-eglot-error-prev`           |                                                                                                              |
+| `merlin-type-enclosing`     | `ocaml-eglot-type-enclosing`       |                                                                                                              |
+| `merlin-type-expr`          | `ocaml-eglot-type-expression`      |                                                                                                              |
+| `merlin-locate`             | `ocaml-eglot-find-declaration`     |                                                                                                              |
+|  —                          | `ocaml-eglot-find-definition`      | Available in Merlin by configuration                                                                         |
+| ❌                          | `ocaml-eglot-find-type-definition` |                                                                          |
+| `merlin-locate-ident`       | ❌                                 |                                                                                                              |
+| `merlin-occurences`         | `ocaml-eglot-occurences`           |                                                                                                              |
+| `merlin-project-occurences` | —                                  | Handle by `ocaml-eglot-occurences` (if `ocaml-version  >= 5.2` and need an index, `dune build @ocaml-index`) |
+| `merlin-iedit-occurrences`  | `ocaml-eglot-rename`               |                                                                                                              |
+| `merlin-document`           | `ocaml-eglot-document`             | also `ocaml-eglot-document-identifier`                                                                       |
+| `merlin-phrase-next`        | `ocaml-eglot-phrase-next`          |                                                                                                              |
+| `merlin-phrase-prev`        | `ocaml-eglot-phrase-prev`          |                                                                                                              |
+| `merlin-switch-to-ml`       | `ocaml-eglot-alternate-file`       |                                                                                                              |
+| `merlin-switch-to-mli`      | `ocaml-eglot-alternate-file`       |                                                                                                              |
+| ❌                          | `ocaml-eglot-infer-interface`      | It was supported by `Tuareg` (and a bit ad-hoc)                                                              |
+| `merlin-jump`               | `ocaml-eglot-jump`                 |                                                                                                              |
+| `merlin-destruct`           | `ocaml-eglot-destruct`             |                                                                                                              |
+| `merlin-construct`          | `ocaml-eglot-construct`            |                                                                                                              |
+| `merlin-next-hole`          | `ocaml-eglot-hole-next`            |                                                                                                              |
+| `merlin-previous-hole`      | `ocaml-eglot-hole-prev`            |                                                                                                              |
+| `merlin-toggle-view-errors` | —                                  | An `eglot` configuration                                                                                     |
