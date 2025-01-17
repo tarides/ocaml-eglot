@@ -11,7 +11,7 @@ implementing canonical custom requests and commands exposed by the
 [**`ocaml-lsp-server`**](https://github.com/ocaml/ocaml-lsp).
 
 > [!WARNING]
-> `ocaml-eglot` is **highly experimental** and at a very early stage
+> `ocaml-eglot` is **experimental** and at an early stage
 > of development. While we're very happy to collect user feedback.
 
 `ocaml-eglot` bridges the gap between generic LSP support and the

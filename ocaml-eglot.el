@@ -389,7 +389,7 @@ KEY-COMPLETABLE define the current value to be selected."
 
 (defun ocaml-eglot--search (query limit key)
   "Search a value using his type (or polarity) by a QUERY.
-the universal prefix argument can be used to change the maximim number
+the universal prefix argument can be used to change the maximum number
 of result (LIMIT).  KEY define the current value to be selected."
   (eglot--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
   (let* ((limit (or(if (> limit 1) limit nil)
