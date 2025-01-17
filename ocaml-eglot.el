@@ -362,13 +362,14 @@ If there is no available holes, it returns the first one of HOLES."
          (line (split-string doc "[\r\n]+")))
     (car line)))
 
-(defun ocaml-eglot--search-to-completion (entries)
-  "Transforms a list of ENTRIES into a search candidate (autocomplete)."
+(defun ocaml-eglot--search-to-completion (entries key-completable)
+  "Transforms a list of ENTRIES into a search candidate (autocomplete).
+KEY-COMPLETABLE define the current value to be selected."
   (mapcar
    (lambda (entry)
      (let* ((value-name (cl-getf entry :name))
             (value-type (cl-getf entry :typ))
-            (value-hole (cl-getf entry :constructible))
+            (value-hole (cl-getf entry key-completable))
             (value-doc (ocaml-eglot--search-as-doc (cl-getf entry :doc)))
             (key (ocaml-eglot--search-as-key value-name value-type value-doc)))
        (cons key value-hole)))
@@ -386,6 +387,26 @@ If there is no available holes, it returns the first one of HOLES."
 		   (cycle-sort-function . identity))
       (complete-with-action action choices string pred))))
 
+(defun ocaml-eglot--search (query limit key)
+  "Search a value using his type (or polarity) by a QUERY.
+the universal prefix argument can be used to change the maximim number
+of result (LIMIT).  KEY define the current value to be selected."
+  (eglot--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
+  (let* ((limit (or(if (> limit 1) limit nil)
+                   ocaml-eglot-type-search-limit 25))
+         (with-doc (or ocaml-eglot-type-search-include-doc :json-false))
+         ;; We use plaintext because the result of the documentation may
+         ;; be truncated
+         (entries (ocaml-eglot-req--search query limit with-doc "plaintext"))
+         (choices (ocaml-eglot--search-to-completion entries key))
+         (chosen  (ocaml-eglot--search-completion
+                   choices
+                   (completing-read
+                    "Candidates: "
+                    (ocaml-eglot--search-complete-sort choices)
+                    nil nil nil t))))
+    chosen))
+
 (defun ocaml-eglot-search (query &optional limit)
   "Search a value using his type (or polarity) by a QUERY.
 the universal prefix argument can be used to change the maximim number
@@ -393,19 +414,7 @@ of result (LIMIT)."
   (interactive "sSearch query: \np")
   (eglot--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
   (let* ((start (eglot--pos-to-lsp-position))
-         (limit (or(if (> limit 1) limit nil)
-                   ocaml-eglot-type-search-limit 25))
-         (with-doc (or ocaml-eglot-type-search-include-doc :json-false))
-         ;; We use plaintext because the result of the documentation may
-         ;; be truncated
-         (entries (ocaml-eglot-req--search query limit with-doc "plaintext"))
-         (choices (ocaml-eglot--search-to-completion entries))
-         (chosen  (ocaml-eglot--search-completion
-                   choices
-                   (completing-read
-                    "Candidates: "
-                    (ocaml-eglot--search-complete-sort choices)
-                    nil nil nil t)))
+         (chosen (ocaml-eglot--search query limit :constructible))
          (result (concat "(" chosen ")"))
          (end (ocaml-eglot-util--position-increase-char start result)))
     (when (region-active-p)
