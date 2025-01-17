@@ -1,8 +1,3 @@
-> [!WARNING]
-> `ocaml-eglot` is **highly experimental** and at a very early stage
-> of development. While we're very happy to collect user feedback,
-> **don't overwhelm your OCaml development** environment just yet.
-
 # ocaml-eglot
 
 **`ocaml-eglot`** is a lightweight
@@ -15,12 +10,52 @@ client. This tool specifically caters to the OCaml ecosystem by
 implementing canonical custom requests and commands exposed by the
 [**`ocaml-lsp-server`**](https://github.com/ocaml/ocaml-lsp).
 
+> [!WARNING]
+> `ocaml-eglot` is **highly experimental** and at a very early stage
+> of development. While we're very happy to collect user feedback.
+
 `ocaml-eglot` bridges the gap between generic LSP support and the
 **specific needs of OCaml developers**. Its tight coupling with Eglot
 ensures a lightweight experience without sacrificing the advanced
 features made available by `ocaml-lsp-server`. Its aim is to offer a
 user experience as close as possible to that offered by the Emacs mode
 [Merlin](https://ocaml.github.io/merlin/editor/emacs/).
+
+## Installation
+
+`ocaml-eglot` is distributed as a [MELPA
+package](https://melpa.org/#/ocaml-eglot). `ocaml-eglot` is only an
+interface between `eglot` and Emacs, a major mode dedicated to OCaml
+editing must be installed (e.g. [caml-mode](https://melpa.org/#/caml)
+or [tuareg](https://melpa.org/#/tuareg)). Then, for example, you can
+use
+[`use-package`](https://www.gnu.org/software/emacs/manual/html_node/use-package/Lisp-Configuration.html)
+to install OCaml-eglot. Here's an example with Tuareg:
+
+```scheme
+(use-package ocaml-eglot
+  :ensure t
+  :after tuareg
+  :hook
+  (tuareg-mode . ocaml-eglot)
+  (ocaml-eglot . eglot-ensure))
+```
+
+### Activating `format-on-save`
+
+Eglot provides a hook to format the buffer on saving:
+
+```diff
+ (use-package ocaml-eglot
+   :ensure t
+   :after tuareg
+   :hook
+   (tuareg-mode . ocaml-eglot)
+-  (ocaml-eglot . eglot-ensure))
++  (ocaml-eglot . eglot-ensure)
++  :config
++  (add-hook #'after-save-hook #'eglot-format))
+```
 
 ## Features
 
