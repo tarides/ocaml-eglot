@@ -258,17 +258,17 @@ option`:
 
 | `merlin` | `ocaml-eglot` | Note |
 | --- | --- | --- |
-| `merlin-error-check` | ❌ | The functionality is supported by `eglot` diagnostics (via LSP).
+| `merlin-error-check` | — | The functionality is supported by `eglot` diagnostics (via LSP).
 | `merlin-error-next` | `ocaml-eglot-error-next` | |
 | `merlin-error-prev` | `ocaml-eglot-error-prev` | |
 | `merlin-type-enclosing` | `ocaml-eglot-type-enclosing` | |
 | `merlin-type-expr` | `ocaml-eglot-type-expression` | |
 | `merlin-locate` | `ocaml-eglot-find-declaration` | |
-|  ❌ | `ocaml-eglot-find-definition` | |
-|  ❌ | `ocaml-eglot-find-type-definition` | |
+|  ❌ | `ocaml-eglot-find-definition` | Available in Merlin by configuration |
+|  ❌ | `ocaml-eglot-find-type-definition` | Available in Merlin by configuration |
 | `merlin-locate-ident` |  ❌ |  |
 | `merlin-occurences` |  `ocaml-eglot-occurences` |  |
-| `merlin-project-occurences` |  ❌ | Handle by `ocaml-eglot-occurences`  |
+| `merlin-project-occurences` |  — | Handle by `ocaml-eglot-occurences`  |
 | `merlin-document` | `ocaml-eglot-document` | also `ocaml-eglot-document-identifier`
 | `merlin-phrase-next` | `ocaml-eglot-phrase-next` | |
 | `merlin-phrase-prev` | `ocaml-eglot-phrase-prev` | |
@@ -280,4 +280,4 @@ option`:
 | `merlin-construct` | `ocaml-eglot-construct` | |
 | `merlin-next-hole` | `ocaml-eglot-hole-next` | |
 | `merlin-previous-hole` | `ocaml-eglot-hole-prev` | |
-| `merlin-toggle-view-errors` |  ❌ | An `eglot` configuration  |
+| `merlin-toggle-view-errors` |  — | An `eglot` configuration  |
