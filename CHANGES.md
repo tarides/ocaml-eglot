@@ -1,3 +1,10 @@
+ocaml-eglot unreleased
+=================
+
+- Improve the behaviour of construct
+  ([#24](https://github.com/tarides/ocaml-eglot/issues/24) fixes
+  [#23](https://github.com/tarides/ocaml-eglot/issues/23))
+
 ocaml-eglot 1.0.0
 =================
 Fri Jan 17 04:50:35 PM CET 2025
