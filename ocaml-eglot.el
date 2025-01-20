@@ -463,13 +463,13 @@ It use the ARG to use local values or not."
          (hole (ocaml-eglot--get-first-hole-in start end)))
     (if hole
         (ocaml-eglot--construct-with-hole arg hole)
-      (if (not (equal (symbol-at-point) '_))
-          (progn (save-excursion (insert "_"))
-                 (let ((hole (ocaml-eglot--get-first-hole-in start end)))
-                   (if (not hole)
-                       (progn (delete-char 1)
-                              (eglot--error "Not a hole"))
-                     (ocaml-eglot--construct-with-hole arg hole))))))))
+      (when (not (equal (symbol-at-point) '_))
+        (save-excursion (insert "_"))
+        (let ((hole (ocaml-eglot--get-first-hole-in start end)))
+          (if (not hole)
+              (progn (delete-char 1)
+                     (eglot--error "Not a hole"))
+            (ocaml-eglot--construct-with-hole arg hole)))))))
 
 ;; Get Documentation
 
