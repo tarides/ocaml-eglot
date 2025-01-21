@@ -1,4 +1,4 @@
-# ocaml-eglot
+# OCaml-eglot
 
 **`ocaml-eglot`** is a lightweight
 [Emacs](https://www.gnu.org/software/emacs/) **minor mode** designed

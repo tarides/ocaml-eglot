@@ -1,3 +1,8 @@
+ocaml-eglot unreleased
+======================
+
+- Made the mode-line "lighter" more conventional ([#26](https://github.com/tarides/ocaml-eglot/pull/26))
+
 ocaml-eglot 1.0.0
 =================
 Fri Jan 17 04:50:35 PM CET 2025
