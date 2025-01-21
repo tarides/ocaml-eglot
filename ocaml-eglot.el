@@ -543,7 +543,7 @@ and print its type."
   "Minor mode for interacting with `ocaml-lsp-server' using `eglot' as a client.
 `ocaml-eglot' provides standard implementations of the various custom-requests
  exposed by `ocaml-lsp-server'."
-  :lighter " ocaml-eglot"
+  :lighter " OCaml-eglot"
   :keymap ocaml-eglot-map
   :group 'ocaml-eglot
   (add-hook 'find-file-hook #'ocaml-eglot--file-hook))
