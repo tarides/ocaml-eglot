@@ -42,7 +42,7 @@
 
 (defun ocaml-eglot-util--vec-first-or-nil (vec)
   "Return the first element of VEC or nil."
-  (when (> (length vec) 0)
+  (when (not (null vec))
     (aref vec 0)))
 
 (defun ocaml-eglot-util--load-uri (uri)

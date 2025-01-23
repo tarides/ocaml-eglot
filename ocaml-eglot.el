@@ -446,7 +446,7 @@ It use the ARG to use local values or not."
              (result (ocaml-eglot-req--construct hole-start 1 with-local-value))
              (range (cl-getf result :position))
              (suggestions (append (cl-getf result :result) nil)))
-        (when (= (length suggestions) 0)
+        (when (null suggestions)
           (eglot--error "No constructors for this hole"))
         (cl-labels
             ((insert-construct-choice (subst)
