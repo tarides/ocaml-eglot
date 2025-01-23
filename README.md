@@ -59,7 +59,9 @@ Eglot provides a hook to format the buffer on saving:
 -  (ocaml-eglot . eglot-ensure))
 +  (ocaml-eglot . eglot-ensure)
 +  :config
-+  (add-hook #'after-save-hook #'eglot-format))
++  (add-hook #'ocaml-eglot-hook
++            (lambda ()
++              (add-hook #'before-save-hook #'eglot-format nil t))))
 ```
 
 ## Features
