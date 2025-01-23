@@ -255,7 +255,7 @@ If NEED-CONFIRMATION is set to non-nil, it will prompt a confirmation."
 
 (defun ocaml-eglot--first-hole-aux (holes pos comparison)
   "Return the first hole of the list HOLES since a POS using COMPARISON."
-  (when (or holes (> 0 (length holes)))
+  (when (or holes (not (null holes)))
     (let* ((hd (car holes))
            (tl (cdr holes))
            (h-start (cl-getf hd :start))
