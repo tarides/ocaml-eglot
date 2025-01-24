@@ -134,7 +134,7 @@ If CURRENT is set, the range of the enclosing will be highlighted."
                       (font-lock-fontify-region (point-min) (point-max))
                       (buffer-string)))
     (display-buffer ocaml-eglot-type-buffer-name))
-  (when (and current (not (null ocaml-eglot-type-enclosing-types)))
+  (when (and current (not (equal [] ocaml-eglot-type-enclosing-types)))
     (let ((current (aref ocaml-eglot-type-enclosing-types
                                    ocaml-eglot-type-enclosing-offset)))
       (ocaml-eglot-util--highlight-range current

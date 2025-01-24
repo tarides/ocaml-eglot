@@ -22,10 +22,6 @@
 
 ;; Generic util
 
-(defun ocaml-eglot-util--empty-p (value)
-  "Check if a list or a vector is empty."
-  (or (null value) (equal value [])))
-
 (defun ocaml-eglot-util--goto-char (target)
   "Goto the point TARGET."
   (when (or (< target (point-min))
@@ -46,7 +42,7 @@
 
 (defun ocaml-eglot-util--vec-first-or-nil (vec)
   "Return the first element of VEC or nil."
-  (when (not (ocaml-eglot-util--empty-p vec))
+  (when (not (equal vec []))
     (aref vec 0)))
 
 (defun ocaml-eglot-util--load-uri (uri)

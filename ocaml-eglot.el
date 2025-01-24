@@ -255,7 +255,7 @@ If NEED-CONFIRMATION is set to non-nil, it will prompt a confirmation."
 
 (defun ocaml-eglot--first-hole-aux (holes pos comparison)
   "Return the first hole of the list HOLES since a POS using COMPARISON."
-  (when (or holes (not (null holes)))
+  (when (or holes (not (equal [] holes)))
     (let* ((hd (car holes))
            (tl (cdr holes))
            (h-start (cl-getf hd :start))
@@ -446,7 +446,7 @@ It use the ARG to use local values or not."
              (result (ocaml-eglot-req--construct hole-start 1 with-local-value))
              (range (cl-getf result :position))
              (suggestions (append (cl-getf result :result) nil)))
-        (when (null suggestions)
+        (when (equal suggestions [])
           (eglot--error "No constructors for this hole"))
         (cl-labels
             ((insert-construct-choice (subst)
