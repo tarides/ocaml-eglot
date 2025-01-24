@@ -1,6 +1,7 @@
 ocaml-eglot unreleased
 ======================
 
+- Use a more efficient way to ensure that a vector is empty ([#27](https://github.com/tarides/ocaml-eglot/pull/27))
 - Made the mode-line "lighter" more conventional ([#26](https://github.com/tarides/ocaml-eglot/pull/26))
 
 ocaml-eglot 1.0.0
