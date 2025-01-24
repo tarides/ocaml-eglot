@@ -17,6 +17,13 @@
   "Test for ocaml-eglot-util."
   :group 'test)
 
+(ert-deftest empty-p-illustration-test ()
+  "Test for illustrating `ocaml-eglot-util--empty-p' behaviour."
+  (should-not (ocaml-eglot-util--empty-p [1 2 3 4]))
+  ;; (should-not (ocaml-eglot-util--empty-p [1]))
+  ;; (should (ocaml-eglot-util--empty-p []))
+  )
+
 (ert-deftest vec-first-or-nil-test ()
   "Test for `ocaml-eglot-util--vec-first-or-nil'."
   (should-not (ocaml-eglot-util--vec-first-or-nil []))
