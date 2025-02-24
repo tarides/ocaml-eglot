@@ -1,6 +1,6 @@
 # Space-separated list of the dependencies of your project (include
 # package-lint and/or buttercup if you want makel to use these tools):
-ELPA_DEPENDENCIES=package-lint,flycheck
+ELPA_DEPENDENCIES=package-lint flycheck
 
 # List of package archives to download above dependencies
 # from. Available archives are: gnu (aka elpa), elpa-devel, nongnu,
