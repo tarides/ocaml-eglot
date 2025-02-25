@@ -33,6 +33,7 @@
 ;;; Code:
 
 (require 'flymake)
+(require 'flycheck)
 (require 'xref)
 (require 'cl-lib)
 (require 'ocaml-eglot-util)
@@ -77,6 +78,13 @@ Otherwise, `merlin-construct' only includes constructors."
                  (const :tag "Always open in a new window" new)
                  (const :tag "Always open in the current window" current)))
 
+(defcustom ocaml-eglot-syntax-checker 'flymake
+  "Defines the syntax checker to use."
+  :group 'ocaml-eglot
+  :type '(choice
+          (const :tag "Use flycheck" flycheck)
+          (const :tag "Use flymake" flymake)))
+
 ;;; Faces
 
 (defface ocaml-eglot-value-name-face
@@ -105,12 +113,16 @@ Otherwise, `merlin-construct' only includes constructors."
 (defun ocaml-eglot-error-next ()
   "Jump to the next error."
   (interactive)
-  (call-interactively #'flymake-goto-next-error))
+  (pcase ocaml-eglot-syntax-checker
+    ('flymake (call-interactively #'flymake-goto-next-error))
+    ('flycheck (call-interactively #'flycheck-next-error))))
 
 (defun ocaml-eglot-error-prev ()
   "Jump to the previous error."
   (interactive)
-  (call-interactively #'flymake-goto-prev-error))
+  (pcase ocaml-eglot-syntax-checker
+    ('flymake (call-interactively #'flymake-goto-prev-error))
+    ('flycheck (call-interactively #'flycheck-previous-error))))
 
 ;; Jump to definition
 
@@ -536,7 +548,6 @@ and print its type."
     (define-key ocaml-eglot-keymap (kbd "C-c C-n") #'ocaml-eglot-phrase-next)
     ocaml-eglot-keymap)
   "Keymap for OCaml-eglot minor mode.")
-
 
 ;;;###autoload
 (define-minor-mode ocaml-eglot
