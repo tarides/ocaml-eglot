@@ -33,7 +33,7 @@
 ;;; Code:
 
 (require 'flymake)
-(require 'flycheck)
+(require 'flycheck nil 'noerror)
 (require 'xref)
 (require 'cl-lib)
 (require 'ocaml-eglot-util)
