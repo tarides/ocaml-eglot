@@ -517,7 +517,7 @@ and print its type."
 (defun ocaml-eglot-destruct ()
   "Perform case-analysis at the current point."
   (interactive)
-  (ocaml-eglot-req--destruct))
+  (ocaml-eglot-req--destruct (point)))
 
 ;; Occurences
 
