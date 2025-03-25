@@ -34,6 +34,7 @@
 
 (require 'flymake)
 (require 'flycheck nil 'noerror)
+(require 'flycheck-eglot nil 'noerror)
 (require 'xref)
 (require 'cl-lib)
 (require 'ocaml-eglot-util)
@@ -81,9 +82,18 @@ Otherwise, `merlin-construct' only includes constructors."
 (defcustom ocaml-eglot-syntax-checker 'flymake
   "Defines the syntax checker to use."
   :group 'ocaml-eglot
-  :type '(choice
-          (const :tag "Use flycheck" flycheck)
-          (const :tag "Use flymake" flymake)))
+  :type `(choice
+          (const :tag "Use Flymake" flymake)
+          ,@(when (and (featurep 'flycheck)
+                       (featurep 'flycheck-eglot))
+              '((const :tag "Use Flycheck" flycheck)))))
+
+;; (defcustom ocaml-eglot-syntax-checker 'flymake
+;;   "Defines the syntax checker to use."
+;;   :group 'ocaml-eglot
+;;   :type '(choice
+;;           (const :tag "Use flycheck" flycheck)
+;;           (const :tag "Use flymake" flymake)))
 
 ;;; Faces
 
@@ -110,19 +120,25 @@ Otherwise, `merlin-construct' only includes constructors."
 
 ;; Jump to errors
 
+(defun ocaml-eglot--invalid-syntax-checker ()
+  "Error when trying to trigger an invalid syntax checker."
+  (error "Unknown syntax checker: %s" ocaml-eglot-syntax-checker))
+
 (defun ocaml-eglot-error-next ()
   "Jump to the next error."
   (interactive)
   (pcase ocaml-eglot-syntax-checker
     ('flymake (call-interactively #'flymake-goto-next-error))
-    ('flycheck (call-interactively #'flycheck-next-error))))
+    ('flycheck (call-interactively #'flycheck-next-error))
+    (_ (ocaml-eglot--invalid-syntax-checker))))
 
 (defun ocaml-eglot-error-prev ()
   "Jump to the previous error."
   (interactive)
   (pcase ocaml-eglot-syntax-checker
     ('flymake (call-interactively #'flymake-goto-prev-error))
-    ('flycheck (call-interactively #'flycheck-previous-error))))
+    ('flycheck (call-interactively #'flycheck-previous-error))
+    (_ (ocaml-eglot--invalid-syntax-checker))))
 
 ;; Jump to definition
 
@@ -552,7 +568,7 @@ and print its type."
 ;;;###autoload
 (define-minor-mode ocaml-eglot
   "Minor mode for interacting with `ocaml-lsp-server' using `eglot' as a client.
-`ocaml-eglot' provides standard implementations of the various custom-requests
+OCaml Eglot provides standard implementations of the various custom-requests
  exposed by `ocaml-lsp-server'."
   :lighter " OCaml-eglot"
   :keymap ocaml-eglot-map
