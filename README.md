@@ -37,7 +37,7 @@ switch](https://ocaml.org/docs/opam-switch-introduction).
 
 Here's an example with Tuareg already installed:
 
-```scheme
+```elisp
 (use-package ocaml-eglot
   :ensure t
   :after tuareg
@@ -70,6 +70,10 @@ package. If you have `flycheck-eglot` installed, you can change your
 configuration in this way:
 
 ```diff
++ (use-package flycheck-eglot
++  :ensure t
++  :after (flycheck eglot))
+
  (use-package ocaml-eglot
    :ensure t
    :after tuareg
