@@ -45,9 +45,24 @@
   (when (not (equal vec []))
     (aref vec 0)))
 
+(defun ocaml-eglot-util--uri-to-path (uri)
+  "Convert an URI into an Emacs path."
+  (if (fboundp 'eglot-uri-to-path)
+      (eglot-uri-to-path uri)
+    ;; Before Emacs 30
+    (with-no-warnings (eglot--uri-to-path uri))))
+
+(defun ocaml-eglot-util--range-region (range &optional markers)
+  "Return a cons (BEG . END) of positions representing LSP RANGE.
+If optional MARKERS, make markers instead."
+  (if (fboundp 'eglot-range-region)
+      (eglot-range-region range markers)
+    ;; Before Emacs 30
+    (with-no-warnings (eglot--range-region range markers))))
+
 (defun ocaml-eglot-util--load-uri (uri)
   "Check and load if URI is available for typechecking."
-  (let ((path (eglot--uri-to-path uri)))
+  (let ((path (ocaml-eglot-util--uri-to-path uri)))
     (when (file-exists-p path)
       (if (member path (mapcar #'buffer-file-name (buffer-list)))
           t
@@ -81,7 +96,7 @@
 
 (defun ocaml-eglot-util--replace-region (range content)
   "Replace a LSP region (RANGE) by a given CONTENT."
-  (pcase-let ((`(,beg . ,end) (eglot--range-region range)))
+  (pcase-let ((`(,beg . ,end) (ocaml-eglot-util--range-region range)))
     (delete-region beg end)
     (ocaml-eglot-util--goto-char beg)
     (insert content)))
@@ -119,7 +134,7 @@
 
 (defun ocaml-eglot-util--is-interface (uri)
   "Return non-nil if the given URI is an interface, nil otherwise."
-  (let* ((file (eglot--uri-to-path uri)))
+  (let ((file (ocaml-eglot-util--uri-to-path uri)))
     (string-match-p "\\.\\(mli\\|rei\\|eliomi\\)\\'" file)))
 
 (defun ocaml-eglot-util--on-interface ()

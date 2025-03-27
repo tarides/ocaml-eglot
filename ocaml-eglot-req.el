@@ -44,6 +44,13 @@ CANCEL-ON-INPUT-RETVAL are hooks for cancellation."
                      :cancel-on-input cancel-on-input
                      :cancel-on-input-retval cancel-on-input-retval)))
 
+(defun ocaml-eglot-req--server-capable-or-lose (&rest feats)
+  "Determine if current server is capable of FEATS (or fail)."
+  (if (fboundp 'eglot-server-capable)
+      (eglot-server-capable feats)
+    ;; Before Emacs 30
+    (with-no-warnings (eglot--server-capable feats))))
+
 ;;; Parameters structures
 
 (defun ocaml-eglot-req--TextDocumentIdentifier ()
