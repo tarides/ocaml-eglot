@@ -1,6 +1,7 @@
 ocaml-eglot unreleased
 ======================
 
+- A first support for `flycheck` ([#29](https://github.com/tarides/ocaml-eglot/pull/29), [#33](https://github.com/tarides/ocaml-eglot/pull/33) and [#37](https://github.com/tarides/ocaml-eglot/pull/37))
 - Use a more efficient way to ensure that a vector is empty ([#27](https://github.com/tarides/ocaml-eglot/pull/27))
 - Made the mode-line "lighter" more conventional ([#26](https://github.com/tarides/ocaml-eglot/pull/26))
 

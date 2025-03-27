@@ -87,13 +87,6 @@ Otherwise, `merlin-construct' only includes constructors."
                        (featurep 'flycheck-eglot))
               '((const :tag "Use Flycheck" flycheck)))))
 
-;; (defcustom ocaml-eglot-syntax-checker 'flymake
-;;   "Defines the syntax checker to use."
-;;   :group 'ocaml-eglot
-;;   :type '(choice
-;;           (const :tag "Use flycheck" flycheck)
-;;           (const :tag "Use flymake" flymake)))
-
 ;;; Faces
 
 (defface ocaml-eglot-value-name-face
