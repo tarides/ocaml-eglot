@@ -57,11 +57,28 @@ Eglot provides a hook to format the buffer on saving:
    :hook
    (tuareg-mode . ocaml-eglot)
 -  (ocaml-eglot . eglot-ensure))
-+  (ocaml-eglot . eglot-ensure)
++  (ocaml-eglot . (lambda () 
++                   (add-hook #'before-save-hook #'eglot-format nil t))))
+```
+
+### Using `flycheck` instead of `flymake`
+
+Out of the box, eglot uses `Flymake` as a syntax checker. However, it
+is possible to use `flycheck`, via the
+[flycheck-eglot](https://github.com/flycheck/flycheck-eglot)
+package. If you have `flycheck-eglot` installed, you can change your
+configuration in this way:
+
+```diff
+ (use-package ocaml-eglot
+   :ensure t
+   :after tuareg
+   :hook
+   (tuareg-mode . ocaml-eglot)
+-  (ocaml-eglot . eglot-ensure))
++  (ocaml-eglot . (lambda () (flycheck-eglot-mode 1)))
 +  :config
-+  (add-hook #'ocaml-eglot-hook
-+            (lambda ()
-+              (add-hook #'before-save-hook #'eglot-format nil t))))
++  (setq ocaml-eglot-syntax-checker 'flycheck))
 ```
 
 ## Features
