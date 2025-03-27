@@ -81,9 +81,11 @@ Otherwise, `merlin-construct' only includes constructors."
 (defcustom ocaml-eglot-syntax-checker 'flymake
   "Defines the syntax checker to use."
   :group 'ocaml-eglot
-  :type '(choice
-          (const :tag "Use flycheck" flycheck)
-          (const :tag "Use flymake" flymake)))
+  :type `(choice
+          (const :tag "Use Flymake" flymake)
+          ,@(when (and (featurep 'flycheck)
+                       (featurep 'flycheck-eglot))
+              '((const :tag "Use Flycheck" flycheck)))))
 
 ;;; Faces
 
@@ -110,19 +112,25 @@ Otherwise, `merlin-construct' only includes constructors."
 
 ;; Jump to errors
 
+(defun ocaml-eglot--invalid-syntax-checker ()
+  "Error when trying to trigger an invalid syntax checker."
+  (error "Unknown syntax checker: %s" ocaml-eglot-syntax-checker))
+
 (defun ocaml-eglot-error-next ()
   "Jump to the next error."
   (interactive)
   (pcase ocaml-eglot-syntax-checker
     ('flymake (call-interactively #'flymake-goto-next-error))
-    ('flycheck (call-interactively #'flycheck-next-error))))
+    ('flycheck (call-interactively #'flycheck-next-error))
+    (_ (ocaml-eglot--invalid-syntax-checker))))
 
 (defun ocaml-eglot-error-prev ()
   "Jump to the previous error."
   (interactive)
   (pcase ocaml-eglot-syntax-checker
     ('flymake (call-interactively #'flymake-goto-prev-error))
-    ('flycheck (call-interactively #'flycheck-previous-error))))
+    ('flycheck (call-interactively #'flycheck-previous-error))
+    (_ (ocaml-eglot--invalid-syntax-checker))))
 
 ;; Jump to definition
 
@@ -133,7 +141,7 @@ Otherwise, `merlin-construct' only includes constructors."
     (if result
         (let* ((uri (cl-getf result :uri))
                (range (cl-getf result :range))
-               (file (eglot--uri-to-path uri)))
+               (file (ocaml-eglot-util--uri-to-path uri)))
           (ocaml-eglot-util--visit-file strategy (buffer-file-name) file range))
       (eglot--error "Not in environment"))))
 
@@ -161,7 +169,7 @@ Otherwise, `merlin-construct' only includes constructors."
     (if result
         (let* ((uri (cl-getf result :uri))
                (range (cl-getf result :range))
-               (file (eglot--uri-to-path uri)))
+               (file (ocaml-eglot-util--uri-to-path uri)))
           (ocaml-eglot-util--visit-file strategy (buffer-file-name) file range))
       (eglot--error "Not in environment"))))
 
@@ -190,7 +198,7 @@ Show it the current window."
     (if result
         (let* ((uri (cl-getf result :uri))
                (range (cl-getf result :range))
-               (file (eglot--uri-to-path uri)))
+               (file (ocaml-eglot-util--uri-to-path uri)))
           (ocaml-eglot-util--visit-file strategy (buffer-file-name) file range))
       (eglot--error "Not in environment"))))
 
@@ -222,18 +230,18 @@ Show it in the current window."
   "Infer the interface for the current file.
 If NEED-CONFIRMATION is set to non-nil, it will prompt a confirmation."
   (interactive)
-  (eglot--server-capable-or-lose :experimental :ocamllsp :handleInferIntf)
+  (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleInferIntf)
   (ocaml-eglot-util--ensure-interface)
   (let* ((current-uri (ocaml-eglot-util--current-uri))
          (impl-uri (ocaml-eglot--find-alternate-file current-uri)))
     (if (ocaml-eglot-util--load-uri impl-uri)
-      (when (or (not need-confirmation)
-                (y-or-n-p "Try to generate interface? ") )
-        (let ((result (ocaml-eglot-req--infer-intf impl-uri)))
-          (when (or (= (buffer-size) 0)
-                    (y-or-n-p "The buffer is not empty, overwrite it? "))
-            (erase-buffer)
-            (insert result))))
+        (when (or (not need-confirmation)
+                  (y-or-n-p "Try to generate interface? ") )
+          (let ((result (ocaml-eglot-req--infer-intf impl-uri)))
+            (when (or (= (buffer-size) 0)
+                      (y-or-n-p "The buffer is not empty, overwrite it? "))
+              (erase-buffer)
+              (insert result))))
       (when (not need-confirmation)
         (eglot--error "%s is not loaded" impl-uri)))))
 
@@ -244,10 +252,10 @@ If NEED-CONFIRMATION is set to non-nil, it will prompt a confirmation."
   (interactive)
   ;; We don't relay on `tuareg-find-alternate-file‘ because the
   ;; interface generation relies on `ocamlmerlin’.
-  (eglot--server-capable-or-lose :experimental :ocamllsp :handleSwitchImplIntf)
+  (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleSwitchImplIntf)
   (when-let* ((current-uri (ocaml-eglot-util--current-uri))
               (uri (ocaml-eglot--find-alternate-file current-uri))
-              (file (eglot--uri-to-path uri)))
+              (file (ocaml-eglot-util--uri-to-path uri)))
     (find-file file)))
 
 ;; Hook when visiting new interface file
@@ -294,14 +302,14 @@ If there is no available holes, it returns the first one of HOLES."
 
 (defun ocaml-eglot--first-hole-in (start end)
   "Jump to the first hole in a given range denoted by START and END."
-  (when-let ((hole (ocaml-eglot--get-first-hole-in start end))
-             (hole-start (cl-getf hole :start)))
+  (when-let* ((hole (ocaml-eglot--get-first-hole-in start end))
+              (hole-start (cl-getf hole :start)))
     (ocaml-eglot-util--jump-to hole-start)))
 
 (defun ocaml-eglot-hole-prev ()
   "Jump to the previous hole."
   (interactive)
-  (eglot--server-capable-or-lose :experimental :ocamllsp :handleTypedHoles)
+  (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleTypedHoles)
   (let* ((current-pos (eglot--pos-to-lsp-position))
          (holes (reverse (ocaml-eglot-req--holes)))
          (hole (ocaml-eglot--first-hole-at holes current-pos '<)))
@@ -310,7 +318,7 @@ If there is no available holes, it returns the first one of HOLES."
 (defun ocaml-eglot-hole-next ()
   "Jump to the next hole."
   (interactive)
-  (eglot--server-capable-or-lose :experimental :ocamllsp :handleTypedHoles)
+  (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleTypedHoles)
   (let* ((current-pos (eglot--pos-to-lsp-position))
          (holes (ocaml-eglot-req--holes))
          (hole (ocaml-eglot--first-hole-at holes current-pos '>)))
@@ -321,7 +329,7 @@ If there is no available holes, it returns the first one of HOLES."
 (defun ocaml-eglot-jump ()
   "Jumps to the the closest fun/let/match/module/module-type/match-case."
   (interactive)
-  (eglot--server-capable-or-lose :experimental :ocamllsp :handleJump)
+  (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleJump)
   (let ((jumps-result (cl-getf (ocaml-eglot-req--jump) :jumps)))
     (when (<= (length jumps-result) 0)
       (eglot--error "No matching target"))
@@ -403,7 +411,7 @@ KEY-COMPLETABLE define the current value to be selected."
   "Search a value using his type (or polarity) by a QUERY.
 the universal prefix argument can be used to change the maximum number
 of result (LIMIT).  KEY define the current value to be selected."
-  (eglot--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
+  (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
   (let* ((limit (or(if (> limit 1) limit nil)
                    ocaml-eglot-type-search-limit 25))
          (with-doc (or ocaml-eglot-type-search-include-doc :json-false))
@@ -424,7 +432,7 @@ of result (LIMIT).  KEY define the current value to be selected."
 the universal prefix argument can be used to change the maximim number
 of result (LIMIT)."
   (interactive "sSearch query: \np")
-  (eglot--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
+  (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
   (let* ((start (eglot--pos-to-lsp-position))
          (chosen (ocaml-eglot--search query limit :constructible))
          (result (concat "(" chosen ")"))
@@ -446,7 +454,7 @@ of result (LIMIT)."
   "Construct over the current hole.
 It use the ARG to use local values or not."
   (interactive "P")
-  (eglot--server-capable-or-lose :experimental :ocamllsp :handleConstruct)
+  (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleConstruct)
   (let* ((current-range (ocaml-eglot-util--current-range))
          (start (cl-getf current-range :start))
          (end (cl-getf current-range :end))
@@ -517,7 +525,7 @@ and print its type."
 (defun ocaml-eglot-destruct ()
   "Perform case-analysis at the current point."
   (interactive)
-  (ocaml-eglot-req--destruct))
+  (ocaml-eglot-req--destruct (point)))
 
 ;; Occurences
 
@@ -552,7 +560,7 @@ and print its type."
 ;;;###autoload
 (define-minor-mode ocaml-eglot
   "Minor mode for interacting with `ocaml-lsp-server' using `eglot' as a client.
-`ocaml-eglot' provides standard implementations of the various custom-requests
+OCaml Eglot provides standard implementations of the various custom-requests
  exposed by `ocaml-lsp-server'."
   :lighter " OCaml-eglot"
   :keymap ocaml-eglot-map
