@@ -57,6 +57,7 @@ Eglot provides a hook to format the buffer on saving:
    :hook
    (tuareg-mode . ocaml-eglot)
 -  (ocaml-eglot . eglot-ensure))
++  (ocaml-eglot . eglot-ensure)
 +  (ocaml-eglot . (lambda () 
 +                   (add-hook #'before-save-hook #'eglot-format nil t))))
 ```
@@ -80,9 +81,32 @@ configuration in this way:
    :hook
    (tuareg-mode . ocaml-eglot)
 -  (ocaml-eglot . eglot-ensure))
++  (ocaml-eglot . eglot-ensure)
 +  (ocaml-eglot . (lambda () (flycheck-eglot-mode 1)))
 +  :config
 +  (setq ocaml-eglot-syntax-checker 'flycheck))
+```
+
+### Using Merlin-configuration
+
+OCaml-lsp-server can use `.merlin` as a configuration template (rather
+than configuring via `dune`). This requires the
+[`dot-merlin-reader`](https://ocaml.org/p/dot-merlin-reader/latest)
+package to be installed in the switch being used, and `eglot` can be
+configured in this way:
+
+```diff
+ (use-package ocaml-eglot
+   :ensure t
+   :after tuareg
+   :hook
+   (tuareg-mode . ocaml-eglot)
+-  (ocaml-eglot . eglot-ensure))
++  (ocaml-eglot . eglot-ensure)
++  :config
++  (with-eval-after-load 'eglot
++    (add-to-list 'eglot-server-programs
++                 '(tuareg-mode . ("ocamllsp" "--fallback-read-dot-merlin")))))
 ```
 
 ## Features

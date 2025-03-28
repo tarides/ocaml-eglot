@@ -1,5 +1,6 @@
-ocaml-eglot unreleased
+ocaml-eglot 1.1.0
 ======================
+Fri Mar 28 01:27:46 PM CET 2025
 
 - A first support for `flycheck` ([#29](https://github.com/tarides/ocaml-eglot/pull/29), [#33](https://github.com/tarides/ocaml-eglot/pull/33) and [#37](https://github.com/tarides/ocaml-eglot/pull/37))
 - Use a more efficient way to ensure that a vector is empty ([#27](https://github.com/tarides/ocaml-eglot/pull/27))
