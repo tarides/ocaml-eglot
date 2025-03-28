@@ -13,7 +13,7 @@
 ;; Keywords: ocaml languages
 ;; URL: https://github.com/tarides/ocaml-eglot
 ;; Package-Requires: ((emacs "29.1"))
-;; Package-Version: 1.0
+;; Package-Version: 1.1
 ;; SPDX-License-Identifier: MIT
 
 ;;; Commentary:
