@@ -41,6 +41,9 @@
 (require 'ocaml-eglot-type-enclosing)
 (require 'eglot)
 
+(declare-function flycheck-next-error "ext:flycheck")
+(declare-function flycheck-previous-error "ext:flycheck")
+
 (defgroup ocaml-eglot nil
   "All interactions from Eglot to OCaml-lsp-server."
   :link '(url-link "https://ocaml.org")
