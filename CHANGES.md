@@ -1,3 +1,9 @@
+ocaml-eglot unreleased
+======================
+
+- Fix error on on `ocaml-eglot-construct` ([#42](https://github.com/tarides/ocaml-eglot/pull/40))
+- Fix some warnings on byte-compilation ([#40](https://github.com/tarides/ocaml-eglot/pull/40))
+
 ocaml-eglot 1.1.0
 ======================
 Fri Mar 28 01:27:46 PM CET 2025

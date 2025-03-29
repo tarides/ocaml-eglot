@@ -46,6 +46,16 @@ Here's an example with Tuareg already installed:
   (ocaml-eglot . eglot-ensure))
 ```
 
+### Foreword on configuration
+
+`ocaml-eglot` is a minor mode which is grafted onto `eglot` (provided
+by default in Emacs since version `29.1`). Since `eglot` is itself
+based on several popular packages in the Emacs ecosystem (such as
+`xref`, `flymake` `imenu` etc.), you can configure it highly using
+these modes. What's more, reading the [Eglot
+manual](https://www.gnu.org/software/emacs/manual/html_mono/eglot.html)
+is recommended for fine-tuning!
+
 ### Activating `format-on-save`
 
 Eglot provides a hook to format the buffer on saving:
@@ -61,6 +71,30 @@ Eglot provides a hook to format the buffer on saving:
 +  (ocaml-eglot . (lambda () 
 +                   (add-hook #'before-save-hook #'eglot-format nil t))))
 ```
+
+### Make eglot less visually obtrusive
+
+Eglot introduces a lot of visual noise (which can greatly alter the
+user experience, especially when you're from `merlin`). One way of
+reducing this visual obtrusion is to disable type anotations (`eldoc`)
+and `inlay-hints`:
+
+```diff
+ (use-package ocaml-eglot
+   :ensure t
+   :after tuareg
+   :hook
+   (tuareg-mode . ocaml-eglot)
+-  (ocaml-eglot . eglot-ensure))
++  (ocaml-eglot . eglot-ensure)
++  (eglot-managed-mode . (lambda () 
++                          (eldoc-mode -1)
++                          (eglot-inlay-hints-mode -1))))
+```
+
+You can find more customisation options in the
+[Eglot](https://www.gnu.org/software/emacs/manual/html_mono/eglot.html)
+manual.
 
 ### Using `flycheck` instead of `flymake`
 

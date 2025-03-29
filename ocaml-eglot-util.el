@@ -112,14 +112,16 @@ If optional MARKERS, make markers instead."
 
 (defun ocaml-eglot-util--compare-position (a b)
   "Comparison between two LSP positions, A and B."
-  (let ((char-a (cl-getf a :character))
-        (char-b (cl-getf b :character))
-        (line-a (cl-getf a :line))
-        (line-b (cl-getf b :line)))
-    (if (> line-a line-b) 1
-      (if (> line-b line-a) -1
-        (if (> char-a char-b) 1
-          (if (> char-b char-a) -1 0))))))
+  (if (and a b)
+      (let ((char-a (cl-getf a :character))
+            (char-b (cl-getf b :character))
+            (line-a (cl-getf a :line))
+            (line-b (cl-getf b :line)))
+        (if (> line-a line-b) 1
+          (if (> line-b line-a) -1
+            (if (> char-a char-b) 1
+              (if (> char-b char-a) -1 0)))))
+    (when a 1) (when b -1) 0))
 
 (defun ocaml-eglot-util--position-increase-char (pos content)
   "Compute a new position (POS) after inserting text CONTENT."
