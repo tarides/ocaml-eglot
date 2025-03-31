@@ -216,6 +216,14 @@ are provided:
 The default behavior can also be configured using the
 `ocaml-eglot-open-window-strategy` variable.
 
+#### Definition and Declaration
+
+In `LSP`, the terminology between `definition` and `declaration` can
+be confusing:
+
+- `definition`: corresponds to the implementation
+- `declaration`: corresponds to the signature
+
 ### Jump to type definition  of an expression
 
 You can also jump to the type definition of the expression at point.
@@ -342,7 +350,19 @@ to find the function `int_of_string_opt`, search for `string -> int
 option`:
 
 - `ocaml-eglot-search` searches for a value by its type or polarity
-  (the search type is defined by the input query)
+  to included in the current buffer (the search type is defined by the input query)
+- `ocaml-eglot-search-definition` searches for a value definition by 
+  its type or polarity (the search type is defined by the input query)
+- `ocaml-eglot-search-definition-in-current-window` search definition and 
+  jump to the result into the current window
+- `ocaml-eglot-search-definition-in-new-window` search definition and 
+  jump to the result into a new window
+- `ocaml-eglot-search-declaration` searches for a value declaration by 
+  its type or polarity (the search type is defined by the input query)
+- `ocaml-eglot-search-declaration-in-current-window` search declaration and 
+  jump to the result into the current window
+- `ocaml-eglot-search-declaration-in-new-window` search declaration and 
+  jump to the result into a new window
 
 ![Search Example](media/search.gif)
 

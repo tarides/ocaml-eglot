@@ -3,6 +3,7 @@ ocaml-eglot unreleased
 
 - Fix error on on `ocaml-eglot-construct` ([#42](https://github.com/tarides/ocaml-eglot/pull/40))
 - Fix some warnings on byte-compilation ([#40](https://github.com/tarides/ocaml-eglot/pull/40))
+- Add `ocaml-eglot-search-definition`, `ocaml-eglot-search-declaration` and alternative functions ([#45](https://github.com/tarides/ocaml-eglot/pull/45))
 
 ocaml-eglot 1.1.0
 ======================
