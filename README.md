@@ -358,7 +358,7 @@ option`:
 | `merlin-locate`             | `ocaml-eglot-find-declaration`     |                                                                                                              |
 |  —                          | `ocaml-eglot-find-definition`      | Available in Merlin by configuration                                                                         |
 | ❌                          | `ocaml-eglot-find-type-definition` |                                                                          |
-| `merlin-locate-ident`       | ❌                                 |                                                                                                              |
+| `merlin-locate-ident`       | `ocaml-eglot-find-identifier-definition`, `ocaml-eglot-find-identifier-declaration`                                 |                                                                                                              |
 | `merlin-occurences`         | `ocaml-eglot-occurences`           |                                                                                                              |
 | `merlin-project-occurences` | —                                  | Handle by `ocaml-eglot-occurences` (if `ocaml-version  >= 5.2` and need an index, `dune build @ocaml-index`) |
 | `merlin-iedit-occurrences`  | `ocaml-eglot-rename`               |                                                                                                              |
