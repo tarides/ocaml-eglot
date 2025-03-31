@@ -519,7 +519,7 @@ of result (LIMIT)."
    query
    limit))
 
-(defun ocaml-eglot-search-definition-in-current-window (query &optional limit)
+(defun ocaml-eglot-search-definition-in-new-window (query &optional limit)
   "Search a definition using a QUERY (type or polarity) in a new window.
 The universal prefix argument can be used to change the maximim number
 of result (LIMIT)."
@@ -549,7 +549,7 @@ of result (LIMIT)."
    query
    limit))
 
-(defun ocaml-eglot-search-declaration-in-current-window (query &optional limit)
+(defun ocaml-eglot-search-declaration-in-new-window (query &optional limit)
   "Search a declaration using a QUERY (type or polarity) in a new window.
 The universal prefix argument can be used to change the maximim number
 of result (LIMIT)."
