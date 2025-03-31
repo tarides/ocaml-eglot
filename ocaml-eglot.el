@@ -458,7 +458,7 @@ KEY-COMPLETABLE define the current value to be selected."
 
 (defun ocaml-eglot--search (query limit key)
   "Search a value using his type (or polarity) by a QUERY.
-the universal prefix argument can be used to change the maximum number
+The universal prefix argument can be used to change the maximum number
 of result (LIMIT).  KEY define the current value to be selected."
   (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
   (let* ((limit (or(if (> limit 1) limit nil)
@@ -478,7 +478,7 @@ of result (LIMIT).  KEY define the current value to be selected."
 
 (defun ocaml-eglot-search (query &optional limit)
   "Search a value using his type (or polarity) by a QUERY.
-the universal prefix argument can be used to change the maximim number
+The universal prefix argument can be used to change the maximim number
 of result (LIMIT)."
   (interactive "sSearch query: \np")
   (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
@@ -490,6 +490,74 @@ of result (LIMIT)."
       (delete-region (region-beginning) (region-end)))
     (insert result)
     (ocaml-eglot--first-hole-in start end)))
+
+(defun ocaml-eglot--search-def-or-decl (callback query &optional limit)
+  "Search a definition or a declaration using a QUERY (type or polarity).
+The universal prefix argument can be used to change the maximim number
+of result (LIMIT).  CALLBACK is used to define the jump strategy."
+  (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
+  (let ((result (ocaml-eglot--search query limit :name)))
+    (funcall callback result)))
+
+(defun ocaml-eglot-search-definition (query &optional limit)
+  "Search a definition using a QUERY (type or polarity).
+The universal prefix argument can be used to change the maximim number
+of result (LIMIT)."
+  (interactive "sSearch query: \np")
+  (ocaml-eglot--search-def-or-decl
+   #'ocaml-eglot-find-identifier-definition
+   query
+   limit))
+
+(defun ocaml-eglot-search-definition-in-current-window (query &optional limit)
+  "Search a definition using a QUERY (type or polarity) in the current window.
+The universal prefix argument can be used to change the maximim number
+of result (LIMIT)."
+  (interactive "sSearch query: \np")
+  (ocaml-eglot--search-def-or-decl
+   #'ocaml-eglot-find-identifier-definition-in-current-window
+   query
+   limit))
+
+(defun ocaml-eglot-search-definition-in-current-window (query &optional limit)
+  "Search a definition using a QUERY (type or polarity) in a new window.
+The universal prefix argument can be used to change the maximim number
+of result (LIMIT)."
+  (interactive "sSearch query: \np")
+  (ocaml-eglot--search-def-or-decl
+   #'ocaml-eglot-find-identifier-definition-in-new-window
+   query
+   limit))
+
+(defun ocaml-eglot-search-declaration (query &optional limit)
+  "Search a declaration using a QUERY (type or polarity).
+The universal prefix argument can be used to change the maximim number
+of result (LIMIT)."
+  (interactive "sSearch query: \np")
+  (ocaml-eglot--search-def-or-decl
+   #'ocaml-eglot-find-identifier-declaration
+   query
+   limit))
+
+(defun ocaml-eglot-search-declaration-in-current-window (query &optional limit)
+  "Search a declaration using a QUERY (type or polarity) in the current window.
+The universal prefix argument can be used to change the maximim number
+of result (LIMIT)."
+  (interactive "sSearch query: \np")
+  (ocaml-eglot--search-def-or-decl
+   #'ocaml-eglot-find-identifier-declaration-in-current-window
+   query
+   limit))
+
+(defun ocaml-eglot-search-declaration-in-current-window (query &optional limit)
+  "Search a declaration using a QUERY (type or polarity) in a new window.
+The universal prefix argument can be used to change the maximim number
+of result (LIMIT)."
+  (interactive "sSearch query: \np")
+  (ocaml-eglot--search-def-or-decl
+   #'ocaml-eglot-find-identifier-declaration-in-new-window
+   query
+   limit))
 
 ;; Construct
 
