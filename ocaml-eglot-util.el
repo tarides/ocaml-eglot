@@ -123,12 +123,26 @@ If optional MARKERS, make markers instead."
               (if (> char-b char-a) -1 0)))))
     (when a 1) (when b -1) 0))
 
+(defun ocaml-eglot-util--merlin-pos-to-lsp-pos (pos)
+  "Compute a LSP position from a Merlin's POS (as LINE/COL)."
+  (let* ((line (cl-getf pos :line))
+         (col (cl-getf pos :col)))
+    (list :line (1- line) :character col)))
+
 (defun ocaml-eglot-util--position-increase-char (pos content)
   "Compute a new position (POS) after inserting text CONTENT."
   (let* ((line (cl-getf pos :line))
          (character (cl-getf pos :character))
          (new-char (+ character (length content))))
     `(:line ,line :character ,new-char)))
+
+(defun ocaml-eglot-util--merlin-location-to-lsp (location)
+  "Convert a Merlin's LOCATION to an LSP one."
+  (let* ((uri (cl-getf location :file))
+         (pos (cl-getf location :pos))
+         (lsp-pos (ocaml-eglot-util--merlin-pos-to-lsp-pos pos))
+         (range (list :start lsp-pos :end lsp-pos)))
+    (list :uri uri :range range)))
 
 (defun ocaml-eglot-util--current-uri ()
   "Return the uri of the document currently being visited."

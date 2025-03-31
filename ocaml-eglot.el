@@ -137,9 +137,9 @@ Otherwise, `merlin-construct' only includes constructors."
 
 ;; Jump to definition
 
-(defun ocaml-eglot--find-definition (strategy)
-  "Find the definition at point and jump to it using STRATEGY."
-  (let* ((query-result (ocaml-eglot-req--definition))
+(defun ocaml-eglot--find (strategy query)
+  "Find the definition using QUERY and jump to it using STRATEGY."
+  (let* ((query-result (funcall query))
          (result (ocaml-eglot-util--vec-first-or-nil query-result)))
     (if result
         (let* ((uri (cl-getf result :uri))
@@ -147,6 +147,10 @@ Otherwise, `merlin-construct' only includes constructors."
                (file (ocaml-eglot-util--uri-to-path uri)))
           (ocaml-eglot-util--visit-file strategy (buffer-file-name) file range))
       (eglot--error "Not in environment"))))
+
+(defun ocaml-eglot--find-definition (strategy)
+  "Find the definition at point and jump to it using STRATEGY."
+  (ocaml-eglot--find strategy #'ocaml-eglot-req--definition))
 
 (defun ocaml-eglot-find-definition ()
   "Find the definition identifier at point."
@@ -163,18 +167,39 @@ Otherwise, `merlin-construct' only includes constructors."
   (interactive)
   (ocaml-eglot--find-definition 'current))
 
+(defun ocaml-eglot--identifier-query (identifier kind)
+  "Build the locate IDENTIFIER query based on  KIND."
+  (lambda () (let* ((result (ocaml-eglot-req--locate-ident identifier kind))
+                    (result-value (ocaml-eglot-util--merlin-call-result result))
+                    (loc (ocaml-eglot-util--merlin-location-to-lsp result-value)))
+               (make-vector 1 loc))))
+
+(defun ocaml-eglot--find-identifier-definition (identifier strategy)
+  "Find the definition of IDENTIFIER jump to it using STRATEGY."
+  (ocaml-eglot--find
+   strategy (ocaml-eglot--identifier-query identifier 'implementation)))
+
+(defun ocaml-eglot-find-identifier-definition (identifier)
+  "Find the definition of the given IDENTIFIER."
+  (interactive "s> ")
+  (ocaml-eglot--find-identifier-definition
+   identifier ocaml-eglot-open-window-strategy))
+
+(defun ocaml-eglot-find-identifier-definition-in-new-window (identifier)
+  "Find the definition of the IDENTIFIER and show it in a new window."
+  (interactive "s> ")
+  (ocaml-eglot--find-identifier-definition identifier 'new))
+
+(defun ocaml-eglot-find-identifier-definition-in-current-window (identifier)
+  "Find the definition of the IDENTIFIER and show it in the current window."
+  (interactive "s> ")
+  (ocaml-eglot--find-identifier-definition identifier 'current))
+
 ;; Jump to declaration
 
 (defun ocaml-eglot--find-declaration (strategy)
   "Find the declaration of the identifier at point and jump to it using STRATEGY."
-  (let* ((query-result (ocaml-eglot-req--declaration))
-         (result (ocaml-eglot-util--vec-first-or-nil query-result)))
-    (if result
-        (let* ((uri (cl-getf result :uri))
-               (range (cl-getf result :range))
-               (file (ocaml-eglot-util--uri-to-path uri)))
-          (ocaml-eglot-util--visit-file strategy (buffer-file-name) file range))
-      (eglot--error "Not in environment"))))
+  (ocaml-eglot--find strategy #'ocaml-eglot-req--declaration))
 
 (defun ocaml-eglot-find-declaration ()
   "Find the declaration of the identifier at point."
@@ -191,6 +216,27 @@ Otherwise, `merlin-construct' only includes constructors."
 Show it the current window."
   (interactive)
   (ocaml-eglot--find-declaration 'current))
+
+(defun ocaml-eglot--find-identifier-declaration (identifier strategy)
+  "Find the declaration of IDENTIFIER jump to it using STRATEGY."
+  (ocaml-eglot--find
+   strategy (ocaml-eglot--identifier-query identifier 'interface)))
+
+(defun ocaml-eglot-find-identifier-declaration (identifier)
+  "Find the declaration of the given IDENTIFIER."
+  (interactive "s> ")
+  (ocaml-eglot--find-identifier-declaration
+   identifier ocaml-eglot-open-window-strategy))
+
+(defun ocaml-eglot-find-identifier-declaration-in-new-window (identifier)
+  "Find the declaration of the given IDENTIFIER and show it in a new window."
+  (interactive "s> ")
+  (ocaml-eglot--find-identifier-declaration identifier 'new))
+
+(defun ocaml-eglot-find-identifier-declaration-in-current-window (identifier)
+  "Find the declaration of the given IDENTIFIER and show it in the current window."
+  (interactive "s> ")
+  (ocaml-eglot--find-identifier-declaration identifier 'current))
 
 ;; Jump type declaration of expression
 
