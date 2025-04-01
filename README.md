@@ -216,6 +216,32 @@ are provided:
 The default behavior can also be configured using the
 `ocaml-eglot-open-window-strategy` variable.
 
+#### Definition and Declaration
+
+In `LSP`, the terminology between `definition` and `declaration` can
+be confusing:
+
+- `definition`: corresponds to the implementation
+- `declaration`: corresponds to the signature
+
+### Find indentifier definition/declaration
+
+It is also possible to directly enter the name of an identifier
+(definition or declaration) using the following commands:
+
+- `ocaml-eglot-find-identifier-definition`
+- `ocaml-eglot-find-identifier-declaration`
+
+![Find identifier example](media/find-identifier.gif)
+
+And as with commands that locate the identifier below the cursor,
+there are variations for controlling the window to jump to:
+
+- `ocaml-eglot-find-identifier-definition-in-new-window`
+- `ocaml-eglot-find-identifier-definition-in-current-window`
+- `ocaml-eglot-find-identifier-declaration-in-new-window`
+- `ocaml-eglot-find-identifier-declaration-in-current-window`
+
 ### Jump to type definition  of an expression
 
 You can also jump to the type definition of the expression at point.
@@ -245,7 +271,10 @@ project, it requires an index. This index can be created by running
 
 ### Renaming
 
-Use `ocaml-eglot-rename` to rename the symbol under the cursor. Starting with OCaml 5.3 it is possible to rename a symbol across multiple files after building an up-to-date index with `dune build @ocaml-index`.
+Use `ocaml-eglot-rename` to rename the symbol under the
+cursor. Starting with OCaml 5.3 it is possible to rename a symbol
+across multiple files after building an up-to-date index with `dune
+build @ocaml-index`.
 
 ![Rename example](media/rename.gif)
 
@@ -341,10 +370,30 @@ query closer to what you would write to describe a type. For example,
 to find the function `int_of_string_opt`, search for `string -> int
 option`:
 
-- `ocaml-eglot-search` searches for a value by its type or polarity
-  (the search type is defined by the input query)
-
+- `ocaml-eglot-search` searches for a value by its type or polarity to
+  included in the current buffer (the search type is defined by the
+  input query)
+  
 ![Search Example](media/search.gif)
+
+Alternatively, you can search for a definition or declaration:
+  
+- `ocaml-eglot-search-definition` searches for a value definition by 
+  its type or polarity
+  
+- `ocaml-eglot-search-declaration` searches for a value declaration by 
+  its type or polarity
+  
+![Search Definition or Declaration Example](media/search-def.gif)
+
+And as with commands that locate the identifier below the cursor,
+there are variations for controlling the window to jump to:
+  
+- `ocaml-eglot-search-definition-in-current-window`
+- `ocaml-eglot-search-definition-in-new-window`
+- `ocaml-eglot-search-declaration-in-current-window`
+- `ocaml-eglot-search-declaration-in-new-window`
+
 
 ## Comparison of Merlin and OCaml-eglot commands
 
@@ -358,7 +407,7 @@ option`:
 | `merlin-locate`             | `ocaml-eglot-find-declaration`     |                                                                                                              |
 |  —                          | `ocaml-eglot-find-definition`      | Available in Merlin by configuration                                                                         |
 | ❌                          | `ocaml-eglot-find-type-definition` |                                                                          |
-| `merlin-locate-ident`       | ❌                                 |                                                                                                              |
+| `merlin-locate-ident`       | `ocaml-eglot-find-identifier-definition`, `ocaml-eglot-find-identifier-declaration`                                 |                                                                                                              |
 | `merlin-occurences`         | `ocaml-eglot-occurences`           |                                                                                                              |
 | `merlin-project-occurences` | —                                  | Handle by `ocaml-eglot-occurences` (if `ocaml-version  >= 5.2` and need an index, `dune build @ocaml-index`) |
 | `merlin-iedit-occurrences`  | `ocaml-eglot-rename`               |                                                                                                              |
