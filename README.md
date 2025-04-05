@@ -30,7 +30,7 @@ interface between `eglot` (available _out of the box_ since `emacs >=
 installed (e.g. [caml-mode](https://melpa.org/#/caml) or
 [tuareg](https://melpa.org/#/tuareg)). Then, for example, you can use
 [`use-package`](https://www.gnu.org/software/emacs/manual/html_node/use-package/Lisp-Configuration.html)
-to install OCaml-eglot. You will also need
+to install `ocaml-eglot`. You will also need
 `https://ocaml.org/p/ocaml-lsp-server/latest` in the [current
 switch](https://ocaml.org/docs/opam-switch-introduction).
 
@@ -76,7 +76,7 @@ Eglot provides a hook to format the buffer on saving:
 
 Eglot introduces a lot of visual noise (which can greatly alter the
 user experience, especially when you're from `merlin`). One way of
-reducing this visual obtrusion is to disable type anotations (`eldoc`)
+reducing this visual obtrusion is to disable type annotations (`eldoc`)
 and `inlay-hints`:
 
 ```diff
@@ -126,7 +126,7 @@ configuration in this way:
 OCaml-lsp-server can use `.merlin` as a configuration template (rather
 than configuring via `dune`). This requires the
 [`dot-merlin-reader`](https://ocaml.org/p/dot-merlin-reader/latest)
-package to be installed in the switch being used, and `eglot` can be
+package to be installed in the switch being used, and then `eglot` can be
 configured in this way:
 
 ```diff
@@ -191,7 +191,7 @@ to display the type:
 
 ### Jump to definition/declaration
 
-OCaml-eglot provides a shortcut to quickly jump to the definition or
+`ocaml-eglot` provides a shortcut to quickly jump to the definition or
 declaration of an identifier:
 
 - `ocaml-eglot-find-definition` (<kbd>C-c</kbd> <kbd>C-l</kbd>): jump to
@@ -203,8 +203,8 @@ declaration of an identifier:
 ![Jump to definition example](media/find-def-decl.gif)
 
 The default calculation for the window containing the jump result is
-_smart_: if the target is on the same file, the command uses the same
-window; if the target is on another file, the command opens a new
+_smart_: if the target is in the same file, the command uses the same
+window; if the target is in another file, the command opens a new
 window. Auxiliary functions for controlling the placement of a result
 are provided:
 
@@ -224,7 +224,7 @@ be confusing:
 - `definition`: corresponds to the implementation
 - `declaration`: corresponds to the signature
 
-### Find indentifier definition/declaration
+### Find identifier definition/declaration
 
 It is also possible to directly enter the name of an identifier
 (definition or declaration) using the following commands:
@@ -258,7 +258,7 @@ provided:
 - `ocaml-eglot-phrase-next` (<kbd>C-c</kbd> <kbd>C-n</kbd>): jump to
   the beginning of the next phrase
 
-### Find occurences
+### Find occurrences
 
 `ocaml-eglot-occurences` returns all occurrences of the
 identifier under the cursor. To find all occurrences in the entire
@@ -267,7 +267,7 @@ project, it requires an index. This index can be created by running
 `5.2` and Dune `3.16.0`. See the
 [announcement](https://discuss.ocaml.org/t/ann-project-wide-occurrences-in-merlin-and-lsp/14847/1).
 
-![Occurences example](media/occurences.gif)
+![Occurrences example](media/occurences.gif)
 
 ### Renaming
 
@@ -291,20 +291,20 @@ contents:
 ### Find Alternate file
 
 OCaml-eglot allows you to quickly switch from the implementation file
-to the interface file and _vice versa_. If the interface file does not
+to the interface file and vice versa. If the interface file does not
 exist, a prompt can be used to generate it (using type inference,
-based on `ocaml-eglot-infer-inteface`):
+based on `ocaml-eglot-infer-interface`):
 
 - `ocaml-eglot-alternate-file` (<kbd>C-c</kbd> <kbd>C-a</kbd>): switch
-  from the implementation file to the interface file and _vice versa_
+  from the implementation file to the interface file and vice versa
 
 ![Find Alternate File example](media/alternate-file.gif)
 
 ### Get Documentation
 
 Although the `Hover` primitive in the LSP protocol can be used to
-conveniently display value documentation, it is also possible to query for it
-specifically:
+conveniently display the documentation of a value, it is also possible to query for it
+explicitly:
 
 - `ocaml-eglot-document` (<kbd>C-c</kbd> <kbd>C-d</kbd>): documents
   the expression below the cursor.
@@ -316,8 +316,8 @@ specifically:
 
 ### Construct Expression
 
-Enables you to navigate between the different typed-holes (`_`) in a
-document and interactively substitute them:
+Enables you to navigate between typed-holes (`_`) in a document and
+interactively substitute them:
 
 - `ocaml-eglot-hole-next`: jump to the next hole
 - `ocaml-eglot-hole-prev`: jump to the previous hole
@@ -327,13 +327,13 @@ document and interactively substitute them:
 ![Construct Example](media/construct.gif)
 
 If the `ocaml-eglot-construct` (<kbd>C-c</kbd> <kbd>\\</kbd>) command
-is prefixed by an argument, ie: `C-u M-x ocaml-eglot-construct`, the
+is prefixed by an argument, i.e.: `C-u M-x ocaml-eglot-construct`, the
 command will also search for valid candidates in the current
 environment:
 
 ![Construct with prefix-arg Example](media/construct2.gif)
 
-### Destruct (or case-anlysis)
+### Destruct (or case-analysis)
 
 Destruct, `ocaml-eglot-destruct` (<kbd>C-c</kbd> <kbd>|</kbd>) is a
 powerful feature that allows one to generate and manipulate pattern
@@ -357,7 +357,7 @@ navigate between pattern matching cases:
 
 - `ocaml-eglot-jump`: jumps to the referenced expression
 
-![Construct with prefix-arg Example](media/jump.gif)
+![Source Browsing Example](media/jump.gif)
 
 ### Search for values
 
