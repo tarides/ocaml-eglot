@@ -5,6 +5,7 @@ ocaml-eglot unreleased
 - Add `ocaml-eglot-search-definition`, `ocaml-eglot-search-declaration` and alternative functions ([#45](https://github.com/tarides/ocaml-eglot/pull/45))
 - Fix some warnings on byte-compilation ([#40](https://github.com/tarides/ocaml-eglot/pull/40))
 - Fix error on on `ocaml-eglot-construct` ([#42](https://github.com/tarides/ocaml-eglot/pull/40))
+- `ocaml-eglot-alternate-file` now visits file in other window when prefix argument is set ([#51](https://github.com/tarides/ocaml-eglot/pull/51))
 
 ocaml-eglot 1.1.0
 ======================
