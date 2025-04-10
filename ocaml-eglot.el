@@ -296,16 +296,20 @@ If NEED-CONFIRMATION is set to non-nil, it will prompt a confirmation."
 
 ;; Find alternate file `ml<->mli'
 
-(defun ocaml-eglot-alternate-file ()
-  "Visit the alternative file (ml to mli and vice versa)."
-  (interactive)
-  ;; We don't relay on `tuareg-find-alternate-file‘ because the
+(defun ocaml-eglot-alternate-file (&optional in-other-window)
+  "Visit the alternative file (ml to mli and vice versa).
+
+If optional IN-OTHER-WINDOW is non-nil, find the file in another window."
+  (interactive "P")
+  ;; We don't rely on `tuareg-find-alternate-file‘ because the
   ;; interface generation relies on `ocamlmerlin’.
   (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleSwitchImplIntf)
   (when-let* ((current-uri (ocaml-eglot-util--current-uri))
               (uri (ocaml-eglot--find-alternate-file current-uri))
               (file (ocaml-eglot-util--uri-to-path uri)))
-    (find-file file)))
+    (if in-other-window
+        (find-file-other-window file)
+      (find-file file))))
 
 ;; Hook when visiting new interface file
 
