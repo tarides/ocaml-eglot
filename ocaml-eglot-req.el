@@ -196,14 +196,14 @@ VERBOSITY is a potential verbosity index."
   (let ((params (ocaml-eglot-req--TypeEnclosingParams at index verbosity)))
     (ocaml-eglot-req--send :ocamllsp/typeEnclosing params)))
 
-(defun ocaml-eglot-req--call-code-action (beg action-kind)
-  "Call ACTION-KIND promptly (at BEG point)."
-  (eglot-code-actions beg nil action-kind t))
+(defun ocaml-eglot-req--call-code-action (beg end action-kind)
+  "Call ACTION-KIND promptly (at BEG . END)."
+  (eglot-code-actions beg end action-kind t))
 
-(defun ocaml-eglot-req--destruct (beg)
-  "Call code-action `destruct' for a given position BEG."
+(defun ocaml-eglot-req--destruct (beg end)
+  "Call code-action `destruct' for a given position BEG/END."
   (let ((action-kind "destruct (enumerate cases)"))
-    (ocaml-eglot-req--call-code-action beg action-kind)))
+    (ocaml-eglot-req--call-code-action beg end action-kind)))
 
 (defun ocaml-eglot-req--merlin-call (command argv)
   "Use tunneling `ocamllsp/merlinCallCompatible'.

@@ -646,7 +646,9 @@ and print its type."
 (defun ocaml-eglot-destruct ()
   "Perform case-analysis at the current point."
   (interactive)
-  (ocaml-eglot-req--destruct (point)))
+  (if (region-active-p)
+      (ocaml-eglot-req--destruct (region-beginning) (region-end))
+    (ocaml-eglot-req--destruct (point) (point))))
 
 ;; Occurences
 
