@@ -31,18 +31,24 @@
                                         immediate
                                         timeout
                                         cancel-on-input
-                                        cancel-on-input-retval)
+                                        cancel-on-input-retval
+                                        fallback)
   "Execute a custom request on the current LSP server.
 METHOD is the dedicated lsp server request, PARAMS is the parameters of the
 query, IMMEDIATE is a flag to trigger the request only if the document has
-changed, TIMEOUT is a timeout time response.  CANCEL-ON-INPUT and
-CANCEL-ON-INPUT-RETVAL are hooks for cancellation."
+changed, TIMEOUT is a timeout time response.  CANCEL-ON-INPUT,
+CANCEL-ON-INPUT-RETVAL are hooks for cancellation and FALLBACK is a hook when
+request fails."
   (let ((server (ocaml-eglot-req--current-server)))
     (unless immediate (eglot--signal-textDocument/didChange))
-    (jsonrpc-request server method params
-                     :timeout timeout
-                     :cancel-on-input cancel-on-input
-                     :cancel-on-input-retval cancel-on-input-retval)))
+    (condition-case err
+        (jsonrpc-request server method params
+                         :timeout timeout
+                         :cancel-on-input cancel-on-input
+                         :cancel-on-input-retval cancel-on-input-retval)
+      (jsonrpc-error (if fallback
+                         (funcall fallback err)
+                       (signal (car err) (cdr err)))))))
 
 (defun ocaml-eglot-req--server-capable-or-lose (&rest feats)
   "Determine if current server is capable of FEATS (or fail)."
@@ -159,20 +165,28 @@ under the cursor.  The MARKUP-KIND can also be configured."
                  markup-kind)))
     (ocaml-eglot-req--send :ocamllsp/getDocumentation params)))
 
+(defun ocaml-eglot-req--locate-fallback (err)
+  "A fallback for printing ERR from locate queries."
+  (let ((error-data (alist-get 'jsonrpc-error-data err)))
+      (eglot--error "%s" error-data)))
+
 (defun ocaml-eglot-req--definition ()
   "Execute the `textDocument/definition' request for the current point."
   (let ((params (ocaml-eglot-req--TextDocumentPositionParams)))
-    (ocaml-eglot-req--send :textDocument/definition params)))
+    (ocaml-eglot-req--send :textDocument/definition params
+                           :fallback 'ocaml-eglot-req--locate-fallback)))
 
 (defun ocaml-eglot-req--type-definition ()
   "Execute the `textDocument/typeDefinition' request for the current point."
   (let ((params (ocaml-eglot-req--TextDocumentPositionParams)))
-    (ocaml-eglot-req--send :textDocument/typeDefinition params)))
+    (ocaml-eglot-req--send :textDocument/typeDefinition params
+                           :fallback 'ocaml-eglot-req--locate-fallback)))
 
 (defun ocaml-eglot-req--declaration ()
   "Execute the `textDocument/declaration' request for the current point."
   (let ((params (ocaml-eglot-req--TextDocumentPositionParams)))
-    (ocaml-eglot-req--send :textDocument/declaration params)))
+    (ocaml-eglot-req--send :textDocument/declaration params
+                           :fallback 'ocaml-eglot-req--locate-fallback)))
 
 (defun ocaml-eglot-req--type-enclosings (at index verbosity)
   "Execute the `ocamllsp/typeEnclosing' request for the current point.
