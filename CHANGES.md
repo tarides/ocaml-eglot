@@ -6,6 +6,8 @@ ocaml-eglot unreleased
 - Fix some warnings on byte-compilation ([#40](https://github.com/tarides/ocaml-eglot/pull/40))
 - Fix error on on `ocaml-eglot-construct` ([#42](https://github.com/tarides/ocaml-eglot/pull/40))
 - `ocaml-eglot-alternate-file` now visits file in other window when prefix argument is set ([#51](https://github.com/tarides/ocaml-eglot/pull/51))
+- Add error-handling for jsonrpc-request ([#52](https://github.com/tarides/ocaml-eglot/pull/52))
+- Maintain more diagnostics for location failure ([#52](https://github.com/tarides/ocaml-eglot/pull/52))
 
 ocaml-eglot 1.1.0
 ======================
