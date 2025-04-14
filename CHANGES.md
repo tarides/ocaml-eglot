@@ -8,7 +8,8 @@ ocaml-eglot unreleased
 - `ocaml-eglot-alternate-file` now visits file in other window when prefix argument is set ([#51](https://github.com/tarides/ocaml-eglot/pull/51))
 - Add error-handling for jsonrpc-request ([#52](https://github.com/tarides/ocaml-eglot/pull/52))
 - Maintain more diagnostics for location failure ([#52](https://github.com/tarides/ocaml-eglot/pull/52))
-- Fix hole cycle navigation
+- Fix hole cycle navigation ([#53](https://github.com/tarides/ocaml-eglot/pull/53))
+- Relay on custom request (if it is available) for managing holes ([#53](https://github.com/tarides/ocaml-eglot/pull/53))
 
 ocaml-eglot 1.1.0
 ======================
