@@ -172,6 +172,14 @@ If optional MARKERS, make markers instead."
   "Format MARKUP according to LSP's spec."
   (eglot--format-markup markup))
 
+(defun ocaml-eglot-util--current-range-or-nil ()
+  "Compute the current range or return nil."
+  (when (region-active-p)
+    (let ((region-start (region-beginning))
+          (region-stop  (region-end)))
+      (list :start (eglot--pos-to-lsp-position region-start)
+            :end (eglot--pos-to-lsp-position region-stop)))))
+
 (defun ocaml-eglot-util--current-range ()
   "Return the current active range."
   (if (region-active-p)

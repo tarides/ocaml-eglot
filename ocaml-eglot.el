@@ -359,23 +359,42 @@ If there is no available holes, it returns the first one of HOLES."
               (hole-start (cl-getf hole :start)))
     (ocaml-eglot-util--jump-to hole-start)))
 
-(defun ocaml-eglot-hole-prev ()
+(defun ocaml-eglot--hole-prev ()
   "Jump to the previous hole."
-  (interactive)
   (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleTypedHoles)
   (let* ((current-pos (eglot--pos-to-lsp-position))
          (holes (reverse (ocaml-eglot-req--holes)))
          (hole (ocaml-eglot--first-hole-at holes current-pos '<)))
     (when hole (ocaml-eglot-util--jump-to-range hole))))
 
-(defun ocaml-eglot-hole-next ()
+(defun ocaml-eglot--hole-next ()
   "Jump to the next hole."
-  (interactive)
   (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleTypedHoles)
   (let* ((current-pos (eglot--pos-to-lsp-position))
          (holes (ocaml-eglot-req--holes))
          (hole (ocaml-eglot--first-hole-at holes current-pos '>)))
     (when hole (ocaml-eglot-util--jump-to-range hole))))
+
+(defun ocaml-eglot--hole-jump (direction)
+  "Jump to the following hole (by DIRECTION)."
+  (if (ocaml-eglot-req--server-capable :experimental :ocamllsp :handleJumpToTypedHole)
+      (let* ((current-pos (eglot--pos-to-lsp-position))
+             (range (ocaml-eglot-util--current-range-or-nil))
+             (hole (ocaml-eglot-req--hole current-pos direction range)))
+        (when hole (ocaml-eglot-util--jump-to-range hole)))
+    (pcase direction
+      ('prev (ocaml-eglot--hole-prev))
+      (_ (ocaml-eglot--hole-next)))))
+
+(defun ocaml-eglot-hole-prev ()
+  "Jump to the previous hole."
+  (interactive)
+  (ocaml-eglot--hole-jump 'prev))
+
+(defun ocaml-eglot-hole-next ()
+  "Jump to the next hole."
+  (interactive)
+  (ocaml-eglot--hole-jump 'next))
 
 ;; Jump to source elements
 

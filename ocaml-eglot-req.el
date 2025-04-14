@@ -53,9 +53,9 @@ request fails."
 (defun ocaml-eglot-req--server-capable (&rest feats)
   "Determine if current server is capable of FEATS."
   (if (fboundp 'eglot-server-capable)
-      (eglot-server-capable feats)
+      (apply #'eglot-server-capable feats)
     ;; Before Emacs 30
-    (with-no-warnings (eglot--server-capable feats))))
+    (with-no-warnings (apply #'eglot--server-capable feats))))
 
 (defun ocaml-eglot-req--server-capable-or-lose (&rest feats)
   "Determine if current server is capable of FEATS (or fail)."
@@ -163,7 +163,7 @@ In an optional RANGE.  Relaying on `ocamllsp/jumpToTypedHole'"
          (params (append textpos
                          `(:direction, direction)
                          `(:range, range))))
-    (ocaml-eglot-req--send :ocamllsp/jumpToTypedHole)))
+    (ocaml-eglot-req--send :ocamllsp/jumpToTypedHole params)))
 
 (defun ocaml-eglot-req--switch-file (uri)
   "Execute the `ocamllsp/switchImplIntf' request with a given URI."
