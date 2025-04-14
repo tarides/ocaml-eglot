@@ -50,12 +50,19 @@ request fails."
                          (funcall fallback err)
                        (signal (car err) (cdr err)))))))
 
-(defun ocaml-eglot-req--server-capable-or-lose (&rest feats)
-  "Determine if current server is capable of FEATS (or fail)."
+(defun ocaml-eglot-req--server-capable (&rest feats)
+  "Determine if current server is capable of FEATS."
   (if (fboundp 'eglot-server-capable)
       (eglot-server-capable feats)
     ;; Before Emacs 30
     (with-no-warnings (eglot--server-capable feats))))
+
+(defun ocaml-eglot-req--server-capable-or-lose (&rest feats)
+  "Determine if current server is capable of FEATS (or fail)."
+  (if (fboundp 'eglot-server-capable-or-lose)
+      (apply #'eglot-server-capable-or-lose feats)
+    ;; Before Emacs 30
+    (with-no-warnings (apply #'eglot--server-capable-or-lose feats))))
 
 ;;; Parameters structures
 
@@ -145,6 +152,18 @@ The markup used to format documentation can be set using MARKUP-KIND."
   "Execute the `ocamllsp/typedHoles' request."
   (let ((params (ocaml-eglot-req--TextDocumentIdentifier)))
     (append (ocaml-eglot-req--send :ocamllsp/typedHoles params) nil)))
+
+(defun ocaml-eglot-req--hole (position &optional direction range)
+  "Get the following (DIRECTION) hole since POSITION.
+In an optional RANGE.  Relaying on `ocamllsp/jumpToTypedHole'"
+  (let* ((direction (pcase direction
+                      ('prev "prev")
+                      (_ "next")))
+         (textpos (ocaml-eglot-req--TextDocumentPositionParamsWithPos position))
+         (params (append textpos
+                         `(:direction, direction)
+                         `(:range, range))))
+    (ocaml-eglot-req--send :ocamllsp/jumpToTypedHole)))
 
 (defun ocaml-eglot-req--switch-file (uri)
   "Execute the `ocamllsp/switchImplIntf' request with a given URI."

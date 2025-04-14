@@ -328,7 +328,7 @@ If optional IN-OTHER-WINDOW is non-nil, find the file in another window."
 
 (defun ocaml-eglot--first-hole-aux (holes pos comparison)
   "Return the first hole of the list HOLES since a POS using COMPARISON."
-  (when (or holes (not (equal [] holes)))
+  (when (and holes (not (equal [] holes)))
     (let* ((hd (car holes))
            (tl (cdr holes))
            (h-start (cl-getf hd :start))
