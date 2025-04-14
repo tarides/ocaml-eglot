@@ -111,6 +111,13 @@ Otherwise, `merlin-construct' only includes constructors."
   '((t (:inherit highlight)))
   "Face used when highlighting a region.")
 
+;; Custom extension
+
+(defcustom ocaml-eglot-client-capabilities
+  (list "jumpToNextHole")
+  "List of custom client commands."
+  :type '(set (const "jumpToNextHole")))
+
 ;;; Features
 
 ;; Jump to errors
@@ -679,6 +686,54 @@ and print its type."
   "Rename the symbol at point."
   (interactive)
   (call-interactively #'eglot-rename))
+
+;;; Custom command handler
+
+(defun ocaml-eglot--command-next-hole (arguments)
+  "Perform the command `ocaml.next-hole' based using ARGUMENTS."
+  (let* ((range (cl-getf (aref arguments 0) :inRange))
+         (start (cl-getf range :start))
+         (end (cl-getf range :end)))
+    (ocaml-eglot--first-hole-in start end)))
+
+(defun ocaml-eglot--command-handler (action)
+  "Hook to handle client capabilities (ACTION) on SERVER."
+  (pcase (cl-getf action :command)
+    ("ocaml.next-hole" (ocaml-eglot--command-next-hole
+                        (cl-getf action :arguments)))
+    (_  (ocaml-eglot-req--send :workspace/executeCommand action))))
+
+;;; Overiding
+
+(cl-defmethod eglot-client-capabilities :around (server)
+  "Add client capabilities to Eglot for OCaml LSP server."
+  (let* ((capabilities (copy-tree (cl-call-next-method)))
+         (experimental-capabilities (cl-getf capabilities :experimental))
+         (previous (or experimental-capabilities eglot--{}))
+         (commands (append (apply #'vector ocaml-eglot-client-capabilities) nil)))
+    (dolist (key commands)
+      (puthash key t previous))
+    (setq capabilities (plist-put capabilities :experimental previous))))
+
+;; TODO: Find a better way to handle it generically.
+(cl-defmethod eglot-execute :around (server action)
+  "Custom handler for performing client commands."
+  (eglot--dcase action
+    (((Command))
+     ;; Convert to ExecuteCommandParams and recurse (bug#71642)
+     (cl-remf action :title)
+     (eglot-execute server action))
+    (((ExecuteCommandParams))
+     (ocaml-eglot--command-handler action))
+    (((CodeAction) edit command data)
+     (if (and (null edit) (null command) data
+              (eglot-server-capable :codeActionProvider :resolveProvider))
+         (eglot-execute server (eglot--request server :codeAction/resolve action))
+       (when edit (eglot--apply-workspace-edit edit this-command))
+       (when command
+         ;; Recursive call with what must be a Command object (bug#71642)
+         (eglot-execute server command))))))
+
 
 ;;; Mode
 
