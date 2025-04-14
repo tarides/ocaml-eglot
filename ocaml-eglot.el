@@ -322,10 +322,6 @@ If optional IN-OTHER-WINDOW is non-nil, find the file in another window."
 
 ;; Holes
 
-;; TODO: It would probably be possible to improve the query to embed
-;; more logic at the `merlin-lib` level rather than calculating hole
-;; logic at the editor level.
-
 (defun ocaml-eglot--first-hole-aux (holes pos comparison)
   "Return the first hole of the list HOLES since a POS using COMPARISON."
   (when (and holes (not (equal [] holes)))
@@ -344,14 +340,17 @@ If there is no available holes, it returns the first one of HOLES."
 
 (defun ocaml-eglot--get-first-hole-in (start end)
   "Return the first hole in a given range denoted by START and END."
-  (let* ((holes (ocaml-eglot-req--holes))
-         (hole (ocaml-eglot--first-hole-at holes start '>=)))
-    (when hole
-      (let ((hole-start (cl-getf hole :start))
-            (hole-end (cl-getf hole :end)))
-        (when (and (>= (ocaml-eglot-util--compare-position hole-start start) 0)
-                   (<= (ocaml-eglot-util--compare-position hole-end end) 0))
-          hole)))))
+  (if (ocaml-eglot-req--server-capable :experimental :ocamllsp :handleJumpToTypedHole)
+      (let ((range `(:start ,start :end ,end)))
+        (ocaml-eglot-req--hole start 'next range))
+    (let* ((holes (ocaml-eglot-req--holes))
+           (hole (ocaml-eglot--first-hole-at holes start '>=)))
+      (when hole
+        (let ((hole-start (cl-getf hole :start))
+              (hole-end (cl-getf hole :end)))
+          (when (and (>= (ocaml-eglot-util--compare-position hole-start start) 0)
+                     (<= (ocaml-eglot-util--compare-position hole-end end) 0))
+            hole))))))
 
 (defun ocaml-eglot--first-hole-in (start end)
   "Jump to the first hole in a given range denoted by START and END."
