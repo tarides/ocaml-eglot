@@ -696,13 +696,6 @@ and print its type."
          (end (cl-getf range :end)))
     (ocaml-eglot--first-hole-in start end)))
 
-(defun ocaml-eglot--command-handler (action)
-  "Hook to handle client capabilities (ACTION) on SERVER."
-  (pcase (cl-getf action :command)
-    ("ocaml.next-hole" (ocaml-eglot--command-next-hole
-                        (cl-getf action :arguments)))
-    (_  (ocaml-eglot-req--send :workspace/executeCommand action))))
-
 ;;; Overriding
 
 (cl-defmethod eglot-client-capabilities :around (_)
@@ -717,37 +710,19 @@ and print its type."
 
 
 (when (fboundp 'eglot-execute)
-  ;; TODO: Find a better way to handle it generically.
-  ;; Code almost from `eglot.el'
-
-  (cl-defmethod eglot-execute :around (server action)
+  (cl-defmethod eglot-execute :around (_ action)
     "Custom handler for performing client commands."
-    (eglot--dcase action
-      
-      (((Command))
-       (cl-remf action :title)
-       (eglot-execute server action))
-      
-      (((ExecuteCommandParams))
-       (ocaml-eglot--command-handler action))
-      
-      (((CodeAction) edit command data)
-       (if (and (null edit) (null command) data
-                (ocaml-eglot-req--server-capable :codeActionProvider
-                                                 :resolveProvider))
-           (eglot-execute server
-                          (ocaml-eglot-req--send
-                           :codeAction/resolve action :server server))
-         (when edit (eglot--apply-workspace-edit edit this-command))
-         (when command (eglot-execute server command)))))))
+    (pcase (cl-getf action :command)
+      ("ocaml.next-hole" (ocaml-eglot--command-next-hole
+                          (cl-getf action :arguments)))
+      (_ (cl-call-next-method)))))
 
 (when (fboundp 'eglot-execute-command)
-  ;; Since `eglot-execute-command' still exists but is obsolete, we
-  ;; trick warnings relaying on the absence of `eglot-execute'.
   (cl-defmethod eglot-execute-command :around (_ command arguments)
-    "Custom handler for performing client commands."
-    (let ((action `(:command ,(format "%s" command):arguments ,arguments)))
-      (ocaml-eglot--command-handler action))))
+    "Custom handler for performing client commands (legacy)."
+    (pcase command
+      ("ocaml.next-hole" (ocaml-eglot--command-next-hole arguments))
+      (_ (cl-call-next-method)))))
 
 ;;; Mode
 
