@@ -719,6 +719,7 @@ and print its type."
 (when (fboundp 'eglot-execute)
   ;; TODO: Find a better way to handle it generically.
   ;; Code almost from `eglot.el'
+
   (cl-defmethod eglot-execute :around (server action)
     "Custom handler for performing client commands."
     (eglot--dcase action
@@ -740,10 +741,10 @@ and print its type."
          (when edit (eglot--apply-workspace-edit edit this-command))
          (when command (eglot-execute server command)))))))
 
-(unless (fboundp 'eglot-execute)
+(when (fboundp 'eglot-execute-command)
   ;; Since `eglot-execute-command' still exists but is obsolete, we
   ;; trick warnings relaying on the absence of `eglot-execute'.
-  (cl-defmethod eglot-execute-command :around (server command arguments)
+  (cl-defmethod eglot-execute-command :around (_ command arguments)
     "Custom handler for performing client commands."
     (let ((action `(:command ,(format "%s" command):arguments ,arguments)))
       (ocaml-eglot--command-handler action))))
