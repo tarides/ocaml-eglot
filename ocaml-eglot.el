@@ -698,6 +698,10 @@ and print its type."
 
 ;;; Overriding
 
+;; We use `ocaml-eglot-client-capabilities' to list all the
+;; capabilities supported by the client (the editor) and provision
+;; them to the server as supported capabilities.
+
 (cl-defmethod eglot-client-capabilities :around (_)
   "Add client capabilities to Eglot for OCaml LSP server."
   (let* ((capabilities (copy-tree (cl-call-next-method)))
@@ -708,6 +712,10 @@ and print its type."
       (puthash key t previous))
     (setq capabilities (plist-put capabilities :experimental previous))))
 
+;; A command can be executed by the server or by the client. The
+;; following code analyses the command. If it's a command which must
+;; be implemented by the editor (such as `ocaml.next-hole', we execute
+;; it, otherwise we leave it to the previous implementation.
 
 (when (fboundp 'eglot-execute)
   (cl-defmethod eglot-execute :around (_ action)
@@ -716,6 +724,10 @@ and print its type."
       ("ocaml.next-hole" (ocaml-eglot--command-next-hole
                           (cl-getf action :arguments)))
       (_ (cl-call-next-method)))))
+
+;; The way `Eglot' handles commands changed between version `29.1' and
+;; `30.x', hence the replicate between `eglot-execute' (>= 30) and
+;; `eglot-execute-command' (< 30).
 
 (when (fboundp 'eglot-execute-command)
   (cl-defmethod eglot-execute-command :around (_ command arguments)
