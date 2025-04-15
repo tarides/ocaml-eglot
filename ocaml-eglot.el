@@ -322,13 +322,9 @@ If optional IN-OTHER-WINDOW is non-nil, find the file in another window."
 
 ;; Holes
 
-;; TODO: It would probably be possible to improve the query to embed
-;; more logic at the `merlin-lib` level rather than calculating hole
-;; logic at the editor level.
-
 (defun ocaml-eglot--first-hole-aux (holes pos comparison)
   "Return the first hole of the list HOLES since a POS using COMPARISON."
-  (when (or holes (not (equal [] holes)))
+  (when (and holes (not (equal [] holes)))
     (let* ((hd (car holes))
            (tl (cdr holes))
            (h-start (cl-getf hd :start))
@@ -344,14 +340,17 @@ If there is no available holes, it returns the first one of HOLES."
 
 (defun ocaml-eglot--get-first-hole-in (start end)
   "Return the first hole in a given range denoted by START and END."
-  (let* ((holes (ocaml-eglot-req--holes))
-         (hole (ocaml-eglot--first-hole-at holes start '>=)))
-    (when hole
-      (let ((hole-start (cl-getf hole :start))
-            (hole-end (cl-getf hole :end)))
-        (when (and (>= (ocaml-eglot-util--compare-position hole-start start) 0)
-                   (<= (ocaml-eglot-util--compare-position hole-end end) 0))
-          hole)))))
+  (if (ocaml-eglot-req--server-capable :experimental :ocamllsp :handleJumpToTypedHole)
+      (let ((range `(:start ,start :end ,end)))
+        (ocaml-eglot-req--hole start 'next range))
+    (let* ((holes (ocaml-eglot-req--holes))
+           (hole (ocaml-eglot--first-hole-at holes start '>=)))
+      (when hole
+        (let ((hole-start (cl-getf hole :start))
+              (hole-end (cl-getf hole :end)))
+          (when (and (>= (ocaml-eglot-util--compare-position hole-start start) 0)
+                     (<= (ocaml-eglot-util--compare-position hole-end end) 0))
+            hole))))))
 
 (defun ocaml-eglot--first-hole-in (start end)
   "Jump to the first hole in a given range denoted by START and END."
@@ -359,23 +358,42 @@ If there is no available holes, it returns the first one of HOLES."
               (hole-start (cl-getf hole :start)))
     (ocaml-eglot-util--jump-to hole-start)))
 
-(defun ocaml-eglot-hole-prev ()
+(defun ocaml-eglot--hole-prev ()
   "Jump to the previous hole."
-  (interactive)
   (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleTypedHoles)
   (let* ((current-pos (eglot--pos-to-lsp-position))
          (holes (reverse (ocaml-eglot-req--holes)))
          (hole (ocaml-eglot--first-hole-at holes current-pos '<)))
     (when hole (ocaml-eglot-util--jump-to-range hole))))
 
-(defun ocaml-eglot-hole-next ()
+(defun ocaml-eglot--hole-next ()
   "Jump to the next hole."
-  (interactive)
   (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleTypedHoles)
   (let* ((current-pos (eglot--pos-to-lsp-position))
          (holes (ocaml-eglot-req--holes))
          (hole (ocaml-eglot--first-hole-at holes current-pos '>)))
     (when hole (ocaml-eglot-util--jump-to-range hole))))
+
+(defun ocaml-eglot--hole-jump (direction)
+  "Jump to the following hole (by DIRECTION)."
+  (if (ocaml-eglot-req--server-capable :experimental :ocamllsp :handleJumpToTypedHole)
+      (let* ((current-pos (eglot--pos-to-lsp-position))
+             (range (ocaml-eglot-util--current-range-or-nil))
+             (hole (ocaml-eglot-req--hole current-pos direction range)))
+        (when hole (ocaml-eglot-util--jump-to-range hole)))
+    (pcase direction
+      ('prev (ocaml-eglot--hole-prev))
+      (_ (ocaml-eglot--hole-next)))))
+
+(defun ocaml-eglot-hole-prev ()
+  "Jump to the previous hole."
+  (interactive)
+  (ocaml-eglot--hole-jump 'prev))
+
+(defun ocaml-eglot-hole-next ()
+  "Jump to the next hole."
+  (interactive)
+  (ocaml-eglot--hole-jump 'next))
 
 ;; Jump to source elements
 
