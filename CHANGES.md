@@ -1,5 +1,6 @@
-ocaml-eglot unreleased
+ocaml-eglot 1.2.0
 ======================
+Tue Apr 15 11:14:03 PM CEST 2025
 
 - Fix Type-enclosing's buffer update when using `caml-mode` ([#48](https://github.com/tarides/ocaml-eglot/pull/48))
 - Add `ocaml-eglot-search-definition`, `ocaml-eglot-search-declaration` and alternative functions ([#45](https://github.com/tarides/ocaml-eglot/pull/45))
