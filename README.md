@@ -10,9 +10,12 @@ client. This tool specifically caters to the OCaml ecosystem by
 implementing canonical custom requests and commands exposed by the
 [**`ocaml-lsp-server`**](https://github.com/ocaml/ocaml-lsp).
 
-> [!WARNING]
-> `ocaml-eglot` is **experimental** and at an early stage
-> of development. While we're very happy to collect user feedback.
+> [!IMPORTANT]
+> `ocaml-eglot` is an **alternative mode** to
+> [`merlin`](https://ocaml.github.io/merlin/) which uses
+> [`ocaml-lsp-server`](https://github.com/ocaml/ocaml-lsp) (instead of
+> `ocamlmerlin`) as the language server. So yes, if you decide to use
+> `ocaml-eglot`, `merlin` is no longer needed.
 
 `ocaml-eglot` bridges the gap between generic LSP support and the
 **specific needs of OCaml developers**. Its tight coupling with Eglot
@@ -145,6 +148,60 @@ configured in this way:
 
 ## Features
 
+Here is the list of commands offered by `ocaml-eglot`, together with
+their key binding (you'll find more detailed descriptions and
+illustrations of each command in the next section.).
+
+> [!IMPORTANT]
+> This section only covers features specific to `ocaml-eglot`,
+> however, Eglot offers a large number of _out of the box_ features,
+> via LSP (like completion, xref, flymake backend, imenu). To find out
+> more, please consult [its user
+> manual](https://www.gnu.org/software/emacs/manual/html_mono/eglot.html).
+
+| Command | Default Binding | 
+| -- | -- |
+| `ocaml-eglot-error-next` | <kbd>C-c</kbd> <kbd>C-x</kbd> |
+| `ocaml-eglot-error-prev` | <kbd>C-c</kbd> <kbd>C-c</kbd> |
+| `ocaml-eglot-find-definition` |<kbd>C-c</kbd> <kbd>C-l</kbd> |
+| `ocaml-eglot-find-definition-in-new-window` | |
+| `ocaml-eglot-find-definition-in-current-window` | |
+| `ocaml-eglot-find-identifier-definition` | |
+| `ocaml-eglot-find-identifier-definition-in-new-window` | |
+| `ocaml-eglot-find-identifier-definition-in-current-window` | |
+| `ocaml-eglot-find-declaration` | <kbd>C-c</kbd> <kbd>C-i</kbd> |
+| `ocaml-eglot-find-declaration-in-new-window` | |
+| `ocaml-eglot-find-definition-in-current-window` | |
+| `ocaml-eglot-find-identifier-declaration` | |
+| `ocaml-eglot-find-identifier-declaration-in-new-window` | |
+| `ocaml-eglot-find-identifier-declaration-in-current-window` | |
+| `ocaml-eglot-find-type-definition` | |
+| `ocaml-eglot-find-type-definition-in-new-window` | |
+| `ocaml-eglot-find-type-definition-in-current-window` | |
+| `ocaml-eglot-infer-interface` | |
+| `ocaml-eglot-alternate-file` | <kbd>C-c</kbd> <kbd>C-a</kbd> |
+| `ocaml-eglot-hole-next` |  |
+| `ocaml-eglot-hole-prev` |  |
+| `ocaml-eglot-jump` |  |
+| `ocaml-eglot-phrase-next` | <kbd>C-c</kbd> <kbd>C-p</kbd> |
+| `ocaml-eglot-phrase-prev` | <kbd>C-c</kbd> <kbd>C-n</kbd> |
+| `ocaml-eglot-search` | |
+| `ocaml-eglot-search-definition` | |
+| `ocaml-eglot-search-definition-in-new-window` | |
+| `ocaml-eglot-search-definition-in-current-window` | |
+| `ocaml-eglot-search-declaration` | |
+| `ocaml-eglot-search-declaration-in-new-window` | |
+| `ocaml-eglot-search-declaration-in-current-window` | |
+| `ocaml-eglot-document` | <kbd>C-c</kbd> <kbd>C-d</kbd> |
+| `ocaml-eglot-document-identifier` | |
+| `ocaml-eglot-construct` | <kbd>C-c</kbd> <kbd>\\</kbd> |
+| `ocaml-eglot-destruct` | <kbd>C-c</kbd> <kbd>|</kbd> |
+| `ocaml-eglot-type-expression` | |
+| `ocaml-eglot-type-enclosing` | <kbd>C-c</kbd> <kbd>C-t</kbd> |
+| `ocaml-eglot-occurences` | |
+| `ocaml-eglot-rename` | |
+
+
 ### Browsing errors
 
 Eglot relies on
@@ -253,10 +310,6 @@ provided:
 
 - `ocaml-eglot-find-type-definition-in-new-window`
 - `ocaml-eglot-find-type-definition-in-current-window`
-- `ocaml-eglot-phrase-prev` (<kbd>C-c</kbd> <kbd>C-p</kbd>): jump to
-  the beginning of the previous phrase
-- `ocaml-eglot-phrase-next` (<kbd>C-c</kbd> <kbd>C-n</kbd>): jump to
-  the beginning of the next phrase
 
 ### Find occurrences
 
@@ -356,6 +409,10 @@ parent `fun` and the parent `match` expression. It is also possible to
 navigate between pattern matching cases:
 
 - `ocaml-eglot-jump`: jumps to the referenced expression
+- `ocaml-eglot-phrase-prev` (<kbd>C-c</kbd> <kbd>C-p</kbd>): jump to
+  the beginning of the previous phrase
+- `ocaml-eglot-phrase-next` (<kbd>C-c</kbd> <kbd>C-n</kbd>): jump to
+  the beginning of the next phrase
 
 ![Source Browsing Example](media/jump.gif)
 
