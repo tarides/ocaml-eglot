@@ -111,6 +111,13 @@ Otherwise, `merlin-construct' only includes constructors."
   '((t (:inherit highlight)))
   "Face used when highlighting a region.")
 
+;; Custom extension
+
+(defcustom ocaml-eglot-client-capabilities
+  (list "jumpToNextHole")
+  "List of custom client commands."
+  :type '(set (const "jumpToNextHole")))
+
 ;;; Features
 
 ;; Jump to errors
@@ -679,6 +686,55 @@ and print its type."
   "Rename the symbol at point."
   (interactive)
   (call-interactively #'eglot-rename))
+
+;;; Custom command handler
+
+(defun ocaml-eglot--command-next-hole (arguments)
+  "Perform the command `ocaml.next-hole' using ARGUMENTS."
+  (let* ((range (cl-getf (aref arguments 0) :inRange))
+         (start (cl-getf range :start))
+         (end (cl-getf range :end)))
+    (ocaml-eglot--first-hole-in start end)))
+
+;;; Overriding
+
+;; We use `ocaml-eglot-client-capabilities' to list all the
+;; capabilities supported by the client (the editor) and provision
+;; them to the server as supported capabilities.
+
+(cl-defmethod eglot-client-capabilities :around (_)
+  "Add client capabilities to Eglot for OCaml LSP server."
+  (let* ((capabilities (copy-tree (cl-call-next-method)))
+         (experimental-capabilities (cl-getf capabilities :experimental))
+         (previous (or experimental-capabilities eglot--{}))
+         (commands (append (apply #'vector ocaml-eglot-client-capabilities) nil)))
+    (dolist (key commands)
+      (puthash key t previous))
+    (setq capabilities (plist-put capabilities :experimental previous))))
+
+;; A command can be executed by the server or by the client. The
+;; following code analyses the command. If it's a command which must
+;; be implemented by the editor (such as `ocaml.next-hole', we execute
+;; it, otherwise we leave it to the previous implementation.
+
+(when (fboundp 'eglot-execute)
+  (cl-defmethod eglot-execute :around (_ action)
+    "Custom handler for performing client commands."
+    (pcase (cl-getf action :command)
+      ("ocaml.next-hole" (ocaml-eglot--command-next-hole
+                          (cl-getf action :arguments)))
+      (_ (cl-call-next-method)))))
+
+;; The way `Eglot' handles commands changed between version `29.1' and
+;; `30.x', hence the replicate between `eglot-execute' (>= 30) and
+;; `eglot-execute-command' (< 30).
+
+(when (fboundp 'eglot-execute-command)
+  (cl-defmethod eglot-execute-command :around (_ command arguments)
+    "Custom handler for performing client commands (legacy)."
+    (pcase command
+      ("ocaml.next-hole" (ocaml-eglot--command-next-hole arguments))
+      (_ (cl-call-next-method)))))
 
 ;;; Mode
 

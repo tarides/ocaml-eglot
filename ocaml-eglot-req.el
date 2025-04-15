@@ -32,14 +32,15 @@
                                         timeout
                                         cancel-on-input
                                         cancel-on-input-retval
-                                        fallback)
+                                        fallback
+                                        server)
   "Execute a custom request on the current LSP server.
 METHOD is the dedicated lsp server request, PARAMS is the parameters of the
 query, IMMEDIATE is a flag to trigger the request only if the document has
 changed, TIMEOUT is a timeout time response.  CANCEL-ON-INPUT,
 CANCEL-ON-INPUT-RETVAL are hooks for cancellation and FALLBACK is a hook when
-request fails."
-  (let ((server (ocaml-eglot-req--current-server)))
+request fails.  SERVER can also be conditionnaly given."
+  (let ((server (or server (ocaml-eglot-req--current-server))))
     (unless immediate (eglot--signal-textDocument/didChange))
     (condition-case err
         (jsonrpc-request server method params
