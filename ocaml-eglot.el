@@ -690,7 +690,7 @@ and print its type."
 ;;; Custom command handler
 
 (defun ocaml-eglot--command-next-hole (arguments)
-  "Perform the command `ocaml.next-hole' based using ARGUMENTS."
+  "Perform the command `ocaml.next-hole' using ARGUMENTS."
   (let* ((range (cl-getf (aref arguments 0) :inRange))
          (start (cl-getf range :start))
          (end (cl-getf range :end)))
@@ -703,9 +703,9 @@ and print its type."
                         (cl-getf action :arguments)))
     (_  (ocaml-eglot-req--send :workspace/executeCommand action))))
 
-;;; Overiding
+;;; Overriding
 
-(cl-defmethod eglot-client-capabilities :around (server)
+(cl-defmethod eglot-client-capabilities :around (_)
   "Add client capabilities to Eglot for OCaml LSP server."
   (let* ((capabilities (copy-tree (cl-call-next-method)))
          (experimental-capabilities (cl-getf capabilities :experimental))
@@ -715,25 +715,38 @@ and print its type."
       (puthash key t previous))
     (setq capabilities (plist-put capabilities :experimental previous))))
 
-;; TODO: Find a better way to handle it generically.
-(cl-defmethod eglot-execute :around (server action)
-  "Custom handler for performing client commands."
-  (eglot--dcase action
-    (((Command))
-     ;; Convert to ExecuteCommandParams and recurse (bug#71642)
-     (cl-remf action :title)
-     (eglot-execute server action))
-    (((ExecuteCommandParams))
-     (ocaml-eglot--command-handler action))
-    (((CodeAction) edit command data)
-     (if (and (null edit) (null command) data
-              (eglot-server-capable :codeActionProvider :resolveProvider))
-         (eglot-execute server (eglot--request server :codeAction/resolve action))
-       (when edit (eglot--apply-workspace-edit edit this-command))
-       (when command
-         ;; Recursive call with what must be a Command object (bug#71642)
-         (eglot-execute server command))))))
 
+(when (fboundp 'eglot-execute)
+  ;; TODO: Find a better way to handle it generically.
+  ;; Code almost from `eglot.el'
+  (cl-defmethod eglot-execute :around (server action)
+    "Custom handler for performing client commands."
+    (eglot--dcase action
+      
+      (((Command))
+       (cl-remf action :title)
+       (eglot-execute server action))
+      
+      (((ExecuteCommandParams))
+       (ocaml-eglot--command-handler action))
+      
+      (((CodeAction) edit command data)
+       (if (and (null edit) (null command) data
+                (ocaml-eglot-req--server-capable :codeActionProvider
+                                                 :resolveProvider))
+           (eglot-execute server
+                          (ocaml-eglot-req--send
+                           :codeAction/resolve action :server server))
+         (when edit (eglot--apply-workspace-edit edit this-command))
+         (when command (eglot-execute server command)))))))
+
+(unless (fboundp 'eglot-execute)
+  ;; Since `eglot-execute-command' still exists but is obsolete, we
+  ;; trick warnings relaying on the absence of `eglot-execute'.
+  (cl-defmethod eglot-execute-command :around (server command arguments)
+    "Custom handler for performing client commands."
+    (let ((action `(:command ,(format "%s" command):arguments ,arguments)))
+      (ocaml-eglot--command-handler action))))
 
 ;;; Mode
 
