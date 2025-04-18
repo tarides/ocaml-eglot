@@ -235,7 +235,7 @@ current window otherwise."
       (eglot--error "Invalid result class %s" result-class))))
 
 (defun ocaml-eglot-util--is-artifact (filename)
-  "Checks whether a FILENAME has the extension of an OCaml build artefact."
+  "Check whether a FILENAME has the extension of an OCaml build artefact."
   (string-match-p "\\.cm\\(i\\|ti\\|t\\|o\\|x\\|a\\|xa\\|xs\\)\\'"
                   filename))
 
