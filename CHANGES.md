@@ -1,3 +1,8 @@
+unreleased
+======================
+
+- Allows known compilation artefacts to be displayed via the `ocamlobjinfo` binary ([#56](https://github.com/tarides/ocaml-eglot/pull/56))
+
 ocaml-eglot 1.2.0
 ======================
 Tue Apr 15 11:14:03 PM CEST 2025
