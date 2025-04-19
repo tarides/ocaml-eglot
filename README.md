@@ -119,10 +119,13 @@ configuration in this way:
    (tuareg-mode . ocaml-eglot)
 -  (ocaml-eglot . eglot-ensure))
 +  (ocaml-eglot . eglot-ensure)
-+  (ocaml-eglot . (lambda () (flycheck-eglot-mode 1)))
++  (eglot-managed-mode . (lambda () (flycheck-eglot-mode 1)))
 +  :config
 +  (setq ocaml-eglot-syntax-checker 'flycheck))
 ```
+
+You can find more information about `flycheck-eglot` on its
+[README](https://github.com/flycheck/flycheck-eglot).
 
 ### Using Merlin-configuration
 
