@@ -90,6 +90,15 @@ Otherwise, `merlin-construct' only includes constructors."
                        (featurep 'flycheck-eglot))
               '((const :tag "Use Flycheck" flycheck)))))
 
+(defcustom ocaml-eglot-objinfo-flags
+  (list "-shape" "-index" "-decls" "-uid-deps")
+  "Flags passed to `ocamlobjinfo'."
+  :type '(set
+          (const "-shape")
+          (const "-index")
+          (const "-decls")
+          (const "-uid-deps")))
+
 ;;; Faces
 
 (defface ocaml-eglot-value-name-face
@@ -788,7 +797,7 @@ OCaml Eglot provides standard implementations of the various custom-requests
       (setq buffer-read-only nil)
       (erase-buffer)
       (if (executable-find "ocamlobjinfo")
-          (let ((args (list "-shape" "-index" "-decls" "-uid-deps" file)))
+          (let ((args (append ocaml-eglot-objinfo-flags (list file))))
             (apply #'call-process "ocamlobjinfo" nil t nil args))
         (insert "`ocamlobjinfo' not found in PATH"))
       (goto-char (point-min))
