@@ -454,6 +454,13 @@ there are variations for controlling the window to jump to:
 - `ocaml-eglot-search-declaration-in-current-window`
 - `ocaml-eglot-search-declaration-in-new-window`
 
+### Opening up build artefacts
+
+Used to hook the opening of a compilation artefact with
+`ocamlobjinfo`:
+
+![Opening build artfact using ocamlobjinfo](media/ocamlobjinfo.gif)
+
 
 ## Comparison of Merlin and OCaml-eglot commands
 

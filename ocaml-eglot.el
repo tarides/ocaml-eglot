@@ -90,6 +90,15 @@ Otherwise, `merlin-construct' only includes constructors."
                        (featurep 'flycheck-eglot))
               '((const :tag "Use Flycheck" flycheck)))))
 
+(defcustom ocaml-eglot-objinfo-flags
+  (list "-shape" "-index" "-decls" "-uid-deps")
+  "Flags passed to `ocamlobjinfo'."
+  :type '(set
+          (const "-shape")
+          (const "-index")
+          (const "-decls")
+          (const "-uid-deps")))
+
 ;;; Faces
 
 (defface ocaml-eglot-value-name-face
@@ -763,6 +772,39 @@ OCaml Eglot provides standard implementations of the various custom-requests
   :keymap ocaml-eglot-map
   :group 'ocaml-eglot
   (add-hook 'find-file-hook #'ocaml-eglot--file-hook))
+
+;;; Ocamlobjinfo mode
+
+;; Allows known compilation artefacts to be displayed via the
+;; `ocamlobjinfo' binary
+
+(define-derived-mode ocaml-eglot-objinfo-mode special-mode "OCaml-obj-info"
+  "Mode for displaying ocamlobjinfo output."
+  (setq buffer-read-only t
+        buffer-offer-save nil
+        buffer-file-name nil
+        auto-save-default nil
+        make-backup-files nil
+        create-lockfiles nil)
+  (define-key ocaml-eglot-objinfo-mode-map (kbd "q") #'quit-window))
+
+(defun ocaml-eglot--objinfo-handler ()
+  "Display the result of `ocamlobjinfo` instead of file contents."
+  (when (and buffer-file-name
+             (ocaml-eglot-util--is-artifact buffer-file-name))
+    (let ((file buffer-file-name)
+          (inhibit-read-only t))
+      (setq buffer-read-only nil)
+      (erase-buffer)
+      (if (executable-find "ocamlobjinfo")
+          (let ((args (append ocaml-eglot-objinfo-flags (list file))))
+            (apply #'call-process "ocamlobjinfo" nil t nil args))
+        (insert "`ocamlobjinfo' not found in PATH"))
+      (goto-char (point-min))
+      (ocaml-eglot-objinfo-mode))))
+
+;;;###autoload
+(add-hook 'find-file-hook #'ocaml-eglot--objinfo-handler)
 
 (provide 'ocaml-eglot)
 ;;; ocaml-eglot.el ends here
