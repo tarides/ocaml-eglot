@@ -101,6 +101,12 @@ manual.
 
 ### Using `flycheck` instead of `flymake`
 
+> [!WARNING]
+> Currently, without an additional ceremony, `flymake` only displays
+> diagnostics (in the _mini-buffer_) **on a single line**, which can
+> make error reading complicated, which is why switching to `flycheck`
+> is a reasonable proposition.
+
 Out of the box, eglot uses `Flymake` as a syntax checker. However, it
 is possible to use `flycheck`, via the
 [flycheck-eglot](https://github.com/flycheck/flycheck-eglot)
