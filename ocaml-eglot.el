@@ -788,6 +788,7 @@ OCaml Eglot provides standard implementations of the various custom-requests
         create-lockfiles nil)
   (define-key ocaml-eglot-objinfo-mode-map (kbd "q") #'quit-window))
 
+;;;###autoload
 (defun ocaml-eglot--objinfo-handler ()
   "Display the result of `ocamlobjinfo` instead of file contents."
   (when (and buffer-file-name
