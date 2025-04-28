@@ -788,7 +788,8 @@ OCaml Eglot provides standard implementations of the various custom-requests
         create-lockfiles nil)
   (define-key ocaml-eglot-objinfo-mode-map (kbd "q") #'quit-window))
 
-(defun ocaml-eglot--objinfo-handler ()
+;;;###autoload
+(defun ocaml-eglot-objinfo-handler ()
   "Display the result of `ocamlobjinfo` instead of file contents."
   (when (and buffer-file-name
              (ocaml-eglot-util--is-artifact buffer-file-name))
@@ -804,8 +805,7 @@ OCaml Eglot provides standard implementations of the various custom-requests
       (ocaml-eglot-objinfo-mode))))
 
 ;;;###autoload
-(add-hook 'find-file-hook #'ocaml-eglot--objinfo-handler)
+(add-hook 'find-file-hook #'ocaml-eglot-objinfo-handler)
 
 (provide 'ocaml-eglot)
 ;;; ocaml-eglot.el ends here
-
