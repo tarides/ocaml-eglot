@@ -111,7 +111,7 @@ If optional MARKERS, make markers instead."
         (byte-to-position target)))))
 
 (defun ocaml-eglot-util--pos-to-point (pos)
-  "Converts a POS to a point."
+  "Convert a POS to a point."
   (let ((line (cl-getf pos :line))
         (col (cl-getf pos :col)))
     (ocaml-eglot-util--point-by-pos line col)))

@@ -717,7 +717,7 @@ and print its type."
 ;; capabilities supported by the client (the editor) and provision
 ;; them to the server as supported capabilities.
 
-(cl-defmethod eglot-client-capabilities :around ((server ocaml-eglot-server))
+(cl-defmethod eglot-client-capabilities :around ((_server ocaml-eglot-server))
   "Add client capabilities to Eglot for OCaml LSP server."
   (let* ((capabilities (copy-tree (cl-call-next-method)))
          (experimental-capabilities (cl-getf capabilities :experimental))
@@ -733,7 +733,7 @@ and print its type."
 ;; it, otherwise we leave it to the previous implementation.
 
 (when (fboundp 'eglot-execute)
-  (cl-defmethod eglot-execute :around ((server ocaml-eglot-server) action)
+  (cl-defmethod eglot-execute :around ((_server ocaml-eglot-server) action)
     "Custom handler for performing client commands."
     (pcase (cl-getf action :command)
       ("ocaml.next-hole" (ocaml-eglot--command-next-hole
@@ -745,7 +745,7 @@ and print its type."
 ;; `eglot-execute-command' (< 30).
 
 (when (fboundp 'eglot-execute-command)
-  (cl-defmethod eglot-execute-command :around ((server ocaml-eglot-server) command arguments)
+  (cl-defmethod eglot-execute-command :around ((_server ocaml-eglot-server) command arguments)
     "Custom handler for performing client commands (legacy)."
     (pcase command
       ("ocaml.next-hole" (ocaml-eglot--command-next-hole arguments))
@@ -817,10 +817,8 @@ OCaml Eglot provides standard implementations of the various custom-requests
 
 (defun ocaml-eglot--enable-xref-backend ()
   "Register the OCaml-eglot-xref-backend if it is relevant."
-  (print (and eglot--managed-mode
-             (cl-typep (ocaml-eglot-req--current-server) 'ocaml-eglot-server)))
   (when (and eglot--managed-mode
-             (cl-typep (ocaml-eglot-req--current-server) 'ocaml-eglot-server))
+             (object-of-class-p (ocaml-eglot-req--current-server) 'ocaml-eglot-server))
     (add-hook 'xref-backend-functions #'ocaml-eglot-xref-backend nil t)))
 
 ;;;###autoload

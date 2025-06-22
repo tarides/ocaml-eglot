@@ -2,7 +2,7 @@ unreleased
 ======================
 
 - Allows known compilation artifacts to be displayed via the `ocamlobjinfo` binary ([#56](https://github.com/tarides/ocaml-eglot/pull/56), [#61](https://github.com/tarides/ocaml-eglot/pull/61))
-- A total reimplementation of `xref` more suitable for OCaml ([#63](https://github.com/tarides/ocaml-eglot/pull/63))
+- A total reimplementation of `xref` more suitable for OCaml ([#64](https://github.com/tarides/ocaml-eglot/pull/64))
 
 ocaml-eglot 1.2.0
 ======================

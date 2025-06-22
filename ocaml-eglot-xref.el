@@ -109,7 +109,7 @@ Requires that the current buffer be the buffer of FILE."
            (- end-pos start-pos))))
     ;; We don't have the file open, so we can't make a real summary or decode
     ;; the length.  We'll just use the symbol as the summary instead.
-    (xref-make symbol location)))
+    (xref-make symbol xref-loc)))
 
 (cl-defmethod xref-backend-references ((_backend (eql ocaml-eglot-xref)) symbol)
   "An `xref-backend-references' for SYMBOL for OCaml-eglot."
@@ -125,6 +125,7 @@ Requires that the current buffer be the buffer of FILE."
     (reverse result)))
 
 (cl-defmethod xref-backend-definitions ((_backend (eql ocaml-eglot-xref)) symbol)
+  "Extension of `xref-backend-definitions' for SYMBOL."
   (let* ((result (ocaml-eglot-req--locate-for-xref symbol))
          (loc (ocaml-eglot-util--merlin-call-result result)))
     ;; Error handling should be already guarded.
@@ -174,6 +175,7 @@ Requires that the current buffer be the buffer of FILE."
   (rx symbol-start (in "A-Za-z_") (* (in "A-Za-z0-9_'"))))
 
 (cl-defmethod xref-backend-identifier-at-point ((_backend (eql ocaml-eglot-xref)))
+  "Extension of `xref-backend-identifier-at-point'."
   (let ((symbol
          (cond
           ;; binding operator starting at point

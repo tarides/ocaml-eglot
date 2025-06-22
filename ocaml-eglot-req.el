@@ -21,6 +21,8 @@
 (require 'ocaml-eglot-util)
 (require 'jsonrpc)
 
+(defvar ocaml-eglot-locate-preference)
+
 ;;; Low-level plumbing to execute a request
 
 (defun ocaml-eglot-req--current-server ()
@@ -28,12 +30,12 @@
   (eglot--current-server-or-lose))
 
 (cl-defun ocaml-eglot-req--send (method params &key
-                                          immediate
-                                          timeout
-                                          cancel-on-input
-                                          cancel-on-input-retval
-                                          fallback
-                                          server)
+                                        immediate
+                                        timeout
+                                        cancel-on-input
+                                        cancel-on-input-retval
+                                        fallback
+                                        server)
   "Execute a custom request on the current LSP server.
 METHOD is the dedicated lsp server request, PARAMS is the parameters of the
 query, IMMEDIATE is a flag to trigger the request only if the document has
@@ -269,7 +271,7 @@ or the implementation."
 
 (defun ocaml-eglot-req--locate-for-xref (symbol)
   "Locate an idenfier based on SYMBOL used for xref."
-  (let ((argv (if-let ((pt (get-text-property 0 'ocaml-eglot-xref-point symbol)))
+  (let ((argv (if-let* ((pt (get-text-property 0 'ocaml-eglot-xref-point symbol)))
                   ;; SYMBOL is from `xref-backend-identifier-at-point',
                   ;; since if it was read from the minibuffer its text
                   ;; properties would have been stripped
