@@ -28,12 +28,12 @@
   (eglot--current-server-or-lose))
 
 (cl-defun ocaml-eglot-req--send (method params &key
-                                        immediate
-                                        timeout
-                                        cancel-on-input
-                                        cancel-on-input-retval
-                                        fallback
-                                        server)
+                                          immediate
+                                          timeout
+                                          cancel-on-input
+                                          cancel-on-input-retval
+                                          fallback
+                                          server)
   "Execute a custom request on the current LSP server.
 METHOD is the dedicated lsp server request, PARAMS is the parameters of the
 query, IMMEDIATE is a flag to trigger the request only if the document has
@@ -188,7 +188,7 @@ under the cursor.  The MARKUP-KIND can also be configured."
 (defun ocaml-eglot-req--locate-fallback (err)
   "A fallback for printing ERR from locate queries."
   (let ((error-data (alist-get 'jsonrpc-error-data err)))
-      (eglot--error "%s" error-data)))
+    (eglot--error "%s" error-data)))
 
 (defun ocaml-eglot-req--definition ()
   "Execute the `textDocument/definition' request for the current point."
@@ -259,6 +259,36 @@ or the implementation."
                       "-look-for" (pcase look-for
                                     ('interface "interface")
                                     (_ "implementation")))))
+    (ocaml-eglot-req--merlin-call "locate" argv)))
+
+(defun ocaml-eglot-req--occurences (pt)
+  "Call merlin-occurences for given PT."
+  (let ((argv (vector "-scope" "project"
+                      "-identifier-at" (ocaml-eglot-util-point-as-arg pt))))
+    (ocaml-eglot-req--merlin-call "occurrences" argv)))
+
+(defun ocaml-eglot-req--locate-for-xref (symbol)
+  "Locate an idenfier based on SYMBOL used for xref."
+  (let ((argv (if-let ((pt (get-text-property 0 'ocaml-eglot-xref-point symbol)))
+                  ;; SYMBOL is from `xref-backend-identifier-at-point',
+                  ;; since if it was read from the minibuffer its text
+                  ;; properties would have been stripped
+                  ;; (see `minibuffer-allow-text-properties').  Just pass
+                  ;; position and Merlin will figure out everything from that.
+                  (vector "-position" (ocaml-eglot-util-point-as-arg pt)
+                          "-look-for" ocaml-eglot-locate-preference)
+                ;; SYMBOL was probably just typed in by the user.  So pass it
+                ;; to Merlin, removing a trailing "." in case the user completed
+                ;; a module name with `merlin-cap-dot-after-module':
+                (vector "-prefix" (string-remove-suffix "." symbol)
+                        ;; We don't know if SYMBOL is a module or type or
+                        ;; expr, and we shouldn't use -position to guess.
+                        ;; See: https://github.com/janestreet/merlin-jst/pull/91
+                        "-context" "unknown"
+                        "-position" (ocaml-eglot-util-point-as-arg (point))
+                        ;; And use `point' to pick the lexical environment to
+                        ;; search:
+                        "-look-for" ocaml-eglot-locate-preference))))
     (ocaml-eglot-req--merlin-call "locate" argv)))
 
 (provide 'ocaml-eglot-req)

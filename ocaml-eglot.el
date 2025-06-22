@@ -39,6 +39,7 @@
 (require 'ocaml-eglot-util)
 (require 'ocaml-eglot-req)
 (require 'ocaml-eglot-type-enclosing)
+(require 'ocaml-eglot-xref)
 (require 'eglot)
 
 (declare-function flycheck-next-error "ext:flycheck")
@@ -49,7 +50,6 @@
   :link '(url-link "https://ocaml.org")
   :group 'languages
   :prefix "ocaml-eglot-")
-
 
 ;;; Customizable variables
 
@@ -98,6 +98,12 @@ Otherwise, `merlin-construct' only includes constructors."
           (const "-index")
           (const "-decls")
           (const "-uid-deps")))
+
+(defcustom ocaml-eglot-locate-preference 'ml
+  "Determine whether locate should in priority look in ml or mli files."
+  :group 'ocaml-eglot
+  :type '(choice (const :tag "Look at implementation" ml)
+                 (const :tag "Look at interfaces" mli)))
 
 ;;; Faces
 
@@ -711,7 +717,7 @@ and print its type."
 ;; capabilities supported by the client (the editor) and provision
 ;; them to the server as supported capabilities.
 
-(cl-defmethod eglot-client-capabilities :around (_)
+(cl-defmethod eglot-client-capabilities :around ((server ocaml-eglot-server))
   "Add client capabilities to Eglot for OCaml LSP server."
   (let* ((capabilities (copy-tree (cl-call-next-method)))
          (experimental-capabilities (cl-getf capabilities :experimental))
@@ -727,7 +733,7 @@ and print its type."
 ;; it, otherwise we leave it to the previous implementation.
 
 (when (fboundp 'eglot-execute)
-  (cl-defmethod eglot-execute :around (_ action)
+  (cl-defmethod eglot-execute :around ((server ocaml-eglot-server) action)
     "Custom handler for performing client commands."
     (pcase (cl-getf action :command)
       ("ocaml.next-hole" (ocaml-eglot--command-next-hole
@@ -739,7 +745,7 @@ and print its type."
 ;; `eglot-execute-command' (< 30).
 
 (when (fboundp 'eglot-execute-command)
-  (cl-defmethod eglot-execute-command :around (_ command arguments)
+  (cl-defmethod eglot-execute-command :around ((server ocaml-eglot-server) command arguments)
     "Custom handler for performing client commands (legacy)."
     (pcase command
       ("ocaml.next-hole" (ocaml-eglot--command-next-hole arguments))
@@ -806,6 +812,19 @@ OCaml Eglot provides standard implementations of the various custom-requests
 
 ;;;###autoload
 (add-hook 'find-file-hook #'ocaml-eglot-objinfo-handler)
+
+;;; Handle XRef backend
+
+(defun ocaml-eglot--enable-xref-backend ()
+  "Register the OCaml-eglot-xref-backend if it is relevant."
+  (print (and eglot--managed-mode
+             (cl-typep (ocaml-eglot-req--current-server) 'ocaml-eglot-server)))
+  (when (and eglot--managed-mode
+             (cl-typep (ocaml-eglot-req--current-server) 'ocaml-eglot-server))
+    (add-hook 'xref-backend-functions #'ocaml-eglot-xref-backend nil t)))
+
+;;;###autoload
+(add-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend)
 
 (provide 'ocaml-eglot)
 ;;; ocaml-eglot.el ends here

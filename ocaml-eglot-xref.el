@@ -1,0 +1,214 @@
+;;; ocaml-eglot-xref.el --- Xref backend for OCaml   -*- coding: utf-8; lexical-binding: t -*-
+
+;; TODO: Fix Copyright accredit.
+;; Copyright (C) 2025  Xavier Van de Woestyne
+;; Licensed under the MIT license.
+
+;; TODO: Fix Authors accredit.
+;; Author: Xavier Van de Woestyne <xaviervdw@gmail.com>
+;; Created: 10 June 2025
+;; TODO: Clarify license
+;; SPDX-License-Identifier: MIT
+
+;;; Commentary:
+
+;; An Xref backend for OCaml.
+
+;;; Code:
+
+(require 'cl-lib)
+(require 'xref)
+(require 'ocaml-eglot-util)
+(require 'ocaml-eglot-req)
+
+(defun ocaml-eglot-xref-backend ()
+  "OCaml-eglot backend for Xref."
+  'ocaml-eglot-xref)
+
+(cl-defstruct ocaml-eglot-xref-location
+  "A location suitable for passing to xref.
+Note that while merlin-pos contains a column, it's a byte offset rather
+than a character offset, so we can't use `xref-make-file-location'."
+  (file nil :type string)
+  (line nil :type number)
+  (merlin-pos nil :type plist))
+
+(cl-defmethod xref-location-group ((l ocaml-eglot-xref-location))
+  "Implementation of `xref-make-file-location' for L."
+  (ocaml-eglot-xref-location-file l))
+
+(cl-defmethod xref-location-line ((l ocaml-eglot-xref-location))
+  "Implementation of `xref-make-line-location' for L."
+  (ocaml-eglot-xref-location-line l))
+
+(cl-defmethod xref-location-marker ((l ocaml-eglot-xref-location))
+  "Implementation of `xref-make-file-marker' for L."
+  ;; Mostly copied from the implementations for `xref-make-file-location'
+  ;; and `xref-make-buffer-location'.
+  (let* ((buffer
+          (let ((find-file-suppress-same-file-warnings t))
+            (find-file-noselect (ocaml-eglot-xref-location-file l))))
+         (pos (with-current-buffer buffer
+                (ocaml-eglot-util--pos-to-point
+                 (ocaml-eglot-xref-location-line l)))))
+    (move-marker (make-marker) pos buffer)))
+
+(defun ocaml-eglot-xref--occurences (symbol)
+  "Compute occurrences for the given SYMBOL."
+  (let ((pt (get-text-property 0 'ocaml-eglot-xref-point symbol)))
+    (cl-assert pt nil "OCaml-eglot xref-find-references cannot be used by explicitly typing in a symbol %s" symbol)
+    (let ((result (ocaml-eglot-req--occurences pt)))
+      ;; Change the vector into a list
+      (append (ocaml-eglot-util--merlin-call-result result) nil))))
+
+(defun ocaml-eglot-xref--buffer (file)
+  "Compute a buffer in term of FILE based on occurences results."
+  (if (equal file "/*buffer*")
+      ;; occurences returns "/*buffer*" as the filename for occurences
+      ;; in the current buffer when we don't pass the -filename argument.
+      (current-buffer)
+    ;; Look for an existing buffer with this file, but don't open it
+    ;; if it's not already open.
+    (get-file-buffer file)))
+
+
+(defun ocaml-eglot-xref--make-location-in-file (file merlin-pos)
+  "Turn FILE and MERLIN-POS into an `xref-item'.
+Requires that the current buffer be the buffer of FILE."
+  ;; If we didn't send a filename with the merlin call, we get back "*buffer*"
+  ;; as the filename for locate, "/*buffer*" for occurrences.
+  (if (member file '("*buffer*" "*/buffer*"))
+      ;; We have to remember the current buffer, rather than reading
+      ;; it from the filesystem again later.
+      (xref-make-buffer-location (current-buffer)
+                                 (ocaml-eglot-util--pos-to-point merlin-pos))
+    (make-ocaml-eglot-xref-location :file file
+                                    :line (cl-getf merlin-pos :line)
+                                    :merlin-pos merlin-pos)))
+
+(defun ocaml-eglot-xref--push-marker (symbol buffer start loc xref-loc)
+  "Push computed marker for SYMBOL by START and LOC/XREF-LOC on the given BUFFER."
+  (if buffer
+      ;; We have the file open, or this is just a reference found in
+      ;; the current buffer.  We can populate the summary field with real data,
+      ;; and decode the byte-based `start' and `end' into the character
+      ;; length of the reference.
+      (with-current-buffer buffer
+        (let ((start-pos (ocaml-eglot-util--pos-to-point start))
+              (end-pos (ocaml-eglot-util--pos-to-point (cl-getf loc :end))))
+          (xref-make-match
+           (concat
+            (buffer-substring
+             (save-excursion (goto-char start-pos) (pos-bol))
+             start-pos)
+            (propertize (buffer-substring start-pos end-pos) 'face 'xref-match)
+            (buffer-substring
+             (save-excursion (goto-char end-pos) (pos-eol))
+             end-pos))
+           xref-loc
+           (- end-pos start-pos))))
+    ;; We don't have the file open, so we can't make a real summary or decode
+    ;; the length.  We'll just use the symbol as the summary instead.
+    (xref-make symbol location)))
+
+(cl-defmethod xref-backend-references ((_backend (eql ocaml-eglot-xref)) symbol)
+  "An `xref-backend-references' for SYMBOL for OCaml-eglot."
+  (let ((occurences (ocaml-eglot-xref--occurences symbol))
+        result)
+    (dolist (loc occurences)
+      (let* ((file (cl-getf loc :file))
+             (start-pos (cl-getf loc :start))
+             (buffer (ocaml-eglot-xref--buffer file))
+             (location (ocaml-eglot-xref--make-location-in-file file start-pos)))
+        (push (ocaml-eglot-xref--push-marker
+               symbol buffer start-pos loc location) result)))
+    (reverse result)))
+
+(cl-defmethod xref-backend-definitions ((_backend (eql ocaml-eglot-xref)) symbol)
+  (let* ((result (ocaml-eglot-req--locate-for-xref symbol))
+         (loc (ocaml-eglot-util--merlin-call-result result)))
+    ;; Error handling should be already guarded.
+    (list
+     (xref-make
+      symbol
+      (ocaml-eglot-xref--make-location-in-file (cl-getf loc :file)
+                                               (cl-getf loc :pos))))))
+
+
+;;; TODO: xref-backend-identifier-completion-table
+;;; missing `merlin-cap-table'
+
+(defconst ocaml-eglot-xref--operator-regexp
+  (eval-when-compile
+    (let* ((core-operator-char
+            `(or "$" "&" "*" "+" "-" "/" "=" ">" "@" "^" "|"))
+           (operator-char `(or "~" "!" "?" ,core-operator-char "%" "<" ":" "."))
+           (prefix-symbol `(or (seq "!" (* ,operator-char))
+                               (seq (or "?" "~") (+ ,operator-char))))
+           (infix-symbol `(or (seq (or ,core-operator-char "%" "<")
+                                   (* ,operator-char))
+                              (seq "#" (+ ,operator-char))))
+           (infix-op `(or ,infix-symbol
+                          ":="
+                          ;; Already handled as part of `infix-symbol':
+                          ;; "*" "+" "-" "-." "=" "!=" "<" ">" "||" "&" "&&"
+                          ;; Treated as normal symbols:
+                          ;; "or" "mod" "land" "lor" "lxor" "lsl" "lsr" "asr"
+                          ))
+           (operator-name `(or ,prefix-symbol ,infix-op)))
+      (rx-to-string operator-name t))))
+
+(defconst ocaml-eglot-xref--binding-operator-regexp
+  (eval-when-compile
+    (let* ((core-operator-char
+            `(or "$" "&" "*" "+" "-" "/" "=" ">" "@" "^" "|"))
+           (dot-operator-char
+            `(or "!" "?" ,core-operator-char "%" ":"))
+           (binding-suffix
+            `(seq (or ,core-operator-char "<") (* ,dot-operator-char)))
+           (binding-operator
+            `(seq symbol-start (or "let" "and") ,binding-suffix)))
+      (rx-to-string binding-operator t))))
+
+(defconst ocaml-eglot-xref--identifier-regexp
+  (rx symbol-start (in "A-Za-z_") (* (in "A-Za-z0-9_'"))))
+
+(cl-defmethod xref-backend-identifier-at-point ((_backend (eql ocaml-eglot-xref)))
+  (let ((symbol
+         (cond
+          ;; binding operator starting at point
+          ((looking-at ocaml-eglot-xref--binding-operator-regexp)
+           (match-string 0))
+          ;; ... before point
+          ((and (save-excursion
+                  (skip-chars-backward "letand$&*+/=<>@^|!?%:-")
+                  (looking-at ocaml-eglot-xref--binding-operator-regexp))
+                (<= (point) (match-end 0)))
+           (match-string 0))
+          ;; ordinary name starting at point
+          ((looking-at ocaml-eglot-xref--identifier-regexp)
+           (save-excursion
+             ;; include Module.Context. before point
+             (skip-chars-backward "A-Za-z0-9_'.")
+             (buffer-substring (point) (match-end 0))))
+          ;; operator starting at or before point
+          ((and (save-excursion
+                  (skip-chars-backward "$&*+/=<>@^|!?%:.~#-")
+                  (looking-at ocaml-eglot-xref--operator-regexp))
+                (<= (point) (match-end 0)))
+           (match-string 0))
+          ;; ordinary name starting before point
+          ((and (save-excursion
+                  (skip-chars-backward "A-Za-z0-9_'")
+                  (looking-at ocaml-eglot-xref--identifier-regexp))
+                (<= (point) (match-end 0)))
+           (save-excursion
+             ;; include Module.Context. before point
+             (skip-chars-backward "A-Za-z0-9_'.")
+             (buffer-substring (point) (match-end 0)))))))
+    ;; Return a string with the buffer position in a property, in case
+    ;; point changes before the string is used by one of the methods above.
+    (and symbol (propertize symbol 'ocaml-eglot-xref-point (point)))))
+
+(provide 'ocaml-eglot-xref)
+;;; ocaml-eglot-xref.el ends here
