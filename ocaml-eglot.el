@@ -439,9 +439,7 @@ If there is no available holes, it returns the first one of HOLES."
          (json-result (ocaml-eglot-util--merlin-call-result result))
          (pos (cl-getf json-result :pos)))
     (when pos
-      (let* ((line (cl-getf pos :line))
-             (col (cl-getf pos :col))
-             (target (ocaml-eglot-util--point-by-pos line col)))
+      (let ((target (ocaml-eglot-util--pos-to-point pos)))
         (ocaml-eglot-util--goto-char target)))))
 
 (defun ocaml-eglot-phrase-next ()
