@@ -164,7 +164,9 @@ Requires that the current buffer be the buffer of FILE."
   "Extension of `xref-backend-definitions' for SYMBOL."
   (let* ((result (ocaml-eglot-xref--call-locate symbol))
          (loc (ocaml-eglot-util--merlin-call-result result)))
-    ;; Error handling should be already guarded.
+    (unless loc (error "Not found.  (Check *Messages* for potential errors)"))
+    ;; In this case, an error is returned.
+    (if (stringp loc) (user-error "%s" loc))
     (list
      (xref-make
       symbol
