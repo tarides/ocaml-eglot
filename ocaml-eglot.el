@@ -751,6 +751,14 @@ and print its type."
       ("ocaml.next-hole" (ocaml-eglot--command-next-hole arguments))
       (_ (cl-call-next-method)))))
 
+;;; Handle XRef backend
+
+(defun ocaml-eglot--enable-xref-backend ()
+  "Register the OCaml-eglot-xref-backend if it is relevant."
+  (when (and eglot--managed-mode
+             (object-of-class-p (ocaml-eglot-req--current-server) 'ocaml-eglot-server))
+    (add-hook 'xref-backend-functions #'ocaml-eglot-xref-backend nil t)))
+
 ;;; Mode
 
 (defvar ocaml-eglot-map
@@ -777,7 +785,10 @@ OCaml Eglot provides standard implementations of the various custom-requests
   :lighter " OCaml-eglot"
   :keymap ocaml-eglot-map
   :group 'ocaml-eglot
-  (add-hook 'find-file-hook #'ocaml-eglot--file-hook))
+  (add-hook 'find-file-hook #'ocaml-eglot--file-hook)
+  (if ocaml-eglot
+      (add-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend nil t)
+    (remove-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend t)))
 
 ;;; Ocamlobjinfo mode
 
@@ -812,17 +823,6 @@ OCaml Eglot provides standard implementations of the various custom-requests
 
 ;;;###autoload
 (add-hook 'find-file-hook #'ocaml-eglot-objinfo-handler)
-
-;;; Handle XRef backend
-
-(defun ocaml-eglot--enable-xref-backend ()
-  "Register the OCaml-eglot-xref-backend if it is relevant."
-  (when (and eglot--managed-mode
-             (object-of-class-p (ocaml-eglot-req--current-server) 'ocaml-eglot-server))
-    (add-hook 'xref-backend-functions #'ocaml-eglot-xref-backend nil t)))
-
-;;;###autoload
-(add-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend)
 
 (provide 'ocaml-eglot)
 ;;; ocaml-eglot.el ends here
