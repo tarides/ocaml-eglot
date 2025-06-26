@@ -99,12 +99,6 @@ Otherwise, `merlin-construct' only includes constructors."
           (const "-decls")
           (const "-uid-deps")))
 
-(defcustom ocaml-eglot-locate-preference 'ml
-  "Determine whether locate should in priority look in ml or mli files."
-  :group 'ocaml-eglot
-  :type '(choice (const :tag "Look at implementation" ml)
-                 (const :tag "Look at interfaces" mli)))
-
 ;;; Faces
 
 (defface ocaml-eglot-value-name-face
