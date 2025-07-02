@@ -769,6 +769,31 @@ and print its type."
     ocaml-eglot-keymap)
   "Keymap for OCaml-eglot minor mode.")
 
+(defun ocaml-eglot--make-server (orig-fn &rest args)
+  "Wrap `make-instance` to return `ocaml-eglot-server` using ORIG-FN and ARGS."
+  (let ((class (car args)))
+    (if (and (eq class 'eglot-lsp-server)
+             (member major-mode '(tuareg-mode
+                                  caml-mode
+                                  neocaml-mode
+                                  neocamli-mode)))
+        (apply orig-fn 'ocaml-eglot-server (cdr args))
+      (apply orig-fn args))))
+
+;;;###autoload
+(defun ocaml-eglot-setup ()
+  "Setup OCaml-eglot."
+  (advice-add 'make-instance :around #'ocaml-eglot--make-server)
+  (add-hook 'find-file-hook #'ocaml-eglot--file-hook)
+  (add-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend nil t))
+
+;;;###autoload
+(defun ocaml-eglot-clean ()
+  "Clean registered hooks and advice."
+  (advice-remove 'make-instance #'ocaml-eglot--make-server)
+  (remove-hook 'find-file-hook #'ocaml-eglot--file-hook)
+  (remove-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend t))
+
 ;;;###autoload
 (define-minor-mode ocaml-eglot
   "Minor mode for interacting with `ocaml-lsp-server' using `eglot' as a client.
@@ -778,9 +803,7 @@ OCaml Eglot provides standard implementations of the various custom-requests
   :keymap ocaml-eglot-map
   :group 'ocaml-eglot
   (add-hook 'find-file-hook #'ocaml-eglot--file-hook)
-  (if ocaml-eglot
-      (add-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend nil t)
-    (remove-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend t)))
+  (if ocaml-eglot (ocaml-eglot-setup) (ocaml-eglot-clean)))
 
 ;;; Ocamlobjinfo mode
 
@@ -812,6 +835,7 @@ OCaml Eglot provides standard implementations of the various custom-requests
         (insert "`ocamlobjinfo' not found in PATH"))
       (goto-char (point-min))
       (ocaml-eglot-objinfo-mode))))
+
 
 ;;;###autoload
 (add-hook 'find-file-hook #'ocaml-eglot-objinfo-handler)

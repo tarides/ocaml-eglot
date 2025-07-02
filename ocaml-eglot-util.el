@@ -23,19 +23,6 @@
 (defclass ocaml-eglot-server (eglot-lsp-server) ()
   :documentation "OCaml-eglot Language Server.")
 
-(defun ocaml-eglot-util--make-server (orig-fn &rest args)
-  "Wrap `make-instance` to return `ocaml-eglot-server` using ORIG-FN and ARGS."
-  (let ((class (car args)))
-    (if (and (eq class 'eglot-lsp-server)
-             (member major-mode '(tuareg-mode
-                                  caml-mode
-                                  neocaml-mode
-                                  neocamli-mode)))
-        (apply orig-fn 'ocaml-eglot-server (cdr args))
-      (apply orig-fn args))))
-
-(advice-add 'make-instance :around #'ocaml-eglot-util--make-server)
-
 ;; Generic util
 
 (defun ocaml-eglot-util--goto-char (target)
