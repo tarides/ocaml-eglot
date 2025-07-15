@@ -1,13 +1,11 @@
 ;;; ocaml-eglot-xref.el --- Xref backend for OCaml   -*- coding: utf-8; lexical-binding: t -*-
 
-;; TODO: Fix Copyright accredit.
-;; Copyright (C) 2025  Xavier Van de Woestyne
+;; Copyright (C) 2025  The OCaml-eglot Project Contributors
 ;; Licensed under the MIT license.
 
-;; TODO: Fix Authors accredit.
 ;; Author: Xavier Van de Woestyne <xaviervdw@gmail.com>
+;;         Spencer Baugh
 ;; Created: 10 June 2025
-;; TODO: Clarify license
 ;; SPDX-License-Identifier: MIT
 
 ;;; Commentary:
