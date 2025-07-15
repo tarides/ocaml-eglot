@@ -20,9 +20,6 @@
 (require 'eglot)
 (require 'cl-lib)
 
-(defclass ocaml-eglot-server (eglot-lsp-server) ()
-  :documentation "OCaml-eglot Language Server.")
-
 ;; Generic util
 
 (defun ocaml-eglot-util--goto-char (target)

@@ -709,7 +709,7 @@ and print its type."
 ;; capabilities supported by the client (the editor) and provision
 ;; them to the server as supported capabilities.
 
-(cl-defmethod eglot-client-capabilities :around ((_server ocaml-eglot-server))
+(cl-defmethod eglot-client-capabilities :around (_)
   "Add client capabilities to Eglot for OCaml LSP server."
   (let* ((capabilities (copy-tree (cl-call-next-method)))
          (experimental-capabilities (cl-getf capabilities :experimental))
@@ -725,7 +725,7 @@ and print its type."
 ;; it, otherwise we leave it to the previous implementation.
 
 (when (fboundp 'eglot-execute)
-  (cl-defmethod eglot-execute :around ((_server ocaml-eglot-server) action)
+  (cl-defmethod eglot-execute :around (_ action)
     "Custom handler for performing client commands."
     (pcase (cl-getf action :command)
       ("ocaml.next-hole" (ocaml-eglot--command-next-hole
@@ -737,7 +737,7 @@ and print its type."
 ;; `eglot-execute-command' (< 30).
 
 (when (fboundp 'eglot-execute-command)
-  (cl-defmethod eglot-execute-command :around ((_server ocaml-eglot-server) command arguments)
+  (cl-defmethod eglot-execute-command :around (_ command arguments)
     "Custom handler for performing client commands (legacy)."
     (pcase command
       ("ocaml.next-hole" (ocaml-eglot--command-next-hole arguments))
@@ -747,8 +747,7 @@ and print its type."
 
 (defun ocaml-eglot--enable-xref-backend ()
   "Register the OCaml-eglot-xref-backend if it is relevant."
-  (when (and eglot--managed-mode
-             (object-of-class-p (ocaml-eglot-req--current-server) 'ocaml-eglot-server))
+  (when eglot--managed-mode
     (add-hook 'xref-backend-functions #'ocaml-eglot-xref-backend nil t)))
 
 ;;; Mode
@@ -769,28 +768,15 @@ and print its type."
     ocaml-eglot-keymap)
   "Keymap for OCaml-eglot minor mode.")
 
-(defun ocaml-eglot--make-server (orig-fn &rest args)
-  "Wrap `make-instance` to return `ocaml-eglot-server` using ORIG-FN and ARGS."
-  (let ((class (car args)))
-    (if (and (eq class 'eglot-lsp-server)
-             (member major-mode '(tuareg-mode
-                                  caml-mode
-                                  neocaml-mode
-                                  neocamli-mode)))
-        (apply orig-fn 'ocaml-eglot-server (cdr args))
-      (apply orig-fn args))))
-
 ;;;###autoload
 (defun ocaml-eglot-setup ()
   "Setup OCaml-eglot."
-  (advice-add 'make-instance :around #'ocaml-eglot--make-server)
   (add-hook 'find-file-hook #'ocaml-eglot--file-hook)
   (add-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend nil t))
 
 ;;;###autoload
 (defun ocaml-eglot-clean ()
   "Clean registered hooks and advice."
-  (advice-remove 'make-instance #'ocaml-eglot--make-server)
   (remove-hook 'find-file-hook #'ocaml-eglot--file-hook)
   (remove-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend t))
 
@@ -802,7 +788,6 @@ OCaml Eglot provides standard implementations of the various custom-requests
   :lighter " OCaml-eglot"
   :keymap ocaml-eglot-map
   :group 'ocaml-eglot
-  (add-hook 'find-file-hook #'ocaml-eglot--file-hook)
   (if ocaml-eglot (ocaml-eglot-setup) (ocaml-eglot-clean)))
 
 ;;; Ocamlobjinfo mode
