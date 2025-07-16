@@ -39,6 +39,7 @@
 (require 'ocaml-eglot-util)
 (require 'ocaml-eglot-req)
 (require 'ocaml-eglot-type-enclosing)
+(require 'ocaml-eglot-xref)
 (require 'eglot)
 
 (declare-function flycheck-next-error "ext:flycheck")
@@ -49,7 +50,6 @@
   :link '(url-link "https://ocaml.org")
   :group 'languages
   :prefix "ocaml-eglot-")
-
 
 ;;; Customizable variables
 
@@ -439,9 +439,7 @@ If there is no available holes, it returns the first one of HOLES."
          (json-result (ocaml-eglot-util--merlin-call-result result))
          (pos (cl-getf json-result :pos)))
     (when pos
-      (let* ((line (cl-getf pos :line))
-             (col (cl-getf pos :col))
-             (target (ocaml-eglot-util--point-by-pos line col)))
+      (let ((target (ocaml-eglot-util--pos-to-point pos)))
         (ocaml-eglot-util--goto-char target)))))
 
 (defun ocaml-eglot-phrase-next ()
@@ -745,6 +743,13 @@ and print its type."
       ("ocaml.next-hole" (ocaml-eglot--command-next-hole arguments))
       (_ (cl-call-next-method)))))
 
+;;; Handle XRef backend
+
+(defun ocaml-eglot--enable-xref-backend ()
+  "Register the OCaml-eglot-xref-backend if it is relevant."
+  (when eglot--managed-mode
+    (add-hook 'xref-backend-functions #'ocaml-eglot-xref-backend nil t)))
+
 ;;; Mode
 
 (defvar ocaml-eglot-map
@@ -764,6 +769,18 @@ and print its type."
   "Keymap for OCaml-eglot minor mode.")
 
 ;;;###autoload
+(defun ocaml-eglot-setup ()
+  "Setup OCaml-eglot."
+  (add-hook 'find-file-hook #'ocaml-eglot--file-hook)
+  (add-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend nil t))
+
+;;;###autoload
+(defun ocaml-eglot-clean ()
+  "Clean registered hooks and advice."
+  (remove-hook 'find-file-hook #'ocaml-eglot--file-hook)
+  (remove-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend t))
+
+;;;###autoload
 (define-minor-mode ocaml-eglot
   "Minor mode for interacting with `ocaml-lsp-server' using `eglot' as a client.
 OCaml Eglot provides standard implementations of the various custom-requests
@@ -771,7 +788,7 @@ OCaml Eglot provides standard implementations of the various custom-requests
   :lighter " OCaml-eglot"
   :keymap ocaml-eglot-map
   :group 'ocaml-eglot
-  (add-hook 'find-file-hook #'ocaml-eglot--file-hook))
+  (if ocaml-eglot (ocaml-eglot-setup) (ocaml-eglot-clean)))
 
 ;;; Ocamlobjinfo mode
 
@@ -803,6 +820,7 @@ OCaml Eglot provides standard implementations of the various custom-requests
         (insert "`ocamlobjinfo' not found in PATH"))
       (goto-char (point-min))
       (ocaml-eglot-objinfo-mode))))
+
 
 ;;;###autoload
 (add-hook 'find-file-hook #'ocaml-eglot-objinfo-handler)

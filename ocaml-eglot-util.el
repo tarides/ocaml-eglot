@@ -94,6 +94,12 @@ If optional MARKERS, make markers instead."
              (target (+ offset-l offset-c)))
         (byte-to-position target)))))
 
+(defun ocaml-eglot-util--pos-to-point (pos)
+  "Convert a POS to a point."
+  (let ((line (cl-getf pos :line))
+        (col (cl-getf pos :col)))
+    (ocaml-eglot-util--point-by-pos line col)))
+
 (defun ocaml-eglot-util--replace-region (range content)
   "Replace a LSP region (RANGE) by a given CONTENT."
   (pcase-let ((`(,beg . ,end) (ocaml-eglot-util--range-region range)))

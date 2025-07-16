@@ -188,7 +188,7 @@ under the cursor.  The MARKUP-KIND can also be configured."
 (defun ocaml-eglot-req--locate-fallback (err)
   "A fallback for printing ERR from locate queries."
   (let ((error-data (alist-get 'jsonrpc-error-data err)))
-      (eglot--error "%s" error-data)))
+    (eglot--error "%s" error-data)))
 
 (defun ocaml-eglot-req--definition ()
   "Execute the `textDocument/definition' request for the current point."
