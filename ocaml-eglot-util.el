@@ -22,6 +22,10 @@
 
 ;; Generic util
 
+(defun ocaml-eglot-util--nil-if-blank (term)
+  "Return nil if a TERM is blank."
+  (when (and term (not (string-blank-p term))) term))
+
 (defun ocaml-eglot-util--goto-char (target)
   "Goto the point TARGET."
   (when (or (< target (point-min))
