@@ -99,13 +99,26 @@ You can find more customisation options in the
 [Eglot](https://www.gnu.org/software/emacs/manual/html_mono/eglot.html)
 manual.
 
-### Using `flycheck` instead of `flymake`
+### Configure `flymake`
 
-> [!WARNING]
-> Currently, without an additional ceremony, `flymake` only displays
-> diagnostics (in the _mini-buffer_) **on a single line**, which can
-> make error reading complicated, which is why switching to `flycheck`
-> is a reasonable proposition.
+By default, `flymake` is configured to display error diagnostics on a
+single line only, which, in OCaml, is rather irritating! Fortunately,
+since version `1.4.0` (available via `elpa`), it is possible to
+configure how diagnostics are displayed. Here is a minimal
+configuration that displays the full diagnostic message in the echo
+area:
+
+```elisp
+(use-package flymake
+  :ensure t
+  :pin gnu
+  :config
+  (setq flymake-diagnostic-format-alist
+        '((t . (origin code message)))))
+```
+
+
+### Using `flycheck` instead of `flymake`
 
 Out of the box, eglot uses `Flymake` as a syntax checker. However, it
 is possible to use `flycheck`, via the
@@ -154,6 +167,58 @@ configured in this way:
 +    (add-to-list 'eglot-server-programs
 +                 '(tuareg-mode . ("ocamllsp" "--fallback-read-dot-merlin")))))
 ```
+
+### Recommended minimal configuration
+
+Here is a recommended minimal configuration to take full advantage of
+`ocaml-eglot` via `tuareg` (and a few additional modes):
+
+```elisp
+;; Configure Flymake for verbose diagnostics
+(use-package flymake
+  :ensure t
+  :pin gnu
+  :config
+  (setq flymake-diagnostic-format-alist
+        '((t . (origin code message)))))
+        
+;; Configure Tuareg
+(use-package tuareg
+  :ensure t
+  :mode (("\\.ocamlinit\\'" . tuareg-mode))
+  
+  ;; Set constructor in Bold for readability purpose (NOT MANDATORY)
+  (set-face-attribute 'tuareg-font-lock-constructor-face nil :weight 'bold))
+  
+;; Configure OCaml-eglot
+(use-package ocaml-eglot
+  :ensure t
+  :after tuareg
+  :hook
+  (tuareg-mode . ocaml-eglot)
+  (ocaml-eglot . eglot-ensure)
+  (ocaml-eglot . (lambda () (add-hook #'before-save-hook #'eglot-format nil t)))
+  :config
+  (setq ocaml-eglot-syntax-checker 'flymake))
+  
+;; Additional modes configuration
+(use-package dune
+  :ensure t)
+
+(use-package opam-switch-mode
+  :ensure t
+  :hook
+  (tuareg-mode . opam-switch-mode))
+
+(use-package ocp-indent
+  :ensure t
+  :config
+  (add-hook 'ocaml-eglot-hook 'ocp-setup-indent))
+```
+
+Using this configuration should provide a pleasant OCaml development
+experience in Emacs!
+
 
 ## Features
 
