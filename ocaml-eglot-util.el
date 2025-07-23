@@ -265,5 +265,12 @@ current window otherwise."
     (ocaml-eglot-util--replace-region deletion-range content))
   (ocaml-eglot-util--select-range selection-range))
 
+(defun ocaml-eglot-util--perform-extraction (result)
+  "Perform a refactoring extraction based on RESULT."
+  (let ((del (cl-getf result :position))
+        (ctn (cl-getf result :content))
+        (sel (cl-getf result :selection_range)))
+    (ocaml-eglot-util--substitute-content-with-selection del ctn sel)))
+
 (provide 'ocaml-eglot-util)
 ;;; ocaml-eglot-util.el ends here
