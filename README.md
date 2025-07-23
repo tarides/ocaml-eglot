@@ -274,6 +274,7 @@ illustrations of each command in the next section.).
 | `ocaml-eglot-type-enclosing` | <kbd>C-c</kbd> <kbd>C-t</kbd> |
 | `ocaml-eglot-occurences` | |
 | `ocaml-eglot-rename` | |
+| `ocaml-eglot-refactor-extract` | |
 
 
 ### Browsing errors
@@ -311,6 +312,8 @@ During a "type enclosing" session the following commands are available:
   expression
 - `ocaml-eglot-type-enclosing-copy` (<kbd>C-w</kbd>): to copy the
   type expression to the _kill-ring_ (clipboard)
+- `ocaml-eglot-type-enclosing-refactor-extract` (<kbd>C-e</kbd>): to
+  extract the current enclosing into a toplevel definition
   
 You can also enter an expression in the mini-buffer for which you want
 to display the type:
@@ -525,6 +528,16 @@ there are variations for controlling the window to jump to:
 - `ocaml-eglot-search-declaration-in-current-window`
 - `ocaml-eglot-search-declaration-in-new-window`
 
+### Refactoring
+
+#### Extract expression
+
+Extract the selected region into a top-level variable. If a prefix is
+provided, the command allows entering a name and passing free
+variables (_after extraction_) as arguments:
+
+![Extract Example](media/extract.gif)
+
 ### Opening up build artefacts
 
 Used to hook the opening of a compilation artefact with
@@ -561,3 +574,4 @@ Used to hook the opening of a compilation artefact with
 | `merlin-next-hole`          | `ocaml-eglot-hole-next`            |                                                                                                              |
 | `merlin-previous-hole`      | `ocaml-eglot-hole-prev`            |                                                                                                              |
 | `merlin-toggle-view-errors` | —                                  | An `eglot` configuration                                                                                     |
+| ❌                          | `ocaml-eglot-refactor-extract` |                                                                          |
