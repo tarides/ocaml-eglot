@@ -3,6 +3,7 @@ unreleased
 
 - Allows known compilation artifacts to be displayed via the `ocamlobjinfo` binary ([#56](https://github.com/tarides/ocaml-eglot/pull/56), [#61](https://github.com/tarides/ocaml-eglot/pull/61))
 - A total reimplementation of `xref` more suitable for OCaml ([#64](https://github.com/tarides/ocaml-eglot/pull/64))
+- Add `ocaml-eglot-refactor-extract` to extract region a local definition ([#65](https://github.com/tarides/ocaml-eglot/pull/65)) and attach the feature to `type-enclosing`
 
 ocaml-eglot 1.2.0
 ======================
