@@ -221,12 +221,21 @@ current window otherwise."
         (t (find-file-other-window new-file)))
   (ocaml-eglot-util--jump-to-range range))
 
+(defun ocaml-eglot-util--select-range (range)
+  "Active mark for the given RANGE."
+  (let ((beg (eglot--lsp-position-to-point (cl-getf range :start)))
+        (end (eglot--lsp-position-to-point (cl-getf range :end))))
+    (goto-char beg)
+    (set-mark beg)
+    (goto-char end)
+    (activate-mark)))
+
 (defun ocaml-eglot-util--highlight-range (range face)
   "Highlight a given RANGE using a given FACE."
   (remove-overlays nil nil 'ocaml-eglot-highlight 'highlight)
   (let* ((beg (eglot--lsp-position-to-point (cl-getf range :start)))
-        (end (eglot--lsp-position-to-point (cl-getf range :end)))
-        (overlay (make-overlay beg end)))
+         (end (eglot--lsp-position-to-point (cl-getf range :end)))
+         (overlay (make-overlay beg end)))
     (overlay-put overlay 'face face)
     (overlay-put overlay 'ocaml-eglot-highlight 'highlight)
     (unwind-protect (sit-for 60) (delete-overlay overlay))))
@@ -248,6 +257,13 @@ current window otherwise."
   "Check whether a FILENAME has the extension of an OCaml build artefact."
   (string-match-p "\\.cm\\(i\\|ti\\|t\\|o\\|x\\|a\\|xa\\|xs\\)\\'"
                   filename))
+
+(defun ocaml-eglot-util--substitute-content-with-selection
+    (deletion-range content selection-range)
+  "Replace the DELETION-RANGE with CONTENT and select the SELECTION-RANGE."
+  (let ((deactivate-mark nil))
+    (ocaml-eglot-util--replace-region deletion-range content))
+  (ocaml-eglot-util--select-range selection-range))
 
 (provide 'ocaml-eglot-util)
 ;;; ocaml-eglot-util.el ends here

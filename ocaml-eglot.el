@@ -708,8 +708,10 @@ and print its type."
                (end (cl-getf current-range :end))
                (result (ocaml-eglot-req--refactor-extract start end extract-name)))
           (let ((range (cl-getf result :position))
-                (content (cl-getf result :content)))
-            (ocaml-eglot-util--replace-region range content))))))
+                (content (cl-getf result :content))
+                (selection (cl-getf result :selection_range)))
+            (ocaml-eglot-util--substitute-content-with-selection
+             range content selection))))))
 
 ;;; Custom command handler
 
