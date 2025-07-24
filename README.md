@@ -185,10 +185,7 @@ Here is a recommended minimal configuration to take full advantage of
 ;; Configure Tuareg
 (use-package tuareg
   :ensure t
-  :mode (("\\.ocamlinit\\'" . tuareg-mode))
-  
-  ;; Set constructor in Bold for readability purpose (NOT MANDATORY)
-  (set-face-attribute 'tuareg-font-lock-constructor-face nil :weight 'bold))
+  :mode (("\\.ocamlinit\\'" . tuareg-mode)))
   
 ;; Configure OCaml-eglot
 (use-package ocaml-eglot
