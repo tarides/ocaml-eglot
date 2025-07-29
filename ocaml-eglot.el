@@ -694,6 +694,21 @@ and print its type."
   (interactive)
   (call-interactively #'eglot-rename))
 
+;; Refactoring features
+
+(defun ocaml-eglot-refactor-extract (&optional prefix)
+  "A documentation PREFIX."
+  (interactive "P")
+  (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleRefactorExtract)
+  (if (region-active-p)
+      (let* ((input-name (if prefix (read-string "Name: ")))
+             (extract-name (ocaml-eglot-util--nil-if-blank input-name)))
+        (let* ((current-range (ocaml-eglot-util--current-range))
+               (start (cl-getf current-range :start))
+               (end (cl-getf current-range :end))
+               (result (ocaml-eglot-req--refactor-extract start end extract-name)))
+          (ocaml-eglot-util--perform-extraction result)))))
+
 ;;; Custom command handler
 
 (defun ocaml-eglot--command-next-hole (arguments)

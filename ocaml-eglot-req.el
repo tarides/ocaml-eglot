@@ -69,7 +69,8 @@ request fails.  SERVER can also be conditionnaly given."
 
 (defun ocaml-eglot-req--TextDocumentIdentifier ()
   "Compute `TextDocumentIdentifier' object for current buffer."
-  (eglot--TextDocumentIdentifier))
+  (append (list :textDocument (eglot--TextDocumentIdentifier))
+          (eglot--TextDocumentIdentifier)))
 
 (defun ocaml-eglot-req--PlainUri ()
   "A hack for requests that do not respect the URI parameter scheme."
@@ -84,8 +85,7 @@ request fails.  SERVER can also be conditionnaly given."
 (defun ocaml-eglot-req--TextDocumentPositionParamsWithPos (position)
   "Compute `TextDocumentPositionParams' object for the current buffer.
 With a given POSITION"
-  (append (list :textDocument (ocaml-eglot-req--TextDocumentIdentifier)
-                :position position)
+  (append (list :position position)
           (ocaml-eglot-req--TextDocumentIdentifier)))
 
 (defun ocaml-eglot-req--ConstructParams (position depth with-local-values)
@@ -121,8 +121,7 @@ A potential IDENTIFIER can be given and MARKUP-KIND can be parametrized."
 AT is the range or the position.
 INDEX is the index of the enclosing.
 VERBOSITY is a potential verbosity index."
-  (append (list :textDocument (ocaml-eglot-req--TextDocumentIdentifier))
-          (ocaml-eglot-req--TextDocumentIdentifier)
+  (append (ocaml-eglot-req--TextDocumentIdentifier)
           `(:at, at)
           `(:index, index)
           `(:verbosity, verbosity)))
@@ -215,6 +214,15 @@ INDEX is the index of the enclosing.
 VERBOSITY is a potential verbosity index."
   (let ((params (ocaml-eglot-req--TypeEnclosingParams at index verbosity)))
     (ocaml-eglot-req--send :ocamllsp/typeEnclosing params)))
+
+(defun ocaml-eglot-req--refactor-extract (beg end &optional name)
+  "Extract the given range (BEG END) as a toplevel expression named NAME.
+If NAME is empty, it will be computed"
+  (let ((params (append (ocaml-eglot-req--TextDocumentIdentifier)
+                        `(:start, beg)
+                        `(:stop, end)
+                        `(:extract_name, name))))
+    (ocaml-eglot-req--send :ocamllsp/refactorExtract params)))
 
 (defun ocaml-eglot-req--call-code-action (beg end action-kind)
   "Call ACTION-KIND promptly (at BEG . END)."
