@@ -755,7 +755,6 @@ and print its type."
 (defvar ocaml-eglot-map
   (let ((ocaml-eglot-keymap (make-sparse-keymap)))
     (define-key ocaml-eglot-keymap (kbd "C-c C-x") #'ocaml-eglot-error-next)
-    (define-key ocaml-eglot-keymap (kbd "C-c C-c") #'ocaml-eglot-error-prev)
     (define-key ocaml-eglot-keymap (kbd "C-c C-l") #'ocaml-eglot-find-definition)
     (define-key ocaml-eglot-keymap (kbd "C-c C-i") #'ocaml-eglot-find-declaration)
     (define-key ocaml-eglot-keymap (kbd "C-c C-a") #'ocaml-eglot-alternate-file)
