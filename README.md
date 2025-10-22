@@ -233,7 +233,7 @@ illustrations of each command in the next section.).
 | Command | Default Binding | 
 | -- | -- |
 | `ocaml-eglot-error-next` | <kbd>C-c</kbd> <kbd>C-x</kbd> |
-| `ocaml-eglot-error-prev` | <kbd>C-c</kbd> <kbd>C-c</kbd> |
+| `ocaml-eglot-error-prev` | |
 | `ocaml-eglot-find-definition` |<kbd>C-c</kbd> <kbd>C-l</kbd> |
 | `ocaml-eglot-find-definition-in-new-window` | |
 | `ocaml-eglot-find-definition-in-current-window` | |
