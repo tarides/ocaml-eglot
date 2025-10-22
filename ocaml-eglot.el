@@ -824,34 +824,18 @@ OCaml Eglot provides standard implementations of the various custom-requests
 ;;;###autoload
 (add-hook 'find-file-hook #'ocaml-eglot-objinfo-handler)
 
-;;; Modifies server binary invocation (ocamllsp) to take
-;;; Dune package management into account
-
-(defun ocaml-eglot--dune-call-which-lsp ()
-  "Call `dune tools wich ocamllsp'."
-  (call-process "dune" nil (current-buffer) nil
-                "tools" "which" "ocamllsp" "--no-print-directory"))
-
-(defun ocaml-eglot--dune-which-lsp ()
-  "Execute dune-wich to find out if Dune Package Management is used."
-  (let ((call-result
-         (with-temp-buffer
-           (if (zerop (ocaml-eglot--dune-call-which-lsp))
-               (buffer-string)
-             ""))))
-    (string-trim call-result)))
-
-(defun ocaml-eglot-server-command (_project _mode)
+(defun ocaml-eglot-server-command (interactive project)
   "Return the binary to be executed to start the LSP server.
-PROJECT is used to resolve executable file."
-  (let* ((result (ocaml-eglot--dune-which-lsp)))
-    (if (and result (not (string-empty-p result)))
-        (progn
-          (eglot--message "Using Dune Package Management")
-          (list "dune" "tools" "exec" "ocamllsp"))
-      (progn
-        (eglot--message "Using OPAM")
-        (list "ocamllsp")))))
+PROJECT is used to resolve executable file.
+
+If Dune package management is enabled, use ocamllsp from Dune;
+otherwise, use ocamllsp from PATH."
+  (if (zerop
+       (let ((default-directory (project-root project)))
+         (call-process "dune" nil nil nil
+                       "tools" "which" "ocamllsp" "--no-print-directory")))
+      '("dune" "tools" "exec" "ocamllsp")
+    '("ocamllsp")))
 
 (add-to-list
  'eglot-server-programs
