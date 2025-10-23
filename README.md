@@ -12,9 +12,9 @@ implementing canonical custom requests and commands exposed by the
 
 > [!IMPORTANT]
 > `ocaml-eglot` is an **alternative mode** to
-> [`merlin`](https://ocaml.github.io/merlin/) which uses
+> [`merlin`](https://ocaml.github.io/merlin/). It uses
 > [`ocaml-lsp-server`](https://github.com/ocaml/ocaml-lsp) (instead of
-> `ocamlmerlin`) as the language server. So yes, if you decide to use
+> `ocamlmerlin`) as the language server. So, if you decide to use
 > `ocaml-eglot`, `merlin` is no longer needed.
 
 `ocaml-eglot` bridges the gap between generic LSP support and the
