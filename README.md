@@ -35,7 +35,9 @@ installed (e.g. [caml-mode](https://melpa.org/#/caml) or
 [`use-package`](https://www.gnu.org/software/emacs/manual/html_node/use-package/Lisp-Configuration.html)
 to install `ocaml-eglot`. You will also need
 `https://ocaml.org/p/ocaml-lsp-server/latest` in the [current
-switch](https://ocaml.org/docs/opam-switch-introduction).
+opam switch](https://ocaml.org/docs/opam-switch-introduction). (If you are using
+`dune pkg` to managed your dependencies, see [Usage with `dune
+pkg`](#usage-with-dune-pkg))
 
 
 Here's an example with Tuareg already installed:
@@ -216,6 +218,32 @@ Here is a recommended minimal configuration to take full advantage of
 Using this configuration should provide a pleasant OCaml development
 experience in Emacs!
 
+### Usage with `dune pkg`
+
+If you are using [`dune` for package management][dune-pkg], we recommend using
+[direnv][direnv] via [envrc.el](https://github.com/purcell/envrc), in
+conjunction with the `dune tools env` command to get `dune`-managed dev tools in
+the environment.
+
+Assuming you have [installed and configured
+`envrc.el`](https://github.com/purcell/envrc?tab=readme-ov-file#installation),
+then for each `dune`-managed project:
+
+1. Install `ocamllsp` in your dune workspace with
+
+   ``` sh
+   $ dune tools install ocamllsp
+   ```
+
+2. Configure the `.envrc` file to put `dune`-managed dev tools in your path:
+
+   ```sh
+   $ echo 'eval $(dune tools env)' >> .envrc
+   $ direnv allow
+   ```
+
+[dune-pkg]: https://dune.readthedocs.io/en/stable/explanation/package-management.html
+[direnv]: https://direnv.net/
 
 ## Features
 
