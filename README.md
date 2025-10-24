@@ -12,9 +12,9 @@ implementing canonical custom requests and commands exposed by the
 
 > [!IMPORTANT]
 > `ocaml-eglot` is an **alternative mode** to
-> [`merlin`](https://ocaml.github.io/merlin/) which uses
+> [`merlin`](https://ocaml.github.io/merlin/). It uses
 > [`ocaml-lsp-server`](https://github.com/ocaml/ocaml-lsp) (instead of
-> `ocamlmerlin`) as the language server. So yes, if you decide to use
+> `ocamlmerlin`) as the language server. So, if you decide to use
 > `ocaml-eglot`, `merlin` is no longer needed.
 
 `ocaml-eglot` bridges the gap between generic LSP support and the
@@ -23,6 +23,41 @@ ensures a lightweight experience without sacrificing the advanced
 features made available by `ocaml-lsp-server`. Its aim is to offer a
 user experience as close as possible to that offered by the Emacs mode
 [Merlin](https://ocaml.github.io/merlin/editor/emacs/).
+
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [OCaml-eglot](#ocaml-eglot)
+  - [Installation](#installation)
+    - [Foreword on configuration](#foreword-on-configuration)
+    - [Activating `format-on-save`](#activating-format-on-save)
+    - [Make eglot less visually obtrusive](#make-eglot-less-visually-obtrusive)
+    - [Configure `flymake`](#configure-flymake)
+    - [Using `flycheck` instead of `flymake`](#using-flycheck-instead-of-flymake)
+    - [Using Merlin-configuration](#using-merlin-configuration)
+    - [Recommended minimal configuration](#recommended-minimal-configuration)
+    - [Usage with `dune pkg`](#usage-with-dune-pkg)
+  - [Features](#features)
+    - [Browsing errors](#browsing-errors)
+    - [Type Enclosings](#type-enclosings)
+    - [Jump to definition/declaration](#jump-to-definitiondeclaration)
+      - [Definition and Declaration](#definition-and-declaration)
+    - [Find identifier definition/declaration](#find-identifier-definitiondeclaration)
+    - [Jump to type definition  of an expression](#jump-to-type-definition--of-an-expression)
+    - [Find occurrences](#find-occurrences)
+    - [Renaming](#renaming)
+    - [Infer Interface](#infer-interface)
+    - [Find Alternate file](#find-alternate-file)
+    - [Get Documentation](#get-documentation)
+    - [Construct Expression](#construct-expression)
+    - [Destruct (or case-analysis)](#destruct-or-case-analysis)
+    - [Source Browsing](#source-browsing)
+    - [Search for values](#search-for-values)
+    - [Opening up build artefacts](#opening-up-build-artefacts)
+  - [Comparison of Merlin and OCaml-eglot commands](#comparison-of-merlin-and-ocaml-eglot-commands)
+
+<!-- markdown-toc end -->
+
 
 ## Installation
 
