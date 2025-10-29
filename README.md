@@ -255,10 +255,10 @@ experience in Emacs!
 
 ### Usage with `dune pkg`
 
-If you are using [`dune` for package management][dune-pkg], we recommend using
-[direnv][direnv] via [envrc.el](https://github.com/purcell/envrc), in
-conjunction with the `dune tools env` command to get `dune`-managed dev tools in
-the environment.
+If you are using [`dune` for package management][dune-pkg] on the [latest
+nightly bulid](https://preview.dune.build/) or version 3.21 or later, we
+recommend using [direnv][direnv] via [envrc.el][envrc], in conjunction with the
+`dune tools env` command to get `dune`-managed dev tools in the environment.
 
 Assuming you have [installed and configured
 `envrc.el`](https://github.com/purcell/envrc?tab=readme-ov-file#installation),
@@ -279,6 +279,7 @@ then for each `dune`-managed project:
 
 [dune-pkg]: https://dune.readthedocs.io/en/stable/explanation/package-management.html
 [direnv]: https://direnv.net/
+[envrc]: https://github.com/purcell/envrc
 
 ## Features
 
