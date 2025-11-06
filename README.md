@@ -112,6 +112,21 @@ Eglot provides a hook to format the buffer on saving:
 +                   (add-hook #'before-save-hook #'eglot-format nil t))))
 ```
 
+### Configure the behavior of opening windows
+
+The definition/declaration search uses a dedicated backend
+[xref](https://www.gnu.org/software/emacs/manual/html_node/emacs/Xref.html). By
+default, jumping to an occurrence uses the current window. It is
+possible to override this behavior by configuring `xref` in this way:
+
+```elisp
+(add-to-list
+ 'display-buffer-alist
+ '((category . xref-jump)
+   (display-buffer-reuse-window
+    display-buffer-use-some-window)))
+```
+
 ### Make eglot less visually obtrusive
 
 Eglot introduces a lot of visual noise (which can greatly alter the
@@ -248,6 +263,13 @@ Here is a recommended minimal configuration to take full advantage of
   :ensure t
   :config
   (add-hook 'ocaml-eglot-hook 'ocp-setup-indent))
+
+;; Smart reuse windows for Xref
+(add-to-list
+ 'display-buffer-alist
+ '((category . xref-jump)
+   (display-buffer-reuse-window
+    display-buffer-use-some-window)))
 ```
 
 Using this configuration should provide a pleasant OCaml development

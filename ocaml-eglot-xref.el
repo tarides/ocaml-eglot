@@ -173,7 +173,7 @@ Requires that the current buffer be the buffer of FILE."
 
 
 (cl-defmethod xref-backend-identifier-completion-table ((_backend (eql ocaml-eglot-xref)))
-  "Returns a list of symbols for completion."
+  "Return a list of symbols for completion."
   ;; TODO: xref-backend-identifier-completion-table
   ;; missing `merlin-cap-table'
   nil)
