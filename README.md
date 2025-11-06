@@ -299,17 +299,9 @@ illustrations of each command in the next section.).
 | `ocaml-eglot-error-next` | <kbd>C-c</kbd> <kbd>C-x</kbd> |
 | `ocaml-eglot-error-prev` | |
 | `ocaml-eglot-find-definition` |<kbd>C-c</kbd> <kbd>C-l</kbd> |
-| `ocaml-eglot-find-definition-in-new-window` | |
-| `ocaml-eglot-find-definition-in-current-window` | |
 | `ocaml-eglot-find-identifier-definition` | |
-| `ocaml-eglot-find-identifier-definition-in-new-window` | |
-| `ocaml-eglot-find-identifier-definition-in-current-window` | |
 | `ocaml-eglot-find-declaration` | <kbd>C-c</kbd> <kbd>C-i</kbd> |
-| `ocaml-eglot-find-declaration-in-new-window` | |
-| `ocaml-eglot-find-definition-in-current-window` | |
 | `ocaml-eglot-find-identifier-declaration` | |
-| `ocaml-eglot-find-identifier-declaration-in-new-window` | |
-| `ocaml-eglot-find-identifier-declaration-in-current-window` | |
 | `ocaml-eglot-find-type-definition` | |
 | `ocaml-eglot-find-type-definition-in-new-window` | |
 | `ocaml-eglot-find-type-definition-in-current-window` | |
@@ -322,11 +314,7 @@ illustrations of each command in the next section.).
 | `ocaml-eglot-phrase-prev` | <kbd>C-c</kbd> <kbd>C-n</kbd> |
 | `ocaml-eglot-search` | |
 | `ocaml-eglot-search-definition` | |
-| `ocaml-eglot-search-definition-in-new-window` | |
-| `ocaml-eglot-search-definition-in-current-window` | |
 | `ocaml-eglot-search-declaration` | |
-| `ocaml-eglot-search-declaration-in-new-window` | |
-| `ocaml-eglot-search-declaration-in-current-window` | |
 | `ocaml-eglot-document` | <kbd>C-c</kbd> <kbd>C-d</kbd> |
 | `ocaml-eglot-document-identifier` | |
 | `ocaml-eglot-construct` | <kbd>C-c</kbd> <kbd>\\</kbd> |
@@ -394,19 +382,6 @@ declaration of an identifier:
 
 ![Jump to definition example](media/find-def-decl.gif)
 
-The default calculation for the window containing the jump result is
-_smart_: if the target is in the same file, the command uses the same
-window; if the target is in another file, the command opens a new
-window. Auxiliary functions for controlling the placement of a result
-are provided:
-
-- `ocaml-eglot-find-definition-in-new-window`
-- `ocaml-eglot-find-declaration-in-new-window`
-- `ocaml-eglot-find-definition-in-current-window`
-- `ocaml-eglot-find-declaration-in-current-window`
-
-The default behavior can also be configured using the
-`ocaml-eglot-open-window-strategy` variable.
 
 #### Definition and Declaration
 
@@ -426,13 +401,6 @@ It is also possible to directly enter the name of an identifier
 
 ![Find identifier example](media/find-identifier.gif)
 
-And as with commands that locate the identifier below the cursor,
-there are variations for controlling the window to jump to:
-
-- `ocaml-eglot-find-identifier-definition-in-new-window`
-- `ocaml-eglot-find-identifier-definition-in-current-window`
-- `ocaml-eglot-find-identifier-declaration-in-new-window`
-- `ocaml-eglot-find-identifier-declaration-in-current-window`
 
 ### Jump to type definition  of an expression
 
@@ -578,13 +546,6 @@ Alternatively, you can search for a definition or declaration:
   
 ![Search Definition or Declaration Example](media/search-def.gif)
 
-And as with commands that locate the identifier below the cursor,
-there are variations for controlling the window to jump to:
-  
-- `ocaml-eglot-search-definition-in-current-window`
-- `ocaml-eglot-search-definition-in-new-window`
-- `ocaml-eglot-search-declaration-in-current-window`
-- `ocaml-eglot-search-declaration-in-new-window`
 
 ### Opening up build artefacts
 
