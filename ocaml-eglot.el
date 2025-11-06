@@ -467,8 +467,7 @@ of results (LIMIT)."
   (interactive "sSearch query: \np")
   (ocaml-eglot--search-def-or-decl
    (lambda (identifier)
-     (let ((ocaml-eglot-locate-preference 'ml)
-           (xref-prompt-for-identifier nil))
+     (let ((ocaml-eglot-locate-preference 'ml))
        (xref-find-definitions identifier)))
    query
    limit))
@@ -480,8 +479,7 @@ of results (LIMIT)."
   (interactive "sSearch query: \np")
   (ocaml-eglot--search-def-or-decl
    (lambda (identifier)
-     (let ((ocaml-eglot-locate-preference 'mli)
-           (xref-prompt-for-identifier nil))
+     (let ((ocaml-eglot-locate-preference 'mli))
        (xref-find-definitions identifier)))
    query
    limit))
