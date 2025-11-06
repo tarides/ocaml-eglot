@@ -172,8 +172,11 @@ Requires that the current buffer be the buffer of FILE."
                                                (cl-getf loc :pos))))))
 
 
-;;; TODO: xref-backend-identifier-completion-table
-;;; missing `merlin-cap-table'
+(cl-defmethod xref-backend-identifier-completion-table ((_backend (eql ocaml-eglot-xref)))
+  "Returns a list of symbols for completion."
+  ;; TODO: xref-backend-identifier-completion-table
+  ;; missing `merlin-cap-table'
+  nil)
 
 (defconst ocaml-eglot-xref--operator-regexp
   (eval-when-compile
