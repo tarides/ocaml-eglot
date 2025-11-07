@@ -5,6 +5,7 @@ unreleased
 - A total reimplementation of `xref` more suitable for OCaml ([#64](https://github.com/tarides/ocaml-eglot/pull/64))
 - Remove `C-c C-c` for `ocaml-eglot-error-prev`, clash with usual `compile` ([#67](https://github.com/tarides/ocaml-eglot/pull/67))
 - Rewrite `find/locate` function in term of `xref` ([#73](https://github.com/tarides/ocaml-eglot/pull/73))
+- Add `ocaml-eglot-type-annotate` for type annotating type enclosed expressions ([#74](https://github.com/tarides/ocaml-eglot/pull/74))
 
 ocaml-eglot 1.2.0
 ======================

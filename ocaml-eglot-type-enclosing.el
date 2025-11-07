@@ -49,6 +49,7 @@
     (define-key keymap (kbd "C-c C-t") #'ocaml-eglot-type-enclosing-increase-verbosity)
     (define-key keymap (kbd "C-<right>") #'ocaml-eglot-type-enclosing-increase-verbosity)
     (define-key keymap (kbd "C-<left>") #'ocaml-eglot-type-enclosing-decrease-verbosity)
+    (define-key keymap (kbd "C-'") #'ocaml-eglot-type-annotate)
     keymap)
   "Keymap for OCaml-eglot's type enclosing transient mode.")
 
@@ -109,6 +110,21 @@ If PREV-VERB is given, the verbosity change ensure that the type is different."
           (mod (1- ocaml-eglot-type-enclosing-offset)
                (length ocaml-eglot-type-enclosing-types)))
     (ocaml-eglot-type-enclosing--with-fixed-offset)))
+
+(defun ocaml-eglot-type-annotate ()
+  "Type annotate the expression of the current enclosing with its type."
+  (interactive)
+  (when-let*
+      ((type ocaml-eglot-type-enclosing-current-type)
+       (enclosing (aref ocaml-eglot-type-enclosing-types ocaml-eglot-type-enclosing-offset))
+       (beg (eglot--lsp-position-to-point (cl-getf enclosing :start)))
+       (end (eglot--lsp-position-to-point (cl-getf enclosing :end))))
+    (progn
+      (save-excursion
+        (goto-char beg)
+        (insert ?\())
+      (goto-char (+ 1 end))
+      (insert " : " type ")"))))
 
 (defun ocaml-eglot-type-enclosing--type-buffer (type-expr)
   "Create buffer with content TYPE-EXPR of the enclosing type buffer."
