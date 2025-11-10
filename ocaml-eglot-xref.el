@@ -152,7 +152,10 @@ Requires that the current buffer be the buffer of FILE."
           (propertize (buffer-substring start end) 'face 'xref-match)
           (buffer-substring (save-excursion (goto-char end) (pos-eol)) end))
          loc
-         (- end start)))))
+         (- end start)))
+    ;; We don't have the file open, so we can't make a real summary or decode
+    ;; the length.  We'll just use the symbol as the summary instead.
+    (xref-make symbol loc)))
 
 (cl-defmethod xref-backend-references ((_backend (eql ocaml-eglot-xref)) symbol)
   "An `xref-backend-references' for SYMBOL for OCaml-eglot."
