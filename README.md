@@ -337,7 +337,7 @@ illustrations of each command in the next section.).
 | `ocaml-eglot-destruct` | <kbd>C-c</kbd> <kbd>\|</kbd> |
 | `ocaml-eglot-type-expression` | |
 | `ocaml-eglot-type-enclosing` | <kbd>C-c</kbd> <kbd>C-t</kbd> |
-| `ocaml-eglot-occurences` | |
+| `ocaml-eglot-occurrences` | |
 | `ocaml-eglot-rename` | |
 
 
@@ -435,14 +435,14 @@ provided:
 
 ### Find occurrences
 
-`ocaml-eglot-occurences` returns all occurrences of the
+`ocaml-eglot-occurrences` returns all occurrences of the
 identifier under the cursor. To find all occurrences in the entire
 project, it requires an index. This index can be created by running
 `dune build @ocaml-index --watch` when developing.  Requires OCaml
 `5.2` and Dune `3.16.0`. See the
 [announcement](https://discuss.ocaml.org/t/ann-project-wide-occurrences-in-merlin-and-lsp/14847/1).
 
-![Occurrences example](media/occurences.gif)
+![Occurrences example](media/occurrences.gif)
 
 ### Renaming
 
@@ -587,8 +587,8 @@ Used to hook the opening of a compilation artefact with
 |  —                          | `ocaml-eglot-find-definition`      | Available in Merlin by configuration                                                                         |
 | ❌                          | `ocaml-eglot-find-type-definition` |                                                                          |
 | `merlin-locate-ident`       | `ocaml-eglot-find-identifier-definition`, `ocaml-eglot-find-identifier-declaration`                                 |                                                                                                              |
-| `merlin-occurences`         | `ocaml-eglot-occurences`           |                                                                                                              |
-| `merlin-project-occurences` | —                                  | Handle by `ocaml-eglot-occurences` (if `ocaml-version  >= 5.2` and need an index, `dune build @ocaml-index`) |
+| `merlin-occurrences`         | `ocaml-eglot-occurrences`           |                                                                                                              |
+| `merlin-project-occurrences` | —                                  | Handle by `ocaml-eglot-occurrences` (if `ocaml-version  >= 5.2` and need an index, `dune build @ocaml-index`) |
 | `merlin-iedit-occurrences`  | `ocaml-eglot-rename`               |                                                                                                              |
 | `merlin-document`           | `ocaml-eglot-document`             | also `ocaml-eglot-document-identifier`                                                                       |
 | `merlin-phrase-next`        | `ocaml-eglot-phrase-next`          |                                                                                                              |
