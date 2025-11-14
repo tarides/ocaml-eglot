@@ -240,10 +240,5 @@ current window otherwise."
         (cl-getf json-result :value)
       (eglot--error "Invalid result class %s" result-class))))
 
-(defun ocaml-eglot-util--is-artifact (filename)
-  "Check whether a FILENAME has the extension of an OCaml build artefact."
-  (string-match-p "\\.cm\\(i\\|ti\\|t\\|o\\|x\\|a\\|xa\\|xs\\)\\'"
-                  filename))
-
 (provide 'ocaml-eglot-util)
 ;;; ocaml-eglot-util.el ends here
