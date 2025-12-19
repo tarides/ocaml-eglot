@@ -352,13 +352,16 @@ If there is no available holes, it returns the first one of HOLES."
         (eglot--error "Target not found")))))
 
 (defun ocaml-eglot--phrase (direction)
-  "Move to the next or previous phrase using DIRECTION."
-  (let* ((result (ocaml-eglot-req--phrase direction))
-         (json-result (ocaml-eglot-util--merlin-call-result result))
-         (pos (cl-getf json-result :pos)))
-    (when pos
-      (let ((target (ocaml-eglot-util--pos-to-point pos)))
-        (ocaml-eglot-util--goto-char target)))))
+  (if (ocaml-eglot-req--server-capable :experimental :ocamllsp :handlePhrase)
+      (let ((result (ocaml-eglot-req--phrase direction)))
+        (when result
+          (ocaml-eglot-util--jump-to result)))
+    (let* ((result (ocaml-eglot-req--phrase-legacy direction))
+           (json-result (ocaml-eglot-util--merlin-call-result result))
+           (pos (cl-getf json-result :pos)))
+      (when pos
+        (let ((target (ocaml-eglot-util--pos-to-point pos)))
+          (ocaml-eglot-util--goto-char target))))))
 
 (defun ocaml-eglot-phrase-next ()
   "Go to the beginning of the next phrase."
