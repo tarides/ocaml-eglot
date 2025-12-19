@@ -235,19 +235,30 @@ ARGV is the list of arguments."
                         `(:args, argv))))
     (ocaml-eglot-req--send :ocamllsp/merlinCallCompatible params)))
 
-(defun ocaml-eglot-req--phrase (target)
-  "Compute the beginning of the phrase referenced by TARGET."
-  ;; TODO: use a dedicated custom request instead of tunneling
+(defun ocaml-eglot-req--phrase-legacy (target)
+  "Compute the beginning of the phrase referenced by TARGET (legacy)."
   (let ((argv (vector "-position" (ocaml-eglot-util-point-as-arg (point))
                       "-target" target)))
     (ocaml-eglot-req--merlin-call "phrase" argv)))
 
-(defun ocaml-eglot-req--type-expression (expression)
-  "Get the type of EXPRESSION inside the local context."
+(defun ocaml-eglot-req--phrase (target)
+  "Compute the beginning of the phrase referenced by TARGET."
+  (let ((params (append (ocaml-eglot-req--TextDocumentPositionParams)
+                        `(:target, target))))
+    (ocaml-eglot-req--send :ocamllsp/phrase params)))
+
+(defun ocaml-eglot-req--type-expression-legacy (expression)
+  "Get the type of EXPRESSION inside the local context (legacy)."
   ;; TODO: use a dedicated custom request instead of tunneling
   (let ((argv (vector "-position" (ocaml-eglot-util-point-as-arg (point))
                       "-expression" expression)))
     (ocaml-eglot-req--merlin-call "type-expression" argv)))
+
+(defun ocaml-eglot-req--type-expression (expression)
+  "Get the type of EXPRESSION inside the local context."
+  (let ((params (append (ocaml-eglot-req--TextDocumentPositionParams)
+                        `(:expression, expression))))
+    (ocaml-eglot-req--send :ocamllsp/typeExpression params)))
 
 (defun ocaml-eglot-req--locate-ident (ident look-for)
   "Locate an identifier (IDENT) using `merlin-locate'.

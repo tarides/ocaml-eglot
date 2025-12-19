@@ -161,8 +161,10 @@ If optional MARKERS, make markers instead."
 
 (defun ocaml-eglot-util--on-interface ()
   "Return non-nil if the current URI is an interface, nil otherwise."
-  (let ((uri (ocaml-eglot-util--current-uri)))
-    (ocaml-eglot-util--is-interface uri)))
+  (when (and buffer-file-name
+             (string-match-p "\\.\\(mli\\|rei\\|eliomi\\)\\'" buffer-file-name))
+    (let ((uri (ocaml-eglot-util--current-uri)))
+      (ocaml-eglot-util--is-interface uri))))
 
 (defun ocaml-eglot-util--ensure-is-interface (uri)
   "Ensure that a function is called given an interface file (URI)."
