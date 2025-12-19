@@ -70,22 +70,19 @@ than a character offset, so we can't use `xref-make-file-location'."
         (list :file (ocaml-eglot-util--uri-to-path (cl-getf result :uri))
               :pos (cl-getf (cl-getf result :range) :start)))
     ;; The LSP doesn't support jumping to definition of an arbitrary identifier,
-    ;; so we have to fallback on merlinCallCompatible.
+    ;; so we have to fallback on ocamllsp/locate.
     (let* ((locate-result
-            (ocaml-eglot-req--merlin-call
-             "locate"
-             (vector "-prefix" (string-remove-suffix "." symbol)
-                     ;; We don't know if SYMBOL is a module or type or
-                     ;; expr, and we shouldn't use -position to guess.
-                     ;; See: https://github.com/janestreet/merlin-jst/pull/91
-                     "-context" "unknown"
-                     "-position" (ocaml-eglot-util-point-as-arg (point))
-                     ;; And use `point' to pick the lexical environment to
-                     ;; search:
-                     "-look-for" (symbol-name ocaml-eglot-locate-preference))))
-           (result (ocaml-eglot-util--merlin-call-result locate-result)))
-      (list :file (cl-getf result :file)
-            :pos (ocaml-eglot-util--merlin-pos-to-lsp-pos (cl-getf result :pos))))))
+            (ocaml-eglot-req--send
+             :ocamllsp/locate
+             (append (ocaml-eglot-req--TextDocumentPositionParamsWithPos
+                      (eglot--pos-to-lsp-position (point)))
+                     (list :kind (if (eq ocaml-eglot-locate-preference 'mli)
+                                     "declaration" "definition")
+                           :prefix (string-remove-suffix "." symbol)))))
+           (pos (ocaml-eglot-util--vec-first-or-nil locate-result)))
+      (when pos
+        (list :file (ocaml-eglot-util--uri-to-path (cl-getf pos :uri))
+              :pos (cl-getf (cl-getf pos :range) :start))))))
 
 (defun ocaml-eglot-xref--make-location-in-file (file merlin-pos)
   "Turn FILE and MERLIN-POS into an `xref-item'.
