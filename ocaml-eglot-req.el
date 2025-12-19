@@ -248,7 +248,7 @@ ARGV is the list of arguments."
     (ocaml-eglot-req--send :ocamllsp/phrase params)))
 
 (defun ocaml-eglot-req--type-expression-legacy (expression)
-  "Get the type of EXPRESSION inside the local context. (legacy)"
+  "Get the type of EXPRESSION inside the local context (legacy)."
   ;; TODO: use a dedicated custom request instead of tunneling
   (let ((argv (vector "-position" (ocaml-eglot-util-point-as-arg (point))
                       "-expression" expression)))

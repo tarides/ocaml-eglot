@@ -60,14 +60,5 @@
         create-lockfiles nil)
   (define-key ocaml-eglot-ocamlobjinfo-mode-map (kbd "q") #'quit-window))
 
-;; Disable Eglot for cm* file supervised by tuareg
-(add-hook 'ocaml-eglot-ocamlobjinfo-mode-hook
-          (lambda ()
-            ;; If somehow Eglot attached, shut it down
-            (when (bound-and-true-p eglot--managed-mode)
-              (eglot-shutdown))
-            ;; Make sure buffer hooks do not run
-            (setq-local before-save-hook nil)))
-
 (provide 'ocaml-eglot-objinfo)
 ;;; ocaml-eglot-objinfo.el ends here

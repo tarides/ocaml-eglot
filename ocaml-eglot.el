@@ -352,6 +352,7 @@ If there is no available holes, it returns the first one of HOLES."
         (eglot--error "Target not found")))))
 
 (defun ocaml-eglot--phrase (direction)
+  "Move to the next or previous phrase using DIRECTION."
   (if (ocaml-eglot-req--server-capable :experimental :ocamllsp :handlePhrase)
       (let ((result (ocaml-eglot-req--phrase direction)))
         (when result
@@ -547,9 +548,9 @@ It use the ARG to use local values or not."
        :experimental :ocamllsp :handleTypeExpression)
       (let ((type-expr (ocaml-eglot-req--type-expression expression)))
         (ocaml-eglot-type-enclosing--display type-expr nil))
-    ((let* ((result (ocaml-eglot-req--type-expression-legacy expression))
-            (type-expr (ocaml-eglot-util--merlin-call-result result)))
-       (ocaml-eglot-type-enclosing--display type-expr nil)))))
+    (let* ((result (ocaml-eglot-req--type-expression-legacy expression))
+           (type-expr (ocaml-eglot-util--merlin-call-result result)))
+      (ocaml-eglot-type-enclosing--display type-expr nil))))
 
 (defun ocaml-eglot-type-enclosing (&optional prefix)
   "Print the type of the expression under point (or of the region, if it exists).
