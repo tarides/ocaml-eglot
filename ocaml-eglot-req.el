@@ -247,12 +247,18 @@ ARGV is the list of arguments."
                         `(:target, target))))
     (ocaml-eglot-req--send :ocamllsp/phrase params)))
 
-(defun ocaml-eglot-req--type-expression (expression)
-  "Get the type of EXPRESSION inside the local context."
+(defun ocaml-eglot-req--type-expression-legacy (expression)
+  "Get the type of EXPRESSION inside the local context. (legacy)"
   ;; TODO: use a dedicated custom request instead of tunneling
   (let ((argv (vector "-position" (ocaml-eglot-util-point-as-arg (point))
                       "-expression" expression)))
     (ocaml-eglot-req--merlin-call "type-expression" argv)))
+
+(defun ocaml-eglot-req--type-expression (expression)
+  "Get the type of EXPRESSION inside the local context."
+  (let ((params (append (ocaml-eglot-req--TextDocumentPositionParams)
+                        `(:expression, expression))))
+    (ocaml-eglot-req--send :ocamllsp/typeExpression params)))
 
 (defun ocaml-eglot-req--locate-ident (ident look-for)
   "Locate an identifier (IDENT) using `merlin-locate'.

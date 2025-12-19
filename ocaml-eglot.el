@@ -543,9 +543,13 @@ It use the ARG to use local values or not."
 (defun ocaml-eglot-type-expression (expression)
   "Prompt the user for expression EXPRESSION and print its type."
   (interactive "sExpression: ")
-  (let* ((result (ocaml-eglot-req--type-expression expression))
-         (type-expr (ocaml-eglot-util--merlin-call-result result)))
-    (ocaml-eglot-type-enclosing--display type-expr nil)))
+  (if (ocaml-eglot-req--server-capable
+       :experimental :ocamllsp :handleTypeExpression)
+      (let ((type-expr (ocaml-eglot-req--type-expression expression)))
+        (ocaml-eglot-type-enclosing--display type-expr nil))
+    ((let* ((result (ocaml-eglot-req--type-expression-legacy expression))
+            (type-expr (ocaml-eglot-util--merlin-call-result result)))
+       (ocaml-eglot-type-enclosing--display type-expr nil)))))
 
 (defun ocaml-eglot-type-enclosing (&optional prefix)
   "Print the type of the expression under point (or of the region, if it exists).
