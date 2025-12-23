@@ -601,13 +601,15 @@ and print its type."
 
 (cl-defmethod eglot-client-capabilities :around (_)
   "Add client capabilities to Eglot for OCaml LSP server."
-  (let* ((capabilities (copy-tree (cl-call-next-method)))
-         (experimental-capabilities (cl-getf capabilities :experimental))
-         (previous (or experimental-capabilities eglot--{}))
+(let* ((capabilities (copy-tree (cl-call-next-method)))
+         (experimental-capabilities
+          (if-let* ((previous (cl-getf capabilities :experimental)))
+              (copy-hash-table previous)
+            (make-hash-table)))
          (commands (append (apply #'vector ocaml-eglot-client-capabilities) nil)))
     (dolist (key commands)
-      (puthash key t previous))
-    (setq capabilities (plist-put capabilities :experimental previous))))
+      (puthash key t experimental-capabilities))
+    (setq capabilities (plist-put capabilities :experimental experimental-capabilities))))
 
 ;; A command can be executed by the server or by the client. The
 ;; following code analyses the command. If it's a command which must
