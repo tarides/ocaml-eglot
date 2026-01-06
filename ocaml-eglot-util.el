@@ -92,7 +92,12 @@ If optional MARKERS, make markers instead."
       (let* ((offset-l (position-bytes (point)))
              (offset-c (max 0 col))
              (target (+ offset-l offset-c)))
-        (byte-to-position target)))))
+        (or (byte-to-position target)
+            ;; The target can be out of bounds in generated files with
+            ;; line number directives, and it's difficult to get this
+            ;; behavior exactly right in Emacs.  Do our best to
+            ;; avoid returning nil.
+            (point-max))))))
 
 (defun ocaml-eglot-util--pos-to-point (pos)
   "Convert a POS to a point."
