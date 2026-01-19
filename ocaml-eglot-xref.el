@@ -30,33 +30,26 @@
   "OCaml-eglot backend for Xref."
   'ocaml-eglot-xref)
 
-(cl-defstruct ocaml-eglot-xref-location
-  "A location suitable for passing to xref.
-Note that while pos contains a column, it's a byte offset rather
-than a character offset, so we can't use `xref-make-file-location'."
-  (file nil :type string)
-  (line nil :type number)
-  (pos nil :type plist))
+(defun ocaml-eglot-xref--call-occurrences (pt)
+  "Call `:textDocument/references' for a given PT."
+  (ocaml-eglot-req--send
+   :textDocument/references
+   (append
+    (ocaml-eglot-req--TextDocumentPositionParamsWithPos
+     (eglot--pos-to-lsp-position pt))
+    (list :context (list :includeDeclaration t)))))
 
-(cl-defmethod xref-location-group ((l ocaml-eglot-xref-location))
-  "Implementation of `xref-make-file-location' for L."
-  (ocaml-eglot-xref-location-file l))
+(defun ocaml-eglot-xref--locate (pt)
+  "Perform conditionnaly find definition or find declaration for a given PT."
+  (ocaml-eglot-util--vec-first-or-nil
+   (ocaml-eglot-req--send
+    (if (eq ocaml-eglot-locate-preference 'mli)
+        :textDocument/declaration
+      :textDocument/definition)
+    (ocaml-eglot-req--TextDocumentPositionParamsWithPos
+     (eglot--pos-to-lsp-position pt))
+    :fallback #'ocaml-eglot-req--locate-fallback)))
 
-(cl-defmethod xref-location-line ((l ocaml-eglot-xref-location))
-  "Implementation of `xref-make-line-location' for L."
-  (ocaml-eglot-xref-location-line l))
-
-(cl-defmethod xref-location-marker ((l ocaml-eglot-xref-location))
-  "Implementation of `xref-make-file-marker' for L."
-  ;; Mostly copied from the implementations for `xref-make-file-location'
-  ;; and `xref-make-buffer-location'.
-  (let* ((buffer
-          (let ((find-file-suppress-same-file-warnings t))
-            (find-file-noselect (ocaml-eglot-xref-location-file l))))
-         (pos (with-current-buffer buffer
-                (eglot--lsp-position-to-point
-                 (ocaml-eglot-xref-location-pos l)))))
-    (move-marker (make-marker) pos buffer)))
 
 (defun ocaml-eglot-xref--call-locate (symbol)
   "Locate an identifier based on SYMBOL used for xref."
@@ -66,37 +59,18 @@ than a character offset, so we can't use `xref-make-file-location'."
       ;; properties would have been stripped
       ;; (see `minibuffer-allow-text-properties').  Just pass
       ;; position and Merlin will figure out everything from that.
-      (let ((result (ocaml-eglot-xref--locate pt)))
-        (list :file (ocaml-eglot-util--uri-to-path (cl-getf result :uri))
-              :pos (cl-getf (cl-getf result :range) :start)))
+      (ocaml-eglot-xref--locate pt)
     ;; The LSP doesn't support jumping to definition of an arbitrary identifier,
     ;; so we have to fallback on ocamllsp/locate.
-    (let* ((locate-result
-            (ocaml-eglot-req--send
-             :ocamllsp/locate
-             (append (ocaml-eglot-req--TextDocumentPositionParamsWithPos
-                      (eglot--pos-to-lsp-position (point)))
-                     (list :kind (if (eq ocaml-eglot-locate-preference 'mli)
-                                     "declaration" "definition")
-                           :prefix (string-remove-suffix "." symbol)))))
-           (pos (ocaml-eglot-util--vec-first-or-nil locate-result)))
-      (when pos
-        (list :file (ocaml-eglot-util--uri-to-path (cl-getf pos :uri))
-              :pos (cl-getf (cl-getf pos :range) :start))))))
-
-(defun ocaml-eglot-xref--make-location-in-file (file merlin-pos)
-  "Turn FILE and MERLIN-POS into an `xref-item'.
-Requires that the current buffer be the buffer of FILE."
-  ;; If we didn't send a filename with the merlin call, we get back "*buffer*"
-  ;; as the filename for locate, "/*buffer*" for occurrences.
-  (if (member file '("*buffer*" "*/buffer*"))
-      ;; We have to remember the current buffer, rather than reading
-      ;; it from the filesystem again later.
-      (xref-make-buffer-location (current-buffer)
-                                 (eglot--lsp-position-to-point pos))
-    (make-ocaml-eglot-xref-location :file file
-                                    :line (1+ (cl-getf pos :line))
-                                    :pos pos)))
+    (let ((locate-result
+           (ocaml-eglot-req--send
+            :ocamllsp/locate
+            (append (ocaml-eglot-req--TextDocumentPositionParamsWithPos
+                     (eglot--pos-to-lsp-position (point)))
+                    (list :kind (if (eq ocaml-eglot-locate-preference 'mli)
+                                    "declaration" "definition")
+                          :prefix (string-remove-suffix "." symbol))))))
+      (ocaml-eglot-util--vec-first-or-nil locate-result))))
 
 (cl-defmethod xref-backend-references ((_backend (eql ocaml-eglot-xref)) symbol)
   "An `xref-backend-references' for SYMBOL for OCaml-eglot."
@@ -109,10 +83,9 @@ Requires that the current buffer be the buffer of FILE."
     ;; In this case, an error is returned.
     (if (stringp result) (user-error "%s" result))
     (list
-     (xref-make
-      symbol
-      (ocaml-eglot-xref--make-location-in-file (cl-getf result :file)
-                                               (cl-getf result :pos))))))
+     (eglot--xref-make-match symbol
+                             (cl-getf result :uri)
+                             (cl-getf result :range)))))
 
 
 (cl-defmethod xref-backend-identifier-completion-table ((_backend (eql ocaml-eglot-xref)))
