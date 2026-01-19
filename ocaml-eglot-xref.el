@@ -39,53 +39,36 @@
      (eglot--pos-to-lsp-position pt))
     (list :context (list :includeDeclaration t)))))
 
-(defun ocaml-eglot-xref--locate (pt)
-  "Perform conditionnaly find definition or find declaration for a given PT."
-  (ocaml-eglot-util--vec-first-or-nil
-   (ocaml-eglot-req--send
-    (if (eq ocaml-eglot-locate-preference 'mli)
-        :textDocument/declaration
-      :textDocument/definition)
-    (ocaml-eglot-req--TextDocumentPositionParamsWithPos
-     (eglot--pos-to-lsp-position pt))
-    :fallback #'ocaml-eglot-req--locate-fallback)))
-
-
-(defun ocaml-eglot-xref--call-locate (symbol)
-  "Locate an identifier based on SYMBOL used for xref."
-  (if-let* ((pt (get-text-property 0 'ocaml-eglot-xref-point symbol)))
-      ;; SYMBOL is from `xref-backend-identifier-at-point',
-      ;; since if it was read from the minibuffer its text
-      ;; properties would have been stripped
-      ;; (see `minibuffer-allow-text-properties').  Just pass
-      ;; position and Merlin will figure out everything from that.
-      (ocaml-eglot-xref--locate pt)
-    ;; The LSP doesn't support jumping to definition of an arbitrary identifier,
-    ;; so we have to fallback on ocamllsp/locate.
-    (let ((locate-result
-           (ocaml-eglot-req--send
-            :ocamllsp/locate
-            (append (ocaml-eglot-req--TextDocumentPositionParamsWithPos
-                     (eglot--pos-to-lsp-position (point)))
-                    (list :kind (if (eq ocaml-eglot-locate-preference 'mli)
-                                    "declaration" "definition")
-                          :prefix (string-remove-suffix "." symbol))))))
-      (ocaml-eglot-util--vec-first-or-nil locate-result))))
-
 (cl-defmethod xref-backend-references ((_backend (eql ocaml-eglot-xref)) symbol)
   "An `xref-backend-references' for SYMBOL for OCaml-eglot."
   (xref-backend-references 'eglot symbol))
 
 (cl-defmethod xref-backend-definitions ((_backend (eql ocaml-eglot-xref)) symbol)
   "Extension of `xref-backend-definitions' for SYMBOL."
-  (let ((result (ocaml-eglot-xref--call-locate symbol)))
-    (unless result (error "Not found.  (Check *Messages* for potential errors)"))
-    ;; In this case, an error is returned.
-    (if (stringp result) (user-error "%s" result))
-    (list
-     (eglot--xref-make-match symbol
-                             (cl-getf result :uri)
-                             (cl-getf result :range)))))
+  (if-let* ((pt (get-text-property 0 'eglot--lsp-workspaceSymbol symbol)))
+      ;; SYMBOL is from `xref-backend-identifier-at-point',
+      ;; since if it was read from the minibuffer its text
+      ;; properties would have been stripped
+      ;; (see `minibuffer-allow-text-properties').  Just pass
+      ;; position and Merlin will figure out everything from that.
+      (eglot--lsp-xrefs-for-method
+       (if (eq ocaml-eglot-locate-preference 'mli)
+           :textDocument/declaration
+         :textDocument/definition))
+    ;; The LSP doesn't support jumping to definition of an arbitrary identifier,
+    ;; so we have to fallback on ocamllsp/locate.
+    (if-let* ((locate-result
+               (ocaml-eglot-req--send
+                :ocamllsp/locate
+                (append (ocaml-eglot-req--TextDocumentPositionParamsWithPos
+                         (eglot--pos-to-lsp-position (point)))
+                        (list :kind (if (eq ocaml-eglot-locate-preference 'mli)
+                                        "declaration" "definition")
+                              :prefix (string-remove-suffix "." symbol)))))
+              (result (ocaml-eglot-util--vec-first-or-nil locate-result)))
+        (list (eglot--xref-make-match symbol
+                                      (cl-getf result :uri)
+                                      (cl-getf result :range))))))
 
 (cl-defmethod xref-backend-identifier-completion-table ((_backend (eql ocaml-eglot-xref)))
   "Return a list of symbols for completion."
@@ -164,7 +147,7 @@
              (buffer-substring (point) (match-end 0)))))))
     ;; Return a string with the buffer position in a property, in case
     ;; point changes before the string is used by one of the methods above.
-    (and symbol (propertize symbol 'ocaml-eglot-xref-point (point)))))
+    (and symbol (propertize symbol 'eglot--lsp-workspaceSymbol (point)))))
 
 (provide 'ocaml-eglot-xref)
 ;;; ocaml-eglot-xref.el ends here
