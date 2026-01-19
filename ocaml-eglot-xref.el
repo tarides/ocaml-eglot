@@ -87,7 +87,6 @@
                              (cl-getf result :uri)
                              (cl-getf result :range)))))
 
-
 (cl-defmethod xref-backend-identifier-completion-table ((_backend (eql ocaml-eglot-xref)))
   "Return a list of symbols for completion."
   ;; TODO: xref-backend-identifier-completion-table
