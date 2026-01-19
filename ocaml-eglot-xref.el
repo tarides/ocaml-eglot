@@ -30,15 +30,6 @@
   "OCaml-eglot backend for Xref."
   'ocaml-eglot-xref)
 
-(defun ocaml-eglot-xref--call-occurrences (pt)
-  "Call `:textDocument/references' for a given PT."
-  (ocaml-eglot-req--send
-   :textDocument/references
-   (append
-    (ocaml-eglot-req--TextDocumentPositionParamsWithPos
-     (eglot--pos-to-lsp-position pt))
-    (list :context (list :includeDeclaration t)))))
-
 (cl-defmethod xref-backend-references ((_backend (eql ocaml-eglot-xref)) symbol)
   "An `xref-backend-references' for SYMBOL for OCaml-eglot."
   (xref-backend-references 'eglot symbol))
