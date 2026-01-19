@@ -45,30 +45,32 @@
 
 (cl-defmethod xref-backend-definitions ((_backend (eql ocaml-eglot-xref)) symbol)
   "Extension of `xref-backend-definitions' for SYMBOL."
-  (if-let* ((pt (get-text-property 0 'eglot--lsp-workspaceSymbol symbol)))
-      ;; SYMBOL is from `xref-backend-identifier-at-point',
-      ;; since if it was read from the minibuffer its text
-      ;; properties would have been stripped
-      ;; (see `minibuffer-allow-text-properties').  Just pass
-      ;; position and Merlin will figure out everything from that.
-      (eglot--lsp-xrefs-for-method
-       (if (eq ocaml-eglot-locate-preference 'mli)
-           :textDocument/declaration
-         :textDocument/definition))
-    ;; The LSP doesn't support jumping to definition of an arbitrary identifier,
-    ;; so we have to fallback on ocamllsp/locate.
-    (if-let* ((locate-result
-               (ocaml-eglot-req--send
-                :ocamllsp/locate
-                (append (ocaml-eglot-req--TextDocumentPositionParamsWithPos
-                         (eglot--pos-to-lsp-position (point)))
-                        (list :kind (if (eq ocaml-eglot-locate-preference 'mli)
-                                        "declaration" "definition")
-                              :prefix (string-remove-suffix "." symbol)))))
-              (result (ocaml-eglot-util--vec-first-or-nil locate-result)))
-        (list (eglot--xref-make-match symbol
-                                      (cl-getf result :uri)
-                                      (cl-getf result :range))))))
+  (condition-case err
+      (if-let* ((pt (get-text-property 0 'eglot--lsp-workspaceSymbol symbol)))
+          ;; SYMBOL is from `xref-backend-identifier-at-point',
+          ;; since if it was read from the minibuffer its text
+          ;; properties would have been stripped
+          ;; (see `minibuffer-allow-text-properties').  Just pass
+          ;; position and Merlin will figure out everything from that.
+          (eglot--lsp-xrefs-for-method
+           (if (eq ocaml-eglot-locate-preference 'mli)
+               :textDocument/declaration
+             :textDocument/definition))
+        ;; The LSP doesn't support jumping to definition of an arbitrary identifier,
+        ;; so we have to fallback on ocamllsp/locate.
+        (if-let* ((locate-result
+                   (ocaml-eglot-req--send
+                    :ocamllsp/locate
+                    (append (ocaml-eglot-req--TextDocumentPositionParamsWithPos
+                             (eglot--pos-to-lsp-position (point)))
+                            (list :kind (if (eq ocaml-eglot-locate-preference 'mli)
+                                            "declaration" "definition")
+                                  :prefix (string-remove-suffix "." symbol)))))
+                  (result (ocaml-eglot-util--vec-first-or-nil locate-result)))
+            (list (eglot--xref-make-match symbol
+                                          (cl-getf result :uri)
+                                          (cl-getf result :range)))))
+    (jsonrpc-error (ocaml-eglot-req--locate-fallback err))))
 
 (cl-defmethod xref-backend-identifier-completion-table ((_backend (eql ocaml-eglot-xref)))
   "Return a list of symbols for completion."
