@@ -49,7 +49,7 @@
     (define-key keymap (kbd "C-c C-t") #'ocaml-eglot-type-enclosing-increase-verbosity)
     (define-key keymap (kbd "C-<right>") #'ocaml-eglot-type-enclosing-increase-verbosity)
     (define-key keymap (kbd "C-<left>") #'ocaml-eglot-type-enclosing-decrease-verbosity)
-    (define-key keymap (kbd "C-;") #'ocaml-eglot-type-enclosing--annotate)
+    (define-key keymap (kbd "C-;") #'ocaml-eglot-type-enclosing-annotate)
     keymap)
   "Keymap for OCaml-eglot's type enclosing transient mode.")
 
@@ -163,7 +163,7 @@ If CURRENT is set, the range of the enclosing will be highlighted."
     (set-transient-map ocaml-eglot-type-enclosing-map t
                        'ocaml-eglot-type-enclosing--reset)))
 
-(defun ocaml-eglot-type-enclosing--annotate ()
+(defun ocaml-eglot-type-enclosing-annotate ()
   "Type annotate the expression of the current enclosing with its type."
   (interactive)
   ;; TODO: Currently, the type annotation can reach invalid situation,
