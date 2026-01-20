@@ -19,6 +19,7 @@
 (require 'json)
 (require 'eglot)
 (require 'cl-lib)
+(defvar pulse-flag)
 
 ;; Generic util
 
@@ -227,7 +228,8 @@ current window otherwise."
 (defun ocaml-eglot-util--highlight-range (range face)
   "Highlight a given RANGE using a given FACE."
   (let ((beg (eglot--lsp-position-to-point (cl-getf range :start)))
-        (end (eglot--lsp-position-to-point (cl-getf range :end))))
+        (end (eglot--lsp-position-to-point (cl-getf range :end)))
+        (pulse-flag nil))
     (pulse-momentary-highlight-region beg end face)))
 
 (defun ocaml-eglot-util--as-json (str)
