@@ -6,6 +6,7 @@ unreleased
 - Remove `C-c C-c` for `ocaml-eglot-error-prev`, clash with usual `compile` ([#67](https://github.com/tarides/ocaml-eglot/pull/67))
 - Rewrite `find/locate` function in term of `xref` ([#73](https://github.com/tarides/ocaml-eglot/pull/73))
 - Rewrite `phrase/type-expression` using dedicated custom request instead of tunneling ([#77](https://github.com/tarides/ocaml-eglot/pull/77))
+- Remove blocking highlighting for `type-enclosing` ([#83](https://github.com/tarides/ocaml-eglot/pull/83))
 
 ocaml-eglot 1.2.0
 ======================
