@@ -563,7 +563,7 @@ and print its type."
     (ocaml-eglot-type-enclosing--call)))
 
 (defun ocaml-eglot-type-annotate ()
-  ""
+  "Note the type of expression under the cursor."
   (interactive)
   (call-interactively #'ocaml-eglot-type-enclosing)
   (call-interactively #'ocaml-eglot-type-enclosing-annotate))
