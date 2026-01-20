@@ -376,11 +376,14 @@ During a "type enclosing" session the following commands are available:
   expression
 - `ocaml-eglot-type-enclosing-copy` (<kbd>C-w</kbd>): to copy the
   type expression to the _kill-ring_ (clipboard)
+- `ocaml-eglot-type-enclosing-annotate` (<kbd>C-;</kbd>): to annotate
+  (with type) the current enclosing
   
 You can also enter an expression in the mini-buffer for which you want
 to display the type:
   
 - `ocaml-eglot-type-expression` (<kbd>C-u</kbd> <kbd>C-c</kbd> <kbd>C-t</kbd>)
+- `ocaml-eglot-type-annotate` Add type annotation under the cursor
   
 
 ![Type Enclosings example](media/type-enclosing.gif)
