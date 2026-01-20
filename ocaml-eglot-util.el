@@ -226,13 +226,9 @@ current window otherwise."
 
 (defun ocaml-eglot-util--highlight-range (range face)
   "Highlight a given RANGE using a given FACE."
-  (remove-overlays nil nil 'ocaml-eglot-highlight 'highlight)
-  (let* ((beg (eglot--lsp-position-to-point (cl-getf range :start)))
-        (end (eglot--lsp-position-to-point (cl-getf range :end)))
-        (overlay (make-overlay beg end)))
-    (overlay-put overlay 'face face)
-    (overlay-put overlay 'ocaml-eglot-highlight 'highlight)
-    (unwind-protect (sit-for 60) (delete-overlay overlay))))
+  (let ((beg (eglot--lsp-position-to-point (cl-getf range :start)))
+        (end (eglot--lsp-position-to-point (cl-getf range :end))))
+    (pulse-momentary-highlight-region beg end face)))
 
 (defun ocaml-eglot-util--as-json (str)
   "Parse a string STR as a Json object."
