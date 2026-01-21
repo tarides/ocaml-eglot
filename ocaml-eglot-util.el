@@ -21,6 +21,7 @@
 (require 'cl-lib)
 (defvar pulse-flag)
 
+
 ;; Generic util
 
 (defun ocaml-eglot-util--goto-char (target)

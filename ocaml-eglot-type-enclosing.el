@@ -49,6 +49,7 @@
     (define-key keymap (kbd "C-c C-t") #'ocaml-eglot-type-enclosing-increase-verbosity)
     (define-key keymap (kbd "C-<right>") #'ocaml-eglot-type-enclosing-increase-verbosity)
     (define-key keymap (kbd "C-<left>") #'ocaml-eglot-type-enclosing-decrease-verbosity)
+    (define-key keymap (kbd "C-;") #'ocaml-eglot-type-enclosing-annotate)
     keymap)
   "Keymap for OCaml-eglot's type enclosing transient mode.")
 
@@ -161,6 +162,32 @@ If CURRENT is set, the range of the enclosing will be highlighted."
     (ocaml-eglot-type-enclosing--display type t)
     (set-transient-map ocaml-eglot-type-enclosing-map t
                        'ocaml-eglot-type-enclosing--reset)))
+
+(defun ocaml-eglot-type-enclosing-annotate ()
+  "Type annotate the expression of the current enclosing with its type."
+  (interactive)
+  ;; TODO: Currently, the type annotation can reach invalid situation,
+  ;; like annotating invalid node (like record field or sum parameter).
+  ;; We should improve the situation using a dedicated request.
+  ;; Currently, the LSP code action is not sufficient because it is
+  ;; always based on the first enclosing under the point.
+  (when-let* ((result (ocaml-eglot-req--type-enclosings
+                       (ocaml-eglot-util--current-position-or-range)
+                       ocaml-eglot-type-enclosing-offset
+                       ;; We use verbosity as 0 in order to always reach
+                       ;; a proper type abbreviation.
+                       0))
+              (enclosing (aref (cl-getf result :enclosings)
+                               ocaml-eglot-type-enclosing-offset))
+              (type (cl-getf result :type))
+              (beg (eglot--lsp-position-to-point (cl-getf enclosing :start)))
+              (end (eglot--lsp-position-to-point (cl-getf enclosing :end))))
+    (progn
+      (save-excursion
+        (goto-char beg)
+        (insert ?\())
+      (goto-char (+ 1 end))
+      (insert " : " type ")"))))
 
 (provide 'ocaml-eglot-type-enclosing)
 ;;; ocaml-eglot-type-enclosing.el ends here

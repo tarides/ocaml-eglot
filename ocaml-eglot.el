@@ -562,6 +562,11 @@ and print its type."
       (call-interactively #'ocaml-eglot-type-expression)
     (ocaml-eglot-type-enclosing--call)))
 
+(defun ocaml-eglot-type-annotate ()
+  "Annotate the type of the expression at point."
+  (interactive)
+  (ocaml-eglot-type-enclosing)
+  (ocaml-eglot-type-enclosing-annotate))
 
 ;; Case Analysis
 
