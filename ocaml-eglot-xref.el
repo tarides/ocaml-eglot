@@ -48,6 +48,7 @@
          :textDocument/definition))
     ;; The LSP doesn't support jumping to definition of an arbitrary identifier,
     ;; so we have to fallback on ocamllsp/locate.
+    (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleLocate)
     (if-let* ((locate-result
                (ocaml-eglot-req--send
                 :ocamllsp/locate
