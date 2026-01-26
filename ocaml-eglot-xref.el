@@ -16,6 +16,7 @@
 
 (require 'cl-lib)
 (require 'xref)
+(require 'eglot)
 (require 'ocaml-eglot-util)
 (require 'ocaml-eglot-req)
 
@@ -57,12 +58,6 @@ than a character offset, so we can't use `xref-make-file-location'."
                  (ocaml-eglot-xref-location-merlin-pos l)))))
     (move-marker (make-marker) pos buffer)))
 
-(defun ocaml-eglot-xref--call-occurences (pt)
-  "Call merlin-occurences for given PT."
-  (let ((argv (vector "-scope" "project"
-                      "-identifier-at" (ocaml-eglot-util-point-as-arg pt))))
-    (ocaml-eglot-req--merlin-call "occurrences" argv)))
-
 (defun ocaml-eglot-xref--call-locate (symbol)
   "Locate an idenfier based on SYMBOL used for xref."
   (let ((argv (if-let* ((pt (get-text-property 0 'ocaml-eglot-xref-point symbol)))
@@ -87,25 +82,6 @@ than a character offset, so we can't use `xref-make-file-location'."
                         "-look-for" (symbol-name ocaml-eglot-locate-preference)))))
     (ocaml-eglot-req--merlin-call "locate" argv)))
 
-(defun ocaml-eglot-xref--occurences (symbol)
-  "Compute occurrences for the given SYMBOL."
-  (let ((pt (get-text-property 0 'ocaml-eglot-xref-point symbol)))
-    (cl-assert pt nil "OCaml-eglot xref-find-references cannot be used by explicitly typing in a symbol %s" symbol)
-    (let ((result (ocaml-eglot-xref--call-occurences pt)))
-      ;; Change the vector into a list
-      (append (ocaml-eglot-util--merlin-call-result result) nil))))
-
-(defun ocaml-eglot-xref--buffer (file)
-  "Compute a buffer in term of FILE based on occurences results."
-  (if (equal file "/*buffer*")
-      ;; occurences returns "/*buffer*" as the filename for occurences
-      ;; in the current buffer when we don't pass the -filename argument.
-      (current-buffer)
-    ;; Look for an existing buffer with this file, but don't open it
-    ;; if it's not already open.
-    (get-file-buffer file)))
-
-
 (defun ocaml-eglot-xref--make-location-in-file (file merlin-pos)
   "Turn FILE and MERLIN-POS into an `xref-item'.
 Requires that the current buffer be the buffer of FILE."
@@ -120,43 +96,10 @@ Requires that the current buffer be the buffer of FILE."
                                     :line (cl-getf merlin-pos :line)
                                     :merlin-pos merlin-pos)))
 
-(defun ocaml-eglot-xref--push-marker (symbol buffer start loc xref-loc)
-  "Push computed marker for SYMBOL by START and LOC/XREF-LOC on the given BUFFER."
-  (if buffer
-      ;; We have the file open, or this is just a reference found in
-      ;; the current buffer.  We can populate the summary field with real data,
-      ;; and decode the byte-based `start' and `end' into the character
-      ;; length of the reference.
-      (with-current-buffer buffer
-        (let ((start-pos (ocaml-eglot-util--pos-to-point start))
-              (end-pos (ocaml-eglot-util--pos-to-point (cl-getf loc :end))))
-          (xref-make-match
-           (concat
-            (buffer-substring
-             (save-excursion (goto-char start-pos) (pos-bol))
-             start-pos)
-            (propertize (buffer-substring start-pos end-pos) 'face 'xref-match)
-            (buffer-substring
-             (save-excursion (goto-char end-pos) (pos-eol))
-             end-pos))
-           xref-loc
-           (- end-pos start-pos))))
-    ;; We don't have the file open, so we can't make a real summary or decode
-    ;; the length.  We'll just use the symbol as the summary instead.
-    (xref-make symbol xref-loc)))
 
 (cl-defmethod xref-backend-references ((_backend (eql ocaml-eglot-xref)) symbol)
   "An `xref-backend-references' for SYMBOL for OCaml-eglot."
-  (let ((occurences (ocaml-eglot-xref--occurences symbol))
-        result)
-    (dolist (loc occurences)
-      (let* ((file (cl-getf loc :file))
-             (start-pos (cl-getf loc :start))
-             (buffer (ocaml-eglot-xref--buffer file))
-             (location (ocaml-eglot-xref--make-location-in-file file start-pos)))
-        (push (ocaml-eglot-xref--push-marker
-               symbol buffer start-pos loc location) result)))
-    (reverse result)))
+  (xref-backend-references 'eglot symbol))
 
 (cl-defmethod xref-backend-definitions ((_backend (eql ocaml-eglot-xref)) symbol)
   "Extension of `xref-backend-definitions' for SYMBOL."
