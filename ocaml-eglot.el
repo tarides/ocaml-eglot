@@ -245,10 +245,45 @@ If optional IN-OTHER-WINDOW is non-nil, find the file in another window."
         (find-file-other-window file)
       (find-file file))))
 
+(defun ocaml-eglot-find-identifier-in-alternate-file (&optional in-other-window)
+  "Find the declaration of the identifier at point in the alternative file.
+
+If optional IN-OTHER-WINDOW is non-nil, find the declaration in another window."
+  (interactive "P")
+  (let* ((identifier (xref-backend-identifier-at-point (xref-find-backend)))
+         (identifier-str (progn (substring-no-properties identifier)))
+         (alternate-buffer
+          (progn
+            (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleSwitchImplIntf)
+            (when-let* ((current-uri (ocaml-eglot-util--current-uri))
+                        (uri (ocaml-eglot--find-alternate-file current-uri))
+                        (file (ocaml-eglot-util--uri-to-path uri)))
+              (or (get-file-buffer file) (find-file-noselect file))))))
+    (xref-push-marker-stack)
+    ;; Find, or create, the buffer for the alternate file.
+    (condition-case error
+        (with-current-buffer alternate-buffer
+          ;; We go to the end of buffer to work around https://github.com/ocaml/ocaml-lsp/issues/1586
+          (goto-char (point-max))
+          (if in-other-window
+              (xref-find-definitions-other-window identifier-str)
+            (xref-find-definitions identifier-str))
+          ;; Restore `xref--history'. `xref-find-definitions' will put
+          ;; a marker at the end of the alternate file, but we want to
+          ;; jump back to the non-alternative file rather.
+          (setq xref--history `(,(cdr (car xref--history)) . ,(cdr xref--history))))
+      (user-error
+       ;; For some reason the LSP sometimes fails find the
+       ;; definition/declaration of values. Type
+       ;; declaration/definitions do not seem suffer from this issue.
+       ;; When this happens, `xref-find-definitions' throws an
+       ;; `user-error' that we catch here.
+       (user-error "Couldn't find %s in `%s', error message from LSP: %s" identifier (buffer-name alternate-buffer) (cadr error))))))
+
 ;; Hook when visiting new interface file
 
 (defun ocaml-eglot--file-hook ()
-  "Hook to try to generate interface on visiting new files.."
+  "Hook to try to generate interface on visiting new files."
   (when (and
          (ocaml-eglot-util--on-interface)
          (= (buffer-size) 0))
@@ -655,6 +690,7 @@ and print its type."
     (define-key ocaml-eglot-keymap (kbd "C-c C-l") #'ocaml-eglot-find-definition)
     (define-key ocaml-eglot-keymap (kbd "C-c C-i") #'ocaml-eglot-find-declaration)
     (define-key ocaml-eglot-keymap (kbd "C-c C-a") #'ocaml-eglot-alternate-file)
+    (define-key ocaml-eglot-keymap (kbd "C-c C-'") #'ocaml-eglot-find-identifier-in-alternate-file)
     (define-key ocaml-eglot-keymap (kbd "C-c C-d") #'ocaml-eglot-document)
     (define-key ocaml-eglot-keymap (kbd "C-c C-t") #'ocaml-eglot-type-enclosing)
     (define-key ocaml-eglot-keymap (kbd "C-c |") #'ocaml-eglot-destruct)

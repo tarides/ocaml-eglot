@@ -8,6 +8,7 @@ unreleased
 - Rewrite `phrase/type-expression` using dedicated custom request instead of tunneling ([#77](https://github.com/tarides/ocaml-eglot/pull/77))
 - Remove blocking highlighting for `type-enclosing` ([#83](https://github.com/tarides/ocaml-eglot/pull/83))
 - Add `ocaml-eglot-type-annotate` (and `C-;` for annotating the current enclosing) ([#84](https://github.com/tarides/ocaml-eglot/pull/84))
+- Add `ocaml-eglot-find-identifier-in-alternate-file` to jump between an identifiers location in the interfaces resp. implementation file ([#87](https://github.com/tarides/ocaml-eglot/pull/87))
 
 ocaml-eglot 1.2.0
 ======================
