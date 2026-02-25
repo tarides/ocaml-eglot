@@ -690,7 +690,6 @@ and print its type."
     (define-key ocaml-eglot-keymap (kbd "C-c C-l") #'ocaml-eglot-find-definition)
     (define-key ocaml-eglot-keymap (kbd "C-c C-i") #'ocaml-eglot-find-declaration)
     (define-key ocaml-eglot-keymap (kbd "C-c C-a") #'ocaml-eglot-alternate-file)
-    (define-key ocaml-eglot-keymap (kbd "C-c C-'") #'ocaml-eglot-find-identifier-in-alternate-file)
     (define-key ocaml-eglot-keymap (kbd "C-c C-d") #'ocaml-eglot-document)
     (define-key ocaml-eglot-keymap (kbd "C-c C-t") #'ocaml-eglot-type-enclosing)
     (define-key ocaml-eglot-keymap (kbd "C-c |") #'ocaml-eglot-destruct)
