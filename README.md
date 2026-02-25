@@ -110,7 +110,7 @@ Eglot provides a hook to format the buffer on saving:
    (tuareg-mode . ocaml-eglot)
 -  (ocaml-eglot . eglot-ensure))
 +  (ocaml-eglot . eglot-ensure)
-+  (ocaml-eglot . (lambda () 
++  (ocaml-eglot . (lambda ()
 +                   (add-hook #'before-save-hook #'eglot-format nil t))))
 ```
 
@@ -129,7 +129,7 @@ and `inlay-hints`:
    (tuareg-mode . ocaml-eglot)
 -  (ocaml-eglot . eglot-ensure))
 +  (ocaml-eglot . eglot-ensure)
-+  (eglot-managed-mode . (lambda () 
++  (eglot-managed-mode . (lambda ()
 +                          (eldoc-mode -1)
 +                          (eglot-inlay-hints-mode -1))))
 ```
@@ -236,12 +236,12 @@ Here is a recommended minimal configuration to take full advantage of
   :config
   (setq flymake-diagnostic-format-alist
         '((t . (origin code message)))))
-        
+
 ;; Configure Tuareg
 (use-package tuareg
   :ensure t
   :mode (("\\.ocamlinit\\'" . tuareg-mode)))
-  
+
 ;; Configure OCaml-eglot
 (use-package ocaml-eglot
   :ensure t
@@ -252,7 +252,7 @@ Here is a recommended minimal configuration to take full advantage of
   (ocaml-eglot . (lambda () (add-hook #'before-save-hook #'eglot-format nil t)))
   :config
   (setq ocaml-eglot-syntax-checker 'flymake))
-  
+
 ;; Additional modes configuration
 (use-package dune
   :ensure t)
@@ -312,7 +312,7 @@ illustrations of each command in the next section.).
 > more, please consult [its user
 > manual](https://www.gnu.org/software/emacs/manual/html_mono/eglot.html).
 
-| Command | Default Binding | 
+| Command | Default Binding |
 | -- | -- |
 | `ocaml-eglot-error-next` | <kbd>C-c</kbd> <kbd>C-x</kbd> |
 | `ocaml-eglot-error-prev` | |
@@ -323,6 +323,7 @@ illustrations of each command in the next section.).
 | `ocaml-eglot-find-type-definition` | |
 | `ocaml-eglot-find-type-definition-in-new-window` | |
 | `ocaml-eglot-find-type-definition-in-current-window` | |
+| `ocaml-eglot-find-identifier-in-alternate-file` | |
 | `ocaml-eglot-infer-interface` | |
 | `ocaml-eglot-alternate-file` | <kbd>C-c</kbd> <kbd>C-a</kbd> |
 | `ocaml-eglot-hole-next` |  |
@@ -339,6 +340,7 @@ illustrations of each command in the next section.).
 | `ocaml-eglot-destruct` | <kbd>C-c</kbd> <kbd>\|</kbd> |
 | `ocaml-eglot-type-expression` | |
 | `ocaml-eglot-type-enclosing` | <kbd>C-c</kbd> <kbd>C-t</kbd> |
+| `ocaml-eglot-type-annotate` | |
 | `ocaml-eglot-occurences` | |
 | `ocaml-eglot-rename` | |
 
@@ -380,13 +382,13 @@ During a "type enclosing" session the following commands are available:
   type expression to the _kill-ring_ (clipboard)
 - `ocaml-eglot-type-enclosing-annotate` (<kbd>C-;</kbd>): to annotate
   (with type) the current enclosing
-  
+
 You can also enter an expression in the mini-buffer for which you want
 to display the type:
-  
+
 - `ocaml-eglot-type-expression` (<kbd>C-u</kbd> <kbd>C-c</kbd> <kbd>C-t</kbd>)
 - `ocaml-eglot-type-annotate` Add type annotation under the cursor
-  
+
 
 ![Type Enclosings example](media/type-enclosing.gif)
 
@@ -397,7 +399,7 @@ declaration of an identifier:
 
 - `ocaml-eglot-find-definition` (<kbd>C-c</kbd> <kbd>C-l</kbd>): jump to
   definition (the implementation)
-  
+
 - `ocaml-eglot-find-declaration` (<kbd>C-c</kbd> <kbd>C-i</kbd>): jump to
   declaration (the signature)
 
@@ -554,17 +556,17 @@ option`:
 - `ocaml-eglot-search` searches for a value by its type or polarity to
   included in the current buffer (the search type is defined by the
   input query)
-  
+
 ![Search Example](media/search.gif)
 
 Alternatively, you can search for a definition or declaration:
-  
-- `ocaml-eglot-search-definition` searches for a value definition by 
+
+- `ocaml-eglot-search-definition` searches for a value definition by
   its type or polarity
-  
-- `ocaml-eglot-search-declaration` searches for a value declaration by 
+
+- `ocaml-eglot-search-declaration` searches for a value declaration by
   its type or polarity
-  
+
 ![Search Definition or Declaration Example](media/search-def.gif)
 
 
@@ -585,9 +587,11 @@ Used to hook the opening of a compilation artefact with
 | `merlin-error-prev`         | `ocaml-eglot-error-prev`           |                                                                                                              |
 | `merlin-type-enclosing`     | `ocaml-eglot-type-enclosing`       |                                                                                                              |
 | `merlin-type-expr`          | `ocaml-eglot-type-expression`      |                                                                                                              |
+| ❌                          | `ocaml-eglot-type-annotate` |                                                                          |
 | `merlin-locate`             | `ocaml-eglot-find-declaration`     |                                                                                                              |
 |  —                          | `ocaml-eglot-find-definition`      | Available in Merlin by configuration                                                                         |
 | ❌                          | `ocaml-eglot-find-type-definition` |                                                                          |
+| ❌                          | `ocaml-eglot-find-identifier-in-alternate-file` |                                                                          |
 | `merlin-locate-ident`       | `ocaml-eglot-find-identifier-definition`, `ocaml-eglot-find-identifier-declaration`                                 |                                                                                                              |
 | `merlin-occurences`         | `ocaml-eglot-occurences`           |                                                                                                              |
 | `merlin-project-occurences` | —                                  | Handle by `ocaml-eglot-occurences` (if `ocaml-version  >= 5.2` and need an index, `dune build @ocaml-index`) |
