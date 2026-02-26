@@ -39,7 +39,7 @@ METHOD is the dedicated lsp server request, PARAMS is the parameters of the
 query, IMMEDIATE is a flag to trigger the request only if the document has
 changed, TIMEOUT is a timeout time response.  CANCEL-ON-INPUT,
 CANCEL-ON-INPUT-RETVAL are hooks for cancellation and FALLBACK is a hook when
-request fails.  SERVER can also be conditionnaly given."
+request fails.  SERVER can also be conditionally given."
   (let ((server (or server (ocaml-eglot-req--current-server))))
     (unless immediate (eglot--signal-textDocument/didChange))
     (condition-case err
@@ -83,7 +83,7 @@ request fails.  SERVER can also be conditionnaly given."
 
 (defun ocaml-eglot-req--TextDocumentPositionParamsWithPos (position)
   "Compute `TextDocumentPositionParams' object for the current buffer.
-With a given POSITION"
+POSITION is the cursor position to use."
   (append (list :textDocument (ocaml-eglot-req--TextDocumentIdentifier)
                 :position position)
           (ocaml-eglot-req--TextDocumentIdentifier)))
@@ -156,7 +156,7 @@ The markup used to format documentation can be set using MARKUP-KIND."
 
 (defun ocaml-eglot-req--hole (position &optional direction range)
   "Get the following (DIRECTION) hole since POSITION.
-In an optional RANGE.  Relaying on `ocamllsp/jumpToTypedHole'"
+In an optional RANGE.  Relying on `ocamllsp/jumpToTypedHole'."
   (let* ((direction (pcase direction
                       ('prev "prev")
                       (_ "next")))

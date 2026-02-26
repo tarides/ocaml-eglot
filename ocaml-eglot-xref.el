@@ -59,7 +59,7 @@ than a character offset, so we can't use `xref-make-file-location'."
     (move-marker (make-marker) pos buffer)))
 
 (defun ocaml-eglot-xref--call-locate (symbol)
-  "Locate an idenfier based on SYMBOL used for xref."
+  "Locate an identifier based on SYMBOL used for xref."
   (let ((argv
          ;; SYMBOL was probably just typed in by the user.  So pass it
          ;; to Merlin, removing a trailing "." in case the user completed
