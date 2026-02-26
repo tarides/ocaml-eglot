@@ -106,7 +106,7 @@ included and the documentation output can be set using MARKUP-KIND."
           `(:query, query)
           `(:limit, limit)
           `(:with_doc, with-doc)
-          `(:doc_dormat, markup-kind)))
+          `(:doc_format, markup-kind)))
 
 (defun ocaml-eglot-req--GetDocumentationParam (identifier markup-kind)
   "Compute the `GetDocumentationParam'.
