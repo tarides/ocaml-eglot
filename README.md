@@ -73,7 +73,7 @@ can use
 to install `ocaml-eglot`. You will also need
 `https://ocaml.org/p/ocaml-lsp-server/latest` in the [current opam
 switch](https://ocaml.org/docs/opam-switch-introduction). (If you are
-using `dune pkg` to managed your dependencies, see [Usage with `dune
+using `dune pkg` to manage your dependencies, see [Usage with `dune
 pkg`](#usage-with-dune-pkg))
 
 
@@ -93,7 +93,7 @@ Here's an example with Tuareg already installed:
 `ocaml-eglot` is a minor mode which is grafted onto `eglot` (provided
 by default in Emacs since version `29.1`). Since `eglot` is itself
 based on several popular packages in the Emacs ecosystem (such as
-`xref`, `flymake` `imenu` etc.), you can configure it highly using
+`xref`, `flymake`, `imenu`, etc.), you can configure it highly using
 these modes. What's more, reading the [Eglot
 manual](https://www.gnu.org/software/emacs/manual/html_mono/eglot.html)
 is recommended for fine-tuning!
@@ -274,7 +274,7 @@ experience in Emacs!
 ### Usage with `dune pkg`
 
 If you are using [`dune` for package management][dune-pkg] on the [latest
-nightly bulid](https://preview.dune.build/) or version 3.21 or later, we
+nightly build](https://preview.dune.build/) or version 3.21 or later, we
 recommend using [direnv][direnv] via [envrc.el][envrc], in conjunction with the
 `dune tools env` command to get `dune`-managed dev tools in the environment.
 
@@ -341,7 +341,7 @@ illustrations of each command in the next section.).
 | `ocaml-eglot-type-expression` | |
 | `ocaml-eglot-type-enclosing` | <kbd>C-c</kbd> <kbd>C-t</kbd> |
 | `ocaml-eglot-type-annotate` | |
-| `ocaml-eglot-occurences` | |
+| `ocaml-eglot-occurrences` | |
 | `ocaml-eglot-rename` | |
 
 
@@ -354,8 +354,7 @@ navigating through errors:
 
 - `ocaml-eglot-error-next` (<kbd>C-c</kbd> <kbd>C-x</kbd>): jump to
   the next error
-- `ocaml-eglot-error-prev` (<kbd>C-c</kbd> <kbd>C-c</kbd>): jump to
-  the previous error
+- `ocaml-eglot-error-prev`: jump to the previous error
 
 ![Error navigation example](media/error-navigation.gif)
 
@@ -425,7 +424,7 @@ It is also possible to directly enter the name of an identifier
 ![Find identifier example](media/find-identifier.gif)
 
 
-### Jump to type definition  of an expression
+### Jump to type definition of an expression
 
 You can also jump to the type definition of the expression at point.
 
@@ -439,7 +438,7 @@ provided:
 
 ### Find occurrences
 
-`ocaml-eglot-occurences` returns all occurrences of the
+`ocaml-eglot-occurrences` returns all occurrences of the
 identifier under the cursor. To find all occurrences in the entire
 project, it requires an index. This index can be created by running
 `dune build @ocaml-index --watch` when developing.  Requires OCaml
@@ -519,7 +518,7 @@ powerful feature that allows one to generate and manipulate pattern
 matching expressions. It behaves differently depending on the cursor’s
 context:
 
-- on an expression: it replaces it by a pattern matching over it’s
+- on an expression: it replaces it by a pattern matching over its
   constructors
 - on a wildcard pattern: it will refine it if possible
 - on a pattern of a non-exhaustive matching: it will make the pattern
@@ -554,7 +553,7 @@ to find the function `int_of_string_opt`, search for `string -> int
 option`:
 
 - `ocaml-eglot-search` searches for a value by its type or polarity to
-  included in the current buffer (the search type is defined by the
+  include in the current buffer (the search type is defined by the
   input query)
 
 ![Search Example](media/search.gif)
@@ -575,7 +574,7 @@ Alternatively, you can search for a definition or declaration:
 Used to hook the opening of a compilation artefact with
 `ocamlobjinfo`:
 
-![Opening build artfact using ocamlobjinfo](media/ocamlobjinfo.gif)
+![Opening build artifact using ocamlobjinfo](media/ocamlobjinfo.gif)
 
 
 ## Comparison of Merlin and OCaml-eglot commands
@@ -593,8 +592,8 @@ Used to hook the opening of a compilation artefact with
 | ❌                          | `ocaml-eglot-find-type-definition` |                                                                          |
 | ❌                          | `ocaml-eglot-find-identifier-in-alternate-file` |                                                                          |
 | `merlin-locate-ident`       | `ocaml-eglot-find-identifier-definition`, `ocaml-eglot-find-identifier-declaration`                                 |                                                                                                              |
-| `merlin-occurences`         | `ocaml-eglot-occurences`           |                                                                                                              |
-| `merlin-project-occurences` | —                                  | Handle by `ocaml-eglot-occurences` (if `ocaml-version  >= 5.2` and need an index, `dune build @ocaml-index`) |
+| `merlin-occurences`         | `ocaml-eglot-occurrences`          |                                                                                                              |
+| `merlin-project-occurences` | —                                  | Handled by `ocaml-eglot-occurrences` (if `ocaml-version >= 5.2` and need an index, `dune build @ocaml-index`) |
 | `merlin-iedit-occurrences`  | `ocaml-eglot-rename`               |                                                                                                              |
 | `merlin-document`           | `ocaml-eglot-document`             | also `ocaml-eglot-document-identifier`                                                                       |
 | `merlin-phrase-next`        | `ocaml-eglot-phrase-next`          |                                                                                                              |
