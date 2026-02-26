@@ -329,8 +329,8 @@ illustrations of each command in the next section.).
 | `ocaml-eglot-hole-next` |  |
 | `ocaml-eglot-hole-prev` |  |
 | `ocaml-eglot-jump` |  |
-| `ocaml-eglot-phrase-next` | <kbd>C-c</kbd> <kbd>C-p</kbd> |
-| `ocaml-eglot-phrase-prev` | <kbd>C-c</kbd> <kbd>C-n</kbd> |
+| `ocaml-eglot-phrase-next` | <kbd>C-c</kbd> <kbd>C-n</kbd> |
+| `ocaml-eglot-phrase-prev` | <kbd>C-c</kbd> <kbd>C-p</kbd> |
 | `ocaml-eglot-search` | |
 | `ocaml-eglot-search-definition` | |
 | `ocaml-eglot-search-declaration` | |
