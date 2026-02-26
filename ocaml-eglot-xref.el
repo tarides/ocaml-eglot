@@ -1,6 +1,6 @@
 ;;; ocaml-eglot-xref.el --- Xref backend for OCaml   -*- coding: utf-8; lexical-binding: t -*-
 
-;; Copyright (C) 2025  The OCaml-eglot Project Contributors
+;; Copyright (C) 2025-2026  The OCaml-eglot Project Contributors
 ;; Licensed under the MIT license.
 
 ;; Author: Xavier Van de Woestyne <xaviervdw@gmail.com>

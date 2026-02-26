@@ -1,6 +1,6 @@
 ;;; ocaml-eglot-type-enclosing.el --- Type Enclosing feature   -*- coding: utf-8; lexical-binding: t -*-
 
-;; Copyright (C) 2024-2025  Xavier Van de Woestyne
+;; Copyright (C) 2024-2026  Xavier Van de Woestyne
 ;; Licensed under the MIT license.
 
 ;; Author: Xavier Van de Woestyne <xaviervdw@gmail.com>
