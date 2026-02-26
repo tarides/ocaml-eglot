@@ -612,12 +612,14 @@ and print its type."
       (ocaml-eglot-req--destruct (region-beginning) (region-end))
     (ocaml-eglot-req--destruct (point) (point))))
 
-;; Occurences
+;; Occurrences
 
-(defun ocaml-eglot-occurences ()
+(defun ocaml-eglot-occurrences ()
   "Find all occurrences of the identifier under the cursor."
   (interactive)
   (call-interactively #'xref-find-references))
+
+(defalias 'ocaml-eglot-occurences #'ocaml-eglot-occurrences)
 
 (defun ocaml-eglot-rename ()
   "Rename the symbol at point."
