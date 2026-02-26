@@ -111,14 +111,16 @@ Otherwise, `ocaml-eglot-construct' only includes constructors."
 
 (defface ocaml-eglot-highlight-region-face
   '((t (:inherit highlight)))
-  "Face used when highlighting a region.")
+  "Face used when highlighting a region."
+  :group 'ocaml-eglot)
 
 ;; Custom extension
 
 (defcustom ocaml-eglot-client-capabilities
   (list "jumpToNextHole")
   "List of custom client commands."
-  :type '(set (const "jumpToNextHole")))
+  :type '(set (const "jumpToNextHole"))
+  :group 'ocaml-eglot)
 
 ;;; Features
 
