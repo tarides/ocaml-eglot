@@ -23,7 +23,7 @@ Tue Apr 15 11:14:03 PM CEST 2025
 - Add error-handling for jsonrpc-request ([#52](https://github.com/tarides/ocaml-eglot/pull/52))
 - Maintain more diagnostics for location failure ([#52](https://github.com/tarides/ocaml-eglot/pull/52))
 - Fix hole cycle navigation ([#53](https://github.com/tarides/ocaml-eglot/pull/53))
-- Relay on custom request (if it is available) for managing holes ([#53](https://github.com/tarides/ocaml-eglot/pull/53))
+- Rely on custom request (if it is available) for managing holes ([#53](https://github.com/tarides/ocaml-eglot/pull/53))
 - Implementation of support for experimental client commands (and implementation of `ocaml.next-hole` in the presence of the `ocaml-eglot-destruct` action) ([#54](https://github.com/tarides/ocaml-eglot/pull/54))
 
 ocaml-eglot 1.1.0

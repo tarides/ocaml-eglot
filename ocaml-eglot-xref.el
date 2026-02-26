@@ -1,6 +1,6 @@
 ;;; ocaml-eglot-xref.el --- Xref backend for OCaml   -*- coding: utf-8; lexical-binding: t -*-
 
-;; Copyright (C) 2025  The OCaml-eglot Project Contributors
+;; Copyright (C) 2025-2026  The OCaml-eglot Project Contributors
 ;; Licensed under the MIT license.
 
 ;; Author: Xavier Van de Woestyne <xaviervdw@gmail.com>
@@ -59,7 +59,7 @@ than a character offset, so we can't use `xref-make-file-location'."
     (move-marker (make-marker) pos buffer)))
 
 (defun ocaml-eglot-xref--call-locate (symbol)
-  "Locate an idenfier based on SYMBOL used for xref."
+  "Locate an identifier based on SYMBOL used for xref."
   (let ((argv
          ;; SYMBOL was probably just typed in by the user.  So pass it
          ;; to Merlin, removing a trailing "." in case the user completed

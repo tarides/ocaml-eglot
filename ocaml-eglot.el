@@ -1,6 +1,6 @@
 ;;; ocaml-eglot.el --- An OCaml companion for Eglot   -*- coding: utf-8; lexical-binding: t -*-
 
-;; Copyright (C) 2024-2025  The OCaml-eglot Project Contributors
+;; Copyright (C) 2024-2026  The OCaml-eglot Project Contributors
 ;; Licensed under the MIT license.
 
 ;; Author: Xavier Van de Woestyne <xaviervdw@gmail.com>
@@ -13,7 +13,7 @@
 ;; Keywords: ocaml languages
 ;; URL: https://github.com/tarides/ocaml-eglot
 ;; Package-Requires: ((emacs "29.1"))
-;; Package-Version: 1.1
+;; Package-Version: 1.3.0
 ;; SPDX-License-Identifier: MIT
 
 ;;; Commentary:
@@ -65,8 +65,8 @@
   :type 'boolean)
 
 (defcustom ocaml-eglot-construct-with-local-values nil
-  "If non-nil, `merlin-construct' includes values in the local environment.
-Otherwise, `merlin-construct' only includes constructors."
+  "If non-nil, `ocaml-eglot-construct' includes values in the local environment.
+Otherwise, `ocaml-eglot-construct' only includes constructors."
   :group 'ocaml-eglot
   :type 'boolean)
 
@@ -111,14 +111,16 @@ Otherwise, `merlin-construct' only includes constructors."
 
 (defface ocaml-eglot-highlight-region-face
   '((t (:inherit highlight)))
-  "Face used when highlighting a region.")
+  "Face used when highlighting a region."
+  :group 'ocaml-eglot)
 
 ;; Custom extension
 
 (defcustom ocaml-eglot-client-capabilities
   (list "jumpToNextHole")
   "List of custom client commands."
-  :type '(set (const "jumpToNextHole")))
+  :type '(set (const "jumpToNextHole"))
+  :group 'ocaml-eglot)
 
 ;;; Features
 
@@ -367,7 +369,7 @@ If there is no available holes, it returns the first one of HOLES."
 ;; Jump to source elements
 
 (defun ocaml-eglot-jump ()
-  "Jumps to the the closest fun/let/match/module/module-type/match-case."
+  "Jump to the closest fun/let/match/module/module-type/match-case."
   (interactive)
   (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleJump)
   (let ((jumps-result (cl-getf (ocaml-eglot-req--jump) :jumps)))
@@ -450,9 +452,9 @@ KEY-COMPLETABLE define the current value to be selected."
       (complete-with-action action choices string pred))))
 
 (defun ocaml-eglot--search (query limit key)
-  "Search a value using his type (or polarity) by a QUERY.
+  "Search for a value by its type or polarity using QUERY.
 The universal prefix argument can be used to change the maximum number
-of result (LIMIT).  KEY define the current value to be selected."
+of results (LIMIT).  KEY defines the current value to be selected."
   (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
   (let* ((limit (or(if (> limit 1) limit nil)
                    ocaml-eglot-type-search-limit 25))
@@ -470,7 +472,7 @@ of result (LIMIT).  KEY define the current value to be selected."
     chosen))
 
 (defun ocaml-eglot-search (query &optional limit)
-  "Search a value using his type (or polarity) by a QUERY.
+  "Search for a value by its type or polarity using QUERY.
 The universal prefix argument can be used to change the maximum number
 of results (LIMIT)."
   (interactive "sSearch query: \np")
@@ -485,7 +487,7 @@ of results (LIMIT)."
     (ocaml-eglot--first-hole-in start end)))
 
 (defun ocaml-eglot--search-def-or-decl (callback query &optional limit)
-  "Search a definition or a declaration using a QUERY (type or polarity).
+  "Search for a definition or declaration using QUERY (type or polarity).
 The universal prefix argument can be used to change the maximum number
 of results (LIMIT).  CALLBACK is used to define the jump strategy."
   (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
@@ -493,7 +495,7 @@ of results (LIMIT).  CALLBACK is used to define the jump strategy."
     (funcall callback result)))
 
 (defun ocaml-eglot-search-definition (query &optional limit)
-  "Search a definition using a QUERY (type or polarity).
+  "Search for a definition using QUERY (type or polarity).
 The universal prefix argument can be used to change the maximum number
 of results (LIMIT)."
   (interactive "sSearch query: \np")
@@ -505,7 +507,7 @@ of results (LIMIT)."
    limit))
 
 (defun ocaml-eglot-search-declaration (query &optional limit)
-  "Search a declaration using a QUERY (type or polarity).
+  "Search for a declaration using QUERY (type or polarity).
 The universal prefix argument can be used to change the maximum number
 of results (LIMIT)."
   (interactive "sSearch query: \np")
@@ -526,7 +528,7 @@ of results (LIMIT)."
 
 (defun ocaml-eglot-construct (&optional arg)
   "Construct over the current hole.
-It use the ARG to use local values or not."
+Use ARG to include local values."
   (interactive "P")
   (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleConstruct)
   (let* ((current-range (ocaml-eglot-util--current-range))
@@ -612,12 +614,14 @@ and print its type."
       (ocaml-eglot-req--destruct (region-beginning) (region-end))
     (ocaml-eglot-req--destruct (point) (point))))
 
-;; Occurences
+;; Occurrences
 
-(defun ocaml-eglot-occurences ()
+(defun ocaml-eglot-occurrences ()
   "Find all occurrences of the identifier under the cursor."
   (interactive)
   (call-interactively #'xref-find-references))
+
+(defalias 'ocaml-eglot-occurences #'ocaml-eglot-occurrences)
 
 (defun ocaml-eglot-rename ()
   "Rename the symbol at point."
