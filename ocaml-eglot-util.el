@@ -160,11 +160,9 @@ A nil position is considered less than a non-nil one."
     (string-match-p "\\.\\(mli\\|rei\\|eliomi\\)\\'" file)))
 
 (defun ocaml-eglot-util--on-interface ()
-  "Return non-nil if the current URI is an interface, nil otherwise."
-  (when (and buffer-file-name
-             (string-match-p "\\.\\(mli\\|rei\\|eliomi\\)\\'" buffer-file-name))
-    (let ((uri (ocaml-eglot-util--current-uri)))
-      (ocaml-eglot-util--is-interface uri))))
+  "Return non-nil if the current buffer is an interface, nil otherwise."
+  (and buffer-file-name
+       (string-match-p "\\.\\(mli\\|rei\\|eliomi\\)\\'" buffer-file-name)))
 
 (defun ocaml-eglot-util--ensure-interface ()
   "Ensure that a function is called on a interface file."
