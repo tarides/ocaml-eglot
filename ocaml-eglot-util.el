@@ -149,14 +149,6 @@ If optional MARKERS, make markers instead."
          (new-char (+ character (length content))))
     `(:line ,line :character ,new-char)))
 
-(defun ocaml-eglot-util--merlin-location-to-lsp (location)
-  "Convert a Merlin's LOCATION to an LSP one."
-  (let* ((uri (cl-getf location :file))
-         (pos (cl-getf location :pos))
-         (lsp-pos (ocaml-eglot-util--merlin-pos-to-lsp-pos pos))
-         (range (list :start lsp-pos :end lsp-pos)))
-    (list :uri uri :range range)))
-
 (defun ocaml-eglot-util--current-uri ()
   "Return the uri of the document currently being visited."
   (cl-getf (eglot--TextDocumentIdentifier) :uri))
@@ -172,11 +164,6 @@ If optional MARKERS, make markers instead."
              (string-match-p "\\.\\(mli\\|rei\\|eliomi\\)\\'" buffer-file-name))
     (let ((uri (ocaml-eglot-util--current-uri)))
       (ocaml-eglot-util--is-interface uri))))
-
-(defun ocaml-eglot-util--ensure-is-interface (uri)
-  "Ensure that a function is called given an interface file (URI)."
-  (when (not (ocaml-eglot-util--is-interface uri))
-    (eglot--error "Function is only available for interfaces")))
 
 (defun ocaml-eglot-util--ensure-interface ()
   "Ensure that a function is called on a interface file."

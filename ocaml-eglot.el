@@ -456,8 +456,8 @@ KEY-COMPLETABLE define the current value to be selected."
 The universal prefix argument can be used to change the maximum number
 of results (LIMIT).  KEY defines the current value to be selected."
   (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
-  (let* ((limit (or(if (> limit 1) limit nil)
-                   ocaml-eglot-type-search-limit 25))
+  (let* ((limit (or (if (> limit 1) limit nil)
+                    ocaml-eglot-type-search-limit))
          (with-doc (or ocaml-eglot-type-search-include-doc :json-false))
          ;; We use plaintext because the result of the documentation may
          ;; be truncated
