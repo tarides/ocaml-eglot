@@ -113,13 +113,14 @@ If PREV-VERB is given, the verbosity change ensure that the type is different."
 
 (defun ocaml-eglot-type-enclosing--type-buffer (type-expr)
   "Create buffer with content TYPE-EXPR of the enclosing type buffer."
-  ; We store the current major mode to be used in the type buffer for
-  ; syntax highlighting.
+  ;; We use the current major mode in the type buffer for syntax
+  ;; highlighting, but only switch if it has changed.
   (let ((curr-dir default-directory)
         (current-major-mode major-mode))
     (with-current-buffer (get-buffer-create ocaml-eglot-type-buffer-name)
       (read-only-mode 0)
-      (funcall current-major-mode)
+      (unless (eq major-mode current-major-mode)
+        (funcall current-major-mode))
       (erase-buffer)
       (insert type-expr)
       (goto-char (point-min))
