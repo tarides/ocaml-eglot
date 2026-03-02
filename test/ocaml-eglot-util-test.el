@@ -1,63 +1,69 @@
-;;; ocaml-eglot-util-test.el --- Test for ocaml-eglot-util   -*- coding: utf-8; lexical-binding: t -*-
+;;; ocaml-eglot-util-test.el --- Tests for ocaml-eglot-util   -*- coding: utf-8; lexical-binding: t -*-
 
-;; Copyright (C) 2024  The OCaml-eglot Project Contributors
+;; Copyright (C) 2024-2026  The OCaml-eglot Project Contributors
 ;; Licensed under the MIT license.
 
 ;;; Commentary:
 
-;; Just some test for ocaml-eglot-util
+;; Buttercup tests for ocaml-eglot-util.
 
 ;;; Code:
 
 (require 'ocaml-eglot-util)
 (require 'cl-lib)
-(require 'ert)
-
-(defgroup ocaml-eglot-util-test nil
-  "Test for ocaml-eglot-util."
-  :group 'test)
-
-(ert-deftest vec-first-or-nil-test ()
-  "Test for `ocaml-eglot-util--vec-first-or-nil'."
-  (should-not (ocaml-eglot-util--vec-first-or-nil []))
-  (should (= (ocaml-eglot-util--vec-first-or-nil [1]) 1))
-  (should (= (ocaml-eglot-util--vec-first-or-nil [2 3 4 5]) 2)))
+(require 'buttercup)
 
 (defun pos (l c)
-  "Builds a position with a line number (L) and a character number (C)."
+  "Build a position with line number L and character number C."
   `(:line ,l :character ,c))
 
 (defun same-pos? (a b)
-  "Return non-nil if A = B, nil otherwise."
+  "Return non-nil if positions A and B are equal."
   (= (ocaml-eglot-util--compare-position a b) 0))
 
-(ert-deftest compare-position-test ()
-  "Test for `ocaml-eglot-util--compare-position'."
-  (should (= (ocaml-eglot-util--compare-position (pos 1 1) (pos 0 0)) 1))
-  (should (= (ocaml-eglot-util--compare-position (pos 1 1) (pos 1 1)) 0))
-  (should (= (ocaml-eglot-util--compare-position (pos 0 0) (pos 1 1)) -1))
-  (should (= (ocaml-eglot-util--compare-position (pos 2 3) (pos 2 2)) 1))
-  (should (= (ocaml-eglot-util--compare-position (pos 2 2) (pos 2 2)) 0))
-  (should (= (ocaml-eglot-util--compare-position (pos 7 7) (pos 7 8)) -1)))
+(describe "ocaml-eglot-util"
 
-(ert-deftest position-increase-char-test ()
-  "Test for `ocaml-eglot-util--position-increase-char'."
-  (should (same-pos?
-           (ocaml-eglot-util--position-increase-char (pos 1 1) "")
-           (pos 1 1)))
-  (should (same-pos?
-           (ocaml-eglot-util--position-increase-char (pos 1 1) "foo")
-           (pos 1 4))))
+  (describe "vec-first-or-nil"
+    (it "returns nil for an empty vector"
+      (expect (ocaml-eglot-util--vec-first-or-nil []) :to-be nil))
+    (it "returns the single element of a one-element vector"
+      (expect (ocaml-eglot-util--vec-first-or-nil [1]) :to-equal 1))
+    (it "returns the first element of a multi-element vector"
+      (expect (ocaml-eglot-util--vec-first-or-nil [2 3 4 5]) :to-equal 2)))
 
-(ert-deftest is-interface-test ()
-  "Test for `ocaml-eglot-util--is-interface'."
-  (should-not (ocaml-eglot-util--is-interface "file:///t.ml"))
-  (should-not (ocaml-eglot-util--is-interface "file:///t.re"))
-  (should-not (ocaml-eglot-util--is-interface "file:///t.eliom"))
-  (should (ocaml-eglot-util--is-interface "file:///t.mli"))
-  (should (ocaml-eglot-util--is-interface "file:///t.rei"))
-  (should (ocaml-eglot-util--is-interface "file:///t.eliomi")))
+  (describe "compare-position"
+    (it "returns 1 when first position is greater"
+      (expect (ocaml-eglot-util--compare-position (pos 1 1) (pos 0 0)) :to-equal 1))
+    (it "returns 0 for equal positions"
+      (expect (ocaml-eglot-util--compare-position (pos 1 1) (pos 1 1)) :to-equal 0))
+    (it "returns -1 when first position is lesser"
+      (expect (ocaml-eglot-util--compare-position (pos 0 0) (pos 1 1)) :to-equal -1))
+    (it "compares by character when lines are equal"
+      (expect (ocaml-eglot-util--compare-position (pos 2 3) (pos 2 2)) :to-equal 1)
+      (expect (ocaml-eglot-util--compare-position (pos 2 2) (pos 2 2)) :to-equal 0)
+      (expect (ocaml-eglot-util--compare-position (pos 7 7) (pos 7 8)) :to-equal -1)))
 
+  (describe "position-increase-char"
+    (it "does not change position for empty string"
+      (expect (same-pos?
+               (ocaml-eglot-util--position-increase-char (pos 1 1) "")
+               (pos 1 1))
+              :to-be-truthy))
+    (it "increases character by string length"
+      (expect (same-pos?
+               (ocaml-eglot-util--position-increase-char (pos 1 1) "foo")
+               (pos 1 4))
+              :to-be-truthy)))
+
+  (describe "is-interface"
+    (it "returns nil for implementation files"
+      (expect (ocaml-eglot-util--is-interface "file:///t.ml") :not :to-be-truthy)
+      (expect (ocaml-eglot-util--is-interface "file:///t.re") :not :to-be-truthy)
+      (expect (ocaml-eglot-util--is-interface "file:///t.eliom") :not :to-be-truthy))
+    (it "returns truthy for interface files"
+      (expect (ocaml-eglot-util--is-interface "file:///t.mli") :to-be-truthy)
+      (expect (ocaml-eglot-util--is-interface "file:///t.rei") :to-be-truthy)
+      (expect (ocaml-eglot-util--is-interface "file:///t.eliomi") :to-be-truthy))))
 
 (provide 'ocaml-eglot-util-test)
 ;;; ocaml-eglot-util-test.el ends here
