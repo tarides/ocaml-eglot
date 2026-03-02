@@ -1,3 +1,9 @@
+Unreleased
+======================
+
+- Replace `makel` with `Eldev` as the build tool ([#91](https://github.com/tarides/ocaml-eglot/pull/91))
+- Switch test framework from ERT to Buttercup and extend test suite ([#91](https://github.com/tarides/ocaml-eglot/pull/91))
+
 ocaml-eglot 1.3.0
 ======================
 Wed Feb 25 04:21:45 PM CET 2026
