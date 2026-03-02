@@ -66,12 +66,8 @@ If optional MARKERS, make markers instead."
   "Check and load if URI is available for typechecking."
   (let ((path (ocaml-eglot-util--uri-to-path uri)))
     (when (file-exists-p path)
-      (if (member path (mapcar #'buffer-file-name (buffer-list)))
-          t
-        (let ((buf (current-buffer)))
-          (find-file path)
-          (switch-to-buffer buf)
-          t)))))
+      (find-file-noselect path)
+      t)))
 
 (defun ocaml-eglot-util-point-as-arg (point)
   "Compute POINT as a valid Merlin position."
