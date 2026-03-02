@@ -253,7 +253,7 @@ If optional IN-OTHER-WINDOW is non-nil, find the file in another window."
 If optional IN-OTHER-WINDOW is non-nil, find the declaration in another window."
   (interactive "P")
   (let* ((identifier (xref-backend-identifier-at-point (xref-find-backend)))
-         (identifier-str (progn (substring-no-properties identifier)))
+         (identifier-str (substring-no-properties identifier))
          (alternate-buffer
           (progn
             (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleSwitchImplIntf)
