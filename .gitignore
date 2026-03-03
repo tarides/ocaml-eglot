@@ -10,5 +10,6 @@
 # Undo-tree save-files
 *.~undo-tree
 
-# Makel
-/makel.mk
+# Eldev
+/Eldev-local
+/.eldev
