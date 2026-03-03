@@ -253,7 +253,7 @@ If optional IN-OTHER-WINDOW is non-nil, find the file in another window."
 If optional IN-OTHER-WINDOW is non-nil, find the declaration in another window."
   (interactive "P")
   (let* ((identifier (xref-backend-identifier-at-point (xref-find-backend)))
-         (identifier-str (progn (substring-no-properties identifier)))
+         (identifier-str (substring-no-properties identifier))
          (alternate-buffer
           (progn
             (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleSwitchImplIntf)
@@ -456,8 +456,8 @@ KEY-COMPLETABLE define the current value to be selected."
 The universal prefix argument can be used to change the maximum number
 of results (LIMIT).  KEY defines the current value to be selected."
   (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleTypeSearch)
-  (let* ((limit (or(if (> limit 1) limit nil)
-                   ocaml-eglot-type-search-limit 25))
+  (let* ((limit (or (if (> limit 1) limit nil)
+                    ocaml-eglot-type-search-limit))
          (with-doc (or ocaml-eglot-type-search-include-doc :json-false))
          ;; We use plaintext because the result of the documentation may
          ;; be truncated

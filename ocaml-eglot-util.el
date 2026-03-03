@@ -66,12 +66,8 @@ If optional MARKERS, make markers instead."
   "Check and load if URI is available for typechecking."
   (let ((path (ocaml-eglot-util--uri-to-path uri)))
     (when (file-exists-p path)
-      (if (member path (mapcar #'buffer-file-name (buffer-list)))
-          t
-        (let ((buf (current-buffer)))
-          (find-file path)
-          (switch-to-buffer buf)
-          t)))))
+      (find-file-noselect path)
+      t)))
 
 (defun ocaml-eglot-util-point-as-arg (point)
   "Compute POINT as a valid Merlin position."
@@ -124,17 +120,22 @@ If optional MARKERS, make markers instead."
     (ocaml-eglot-util--goto-char (eglot--lsp-position-to-point start))))
 
 (defun ocaml-eglot-util--compare-position (a b)
-  "Comparison between two LSP positions, A and B."
-  (if (and a b)
-      (let ((char-a (cl-getf a :character))
-            (char-b (cl-getf b :character))
-            (line-a (cl-getf a :line))
-            (line-b (cl-getf b :line)))
-        (if (> line-a line-b) 1
-          (if (> line-b line-a) -1
-            (if (> char-a char-b) 1
-              (if (> char-b char-a) -1 0)))))
-    (when a 1) (when b -1) 0))
+  "Comparison between two LSP positions, A and B.
+Return 1 if A > B, -1 if A < B, 0 if equal.
+A nil position is considered less than a non-nil one."
+  (cond
+   ((and a b)
+    (let ((char-a (cl-getf a :character))
+          (char-b (cl-getf b :character))
+          (line-a (cl-getf a :line))
+          (line-b (cl-getf b :line)))
+      (if (> line-a line-b) 1
+        (if (> line-b line-a) -1
+          (if (> char-a char-b) 1
+            (if (> char-b char-a) -1 0))))))
+   (a 1)
+   (b -1)
+   (t 0)))
 
 (defun ocaml-eglot-util--merlin-pos-to-lsp-pos (pos)
   "Compute a LSP position from a Merlin's POS (as LINE/COL)."
@@ -149,14 +150,6 @@ If optional MARKERS, make markers instead."
          (new-char (+ character (length content))))
     `(:line ,line :character ,new-char)))
 
-(defun ocaml-eglot-util--merlin-location-to-lsp (location)
-  "Convert a Merlin's LOCATION to an LSP one."
-  (let* ((uri (cl-getf location :file))
-         (pos (cl-getf location :pos))
-         (lsp-pos (ocaml-eglot-util--merlin-pos-to-lsp-pos pos))
-         (range (list :start lsp-pos :end lsp-pos)))
-    (list :uri uri :range range)))
-
 (defun ocaml-eglot-util--current-uri ()
   "Return the uri of the document currently being visited."
   (cl-getf (eglot--TextDocumentIdentifier) :uri))
@@ -167,16 +160,9 @@ If optional MARKERS, make markers instead."
     (string-match-p "\\.\\(mli\\|rei\\|eliomi\\)\\'" file)))
 
 (defun ocaml-eglot-util--on-interface ()
-  "Return non-nil if the current URI is an interface, nil otherwise."
-  (when (and buffer-file-name
-             (string-match-p "\\.\\(mli\\|rei\\|eliomi\\)\\'" buffer-file-name))
-    (let ((uri (ocaml-eglot-util--current-uri)))
-      (ocaml-eglot-util--is-interface uri))))
-
-(defun ocaml-eglot-util--ensure-is-interface (uri)
-  "Ensure that a function is called given an interface file (URI)."
-  (when (not (ocaml-eglot-util--is-interface uri))
-    (eglot--error "Function is only available for interfaces")))
+  "Return non-nil if the current buffer is an interface, nil otherwise."
+  (and buffer-file-name
+       (string-match-p "\\.\\(mli\\|rei\\|eliomi\\)\\'" buffer-file-name)))
 
 (defun ocaml-eglot-util--ensure-interface ()
   "Ensure that a function is called on a interface file."

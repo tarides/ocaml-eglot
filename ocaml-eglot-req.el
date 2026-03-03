@@ -71,10 +71,6 @@ request fails.  SERVER can also be conditionally given."
   "Compute `TextDocumentIdentifier' object for current buffer."
   (eglot--TextDocumentIdentifier))
 
-(defun ocaml-eglot-req--PlainUri ()
-  "A hack for requests that do not respect the URI parameter scheme."
-  (make-vector 1 (ocaml-eglot-util--current-uri)))
-
 (defun ocaml-eglot-req--TextDocumentPositionParams ()
   "Compute `TextDocumentPositionParams' object for the current buffer."
   (append
@@ -190,22 +186,10 @@ under the cursor.  The MARKUP-KIND can also be configured."
   (let ((error-data (alist-get 'jsonrpc-error-data err)))
     (eglot--error "%s" error-data)))
 
-(defun ocaml-eglot-req--definition ()
-  "Execute the `textDocument/definition' request for the current point."
-  (let ((params (ocaml-eglot-req--TextDocumentPositionParams)))
-    (ocaml-eglot-req--send :textDocument/definition params
-                           :fallback 'ocaml-eglot-req--locate-fallback)))
-
 (defun ocaml-eglot-req--type-definition ()
   "Execute the `textDocument/typeDefinition' request for the current point."
   (let ((params (ocaml-eglot-req--TextDocumentPositionParams)))
     (ocaml-eglot-req--send :textDocument/typeDefinition params
-                           :fallback 'ocaml-eglot-req--locate-fallback)))
-
-(defun ocaml-eglot-req--declaration ()
-  "Execute the `textDocument/declaration' request for the current point."
-  (let ((params (ocaml-eglot-req--TextDocumentPositionParams)))
-    (ocaml-eglot-req--send :textDocument/declaration params
                            :fallback 'ocaml-eglot-req--locate-fallback)))
 
 (defun ocaml-eglot-req--type-enclosings (at index verbosity)

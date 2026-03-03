@@ -1,3 +1,12 @@
+Unreleased
+======================
+
+- Remove dead code left over from the xref backend rewrite ([#90](https://github.com/tarides/ocaml-eglot/pull/90))
+- Fix `compare-position` nil handling (was always returning 0) ([#90](https://github.com/tarides/ocaml-eglot/pull/90))
+- Use `find-file-noselect` in `load-uri` to avoid buffer flicker ([#90](https://github.com/tarides/ocaml-eglot/pull/90))
+- Simplify `on-interface` to avoid redundant extension check ([#90](https://github.com/tarides/ocaml-eglot/pull/90))
+- Avoid re-initializing major mode on every type display update ([#90](https://github.com/tarides/ocaml-eglot/pull/90))
+
 ocaml-eglot 1.3.0
 ======================
 Wed Feb 25 04:21:45 PM CET 2026
