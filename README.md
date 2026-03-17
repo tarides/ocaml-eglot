@@ -569,14 +569,6 @@ Alternatively, you can search for a definition or declaration:
 ![Search Definition or Declaration Example](media/search-def.gif)
 
 
-### Opening up build artefacts
-
-Used to hook the opening of a compilation artefact with
-`ocamlobjinfo`:
-
-![Opening build artifact using ocamlobjinfo](media/ocamlobjinfo.gif)
-
-
 ## Comparison of Merlin and OCaml-eglot commands
 
 | `merlin`                    | `ocaml-eglot`                      | Note                                                                                                         |

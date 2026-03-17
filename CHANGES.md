@@ -8,6 +8,7 @@ Unreleased
 - Use `find-file-noselect` in `load-uri` to avoid buffer flicker ([#90](https://github.com/tarides/ocaml-eglot/pull/90))
 - Simplify `on-interface` to avoid redundant extension check ([#90](https://github.com/tarides/ocaml-eglot/pull/90))
 - Avoid re-initializing major mode on every type display update ([#90](https://github.com/tarides/ocaml-eglot/pull/90))
+- Remove `ocaml-eglot-objinfo` in favor to `neocaml-objinfo` ([#92](https://github.com/tarides/ocaml-eglot/pull/92))
 
 ocaml-eglot 1.3.0
 ======================
