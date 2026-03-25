@@ -34,7 +34,6 @@
 
 (require 'flymake)
 (require 'flycheck nil 'noerror)
-(require 'flycheck-eglot nil 'noerror)
 (require 'xref)
 (require 'cl-lib)
 (require 'ocaml-eglot-util)
@@ -310,7 +309,7 @@ If there is no available holes, it returns the first one of HOLES."
 
 (defun ocaml-eglot--first-hole-in (start end)
   "Jump to the first hole in a given range denoted by START and END."
-  (when-let ((hole (ocaml-eglot--get-first-hole-in start end))
+  (when-let* ((hole (ocaml-eglot--get-first-hole-in start end))
              (hole-start (cl-getf hole :start)))
     (ocaml-eglot-util--jump-to hole-start)))
 
