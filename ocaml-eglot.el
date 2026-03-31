@@ -687,42 +687,50 @@ and print its type."
 
 ;;; Mode
 
-(defvar ocaml-eglot-map
-  (let ((ocaml-eglot-keymap (make-sparse-keymap)))
-    (define-key ocaml-eglot-keymap (kbd "C-c C-x") #'ocaml-eglot-error-next)
-    (define-key ocaml-eglot-keymap (kbd "C-c C-l") #'ocaml-eglot-find-definition)
-    (define-key ocaml-eglot-keymap (kbd "C-c C-i") #'ocaml-eglot-find-declaration)
-    (define-key ocaml-eglot-keymap (kbd "C-c C-a") #'ocaml-eglot-alternate-file)
-    (define-key ocaml-eglot-keymap (kbd "C-c C-d") #'ocaml-eglot-document)
-    (define-key ocaml-eglot-keymap (kbd "C-c C-t") #'ocaml-eglot-type-enclosing)
-    (define-key ocaml-eglot-keymap (kbd "C-c |") #'ocaml-eglot-destruct)
-    (define-key ocaml-eglot-keymap (kbd "C-c \\") #'ocaml-eglot-construct)
-    (define-key ocaml-eglot-keymap (kbd "C-c C-p") #'ocaml-eglot-phrase-prev)
-    (define-key ocaml-eglot-keymap (kbd "C-c C-n") #'ocaml-eglot-phrase-next)
-    ocaml-eglot-keymap)
-  "Keymap for OCaml-eglot minor mode.")
+(defvar ocaml-eglot-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-x") #'ocaml-eglot-error-next)
+    (define-key map (kbd "C-c C-l") #'ocaml-eglot-find-definition)
+    (define-key map (kbd "C-c C-i") #'ocaml-eglot-find-declaration)
+    (define-key map (kbd "C-c C-a") #'ocaml-eglot-alternate-file)
+    (define-key map (kbd "C-c C-d") #'ocaml-eglot-document)
+    (define-key map (kbd "C-c C-t") #'ocaml-eglot-type-enclosing)
+    (define-key map (kbd "C-c |") #'ocaml-eglot-destruct)
+    (define-key map (kbd "C-c \\") #'ocaml-eglot-construct)
+    (define-key map (kbd "C-c C-p") #'ocaml-eglot-phrase-prev)
+    (define-key map (kbd "C-c C-n") #'ocaml-eglot-phrase-next)
+    map)
+  "Keymap for `ocaml-eglot-mode'.")
 
-;;;###autoload
-(defun ocaml-eglot-setup ()
+(defun ocaml-eglot--setup ()
   "Setup OCaml-eglot."
   (add-hook 'find-file-hook #'ocaml-eglot--file-hook)
   (add-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend nil t))
 
-;;;###autoload
-(defun ocaml-eglot-clean ()
+(defun ocaml-eglot--clean ()
   "Clean registered hooks and advice."
   (remove-hook 'find-file-hook #'ocaml-eglot--file-hook)
   (remove-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend t))
 
 ;;;###autoload
-(define-minor-mode ocaml-eglot
+(define-minor-mode ocaml-eglot-mode
   "Minor mode for interacting with `ocaml-lsp-server' using `eglot' as a client.
 OCaml Eglot provides standard implementations of the various custom-requests
  exposed by `ocaml-lsp-server'."
   :lighter " OCaml-eglot"
-  :keymap ocaml-eglot-map
+  :keymap ocaml-eglot-mode-map
   :group 'ocaml-eglot
-  (if ocaml-eglot (ocaml-eglot-setup) (ocaml-eglot-clean)))
+  (if ocaml-eglot-mode (ocaml-eglot--setup) (ocaml-eglot--clean)))
+
+;;;###autoload
+(defalias 'ocaml-eglot #'ocaml-eglot-mode)
+(make-obsolete 'ocaml-eglot 'ocaml-eglot-mode "1.4.0")
+(defalias 'ocaml-eglot-setup #'ocaml-eglot--setup)
+(make-obsolete 'ocaml-eglot-setup 'ocaml-eglot-mode "1.4.0")
+(defvaralias 'ocaml-eglot-hook 'ocaml-eglot-mode-hook)
+(make-obsolete-variable 'ocaml-eglot-hook 'ocaml-eglot-mode-hook "1.4.0")
+(defvaralias 'ocaml-eglot-map 'ocaml-eglot-mode-map)
+(make-obsolete-variable 'ocaml-eglot-map 'ocaml-eglot-mode-map "1.4.0")
 
 (provide 'ocaml-eglot)
 ;;; ocaml-eglot.el ends here
