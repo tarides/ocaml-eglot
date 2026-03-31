@@ -84,8 +84,8 @@ Here's an example with Tuareg already installed:
   :ensure t
   :after tuareg
   :hook
-  (tuareg-mode . ocaml-eglot)
-  (ocaml-eglot . eglot-ensure))
+  (tuareg-mode . ocaml-eglot-mode)
+  (ocaml-eglot-mode . eglot-ensure))
 ```
 
 ### Foreword on configuration
@@ -107,10 +107,10 @@ Eglot provides a hook to format the buffer on saving:
    :ensure t
    :after tuareg
    :hook
-   (tuareg-mode . ocaml-eglot)
--  (ocaml-eglot . eglot-ensure))
-+  (ocaml-eglot . eglot-ensure)
-+  (ocaml-eglot . (lambda ()
+   (tuareg-mode . ocaml-eglot-mode)
+-  (ocaml-eglot-mode . eglot-ensure))
++  (ocaml-eglot-mode . eglot-ensure)
++  (ocaml-eglot-mode . (lambda ()
 +                   (add-hook #'before-save-hook #'eglot-format nil t))))
 ```
 
@@ -126,9 +126,9 @@ and `inlay-hints`:
    :ensure t
    :after tuareg
    :hook
-   (tuareg-mode . ocaml-eglot)
--  (ocaml-eglot . eglot-ensure))
-+  (ocaml-eglot . eglot-ensure)
+   (tuareg-mode . ocaml-eglot-mode)
+-  (ocaml-eglot-mode . eglot-ensure))
++  (ocaml-eglot-mode . eglot-ensure)
 +  (eglot-managed-mode . (lambda ()
 +                          (eldoc-mode -1)
 +                          (eglot-inlay-hints-mode -1))))
@@ -174,9 +174,9 @@ configuration in this way:
    :ensure t
    :after tuareg
    :hook
-   (tuareg-mode . ocaml-eglot)
--  (ocaml-eglot . eglot-ensure))
-+  (ocaml-eglot . eglot-ensure)
+   (tuareg-mode . ocaml-eglot-mode)
+-  (ocaml-eglot-mode . eglot-ensure))
++  (ocaml-eglot-mode . eglot-ensure)
 +  (eglot-managed-mode . (lambda () (flycheck-eglot-mode 1)))
 +  :config
 +  (setq ocaml-eglot-syntax-checker 'flycheck))
@@ -198,9 +198,9 @@ configured in this way:
    :ensure t
    :after tuareg
    :hook
-   (tuareg-mode . ocaml-eglot)
--  (ocaml-eglot . eglot-ensure))
-+  (ocaml-eglot . eglot-ensure)
+   (tuareg-mode . ocaml-eglot-mode)
+-  (ocaml-eglot-mode . eglot-ensure))
++  (ocaml-eglot-mode . eglot-ensure)
 +  :config
 +  (with-eval-after-load 'eglot
 +    (add-to-list 'eglot-server-programs
@@ -247,9 +247,9 @@ Here is a recommended minimal configuration to take full advantage of
   :ensure t
   :after tuareg
   :hook
-  (tuareg-mode . ocaml-eglot)
-  (ocaml-eglot . eglot-ensure)
-  (ocaml-eglot . (lambda () (add-hook #'before-save-hook #'eglot-format nil t)))
+  (tuareg-mode . ocaml-eglot-mode)
+  (ocaml-eglot-mode . eglot-ensure)
+  (ocaml-eglot-mode . (lambda () (add-hook #'before-save-hook #'eglot-format nil t)))
   :config
   (setq ocaml-eglot-syntax-checker 'flymake))
 
@@ -265,7 +265,7 @@ Here is a recommended minimal configuration to take full advantage of
 (use-package ocp-indent
   :ensure t
   :config
-  (add-hook 'ocaml-eglot-hook 'ocp-setup-indent))
+  (add-hook 'ocaml-eglot-mode-hook 'ocp-setup-indent))
 ```
 
 Using this configuration should provide a pleasant OCaml development
