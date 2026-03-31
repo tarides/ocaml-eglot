@@ -65,10 +65,12 @@ user experience as close as possible to that offered by the Emacs mode
 package](https://melpa.org/#/ocaml-eglot). `ocaml-eglot` is only an
 interface between `eglot` (available _out of the box_ since `emacs >=
 29.1`) and Emacs, a major mode dedicated to OCaml editing must be
-installed (e.g. [caml-mode](https://melpa.org/#/caml),
+installed (e.g. [neocaml](https://melpa.org/#/neocaml),
 [tuareg](https://melpa.org/#/tuareg) or
-[neocaml](https://github.com/bbatsov/neocaml)). Then, for example, you
-can use
+[caml-mode](https://melpa.org/#/caml)). We recommend
+[neocaml](https://melpa.org/#/neocaml) as it's a modern,
+tree-sitter-powered OCaml mode under active development. Then, for
+example, you can use
 [`use-package`](https://www.gnu.org/software/emacs/manual/html_node/use-package/Lisp-Configuration.html)
 to install `ocaml-eglot`. You will also need
 `https://ocaml.org/p/ocaml-lsp-server/latest` in the [current opam
@@ -77,7 +79,19 @@ using `dune pkg` to manage your dependencies, see [Usage with `dune
 pkg`](#usage-with-dune-pkg))
 
 
-Here's an example with Tuareg already installed:
+Here's an example with neocaml:
+
+```elisp
+(use-package ocaml-eglot
+  :ensure t
+  :after neocaml
+  :hook
+  (neocaml-base-mode . ocaml-eglot-mode)
+  (ocaml-eglot-mode . eglot-ensure))
+```
+
+<details>
+<summary>Using Tuareg instead</summary>
 
 ```elisp
 (use-package ocaml-eglot
@@ -87,6 +101,8 @@ Here's an example with Tuareg already installed:
   (tuareg-mode . ocaml-eglot-mode)
   (ocaml-eglot-mode . eglot-ensure))
 ```
+
+</details>
 
 ### Foreword on configuration
 
@@ -105,9 +121,9 @@ Eglot provides a hook to format the buffer on saving:
 ```diff
  (use-package ocaml-eglot
    :ensure t
-   :after tuareg
+   :after neocaml
    :hook
-   (tuareg-mode . ocaml-eglot-mode)
+   (neocaml-base-mode . ocaml-eglot-mode)
 -  (ocaml-eglot-mode . eglot-ensure))
 +  (ocaml-eglot-mode . eglot-ensure)
 +  (ocaml-eglot-mode . (lambda ()
@@ -124,9 +140,9 @@ and `inlay-hints`:
 ```diff
  (use-package ocaml-eglot
    :ensure t
-   :after tuareg
+   :after neocaml
    :hook
-   (tuareg-mode . ocaml-eglot-mode)
+   (neocaml-base-mode . ocaml-eglot-mode)
 -  (ocaml-eglot-mode . eglot-ensure))
 +  (ocaml-eglot-mode . eglot-ensure)
 +  (eglot-managed-mode . (lambda ()
@@ -172,9 +188,9 @@ configuration in this way:
 
  (use-package ocaml-eglot
    :ensure t
-   :after tuareg
+   :after neocaml
    :hook
-   (tuareg-mode . ocaml-eglot-mode)
+   (neocaml-base-mode . ocaml-eglot-mode)
 -  (ocaml-eglot-mode . eglot-ensure))
 +  (ocaml-eglot-mode . eglot-ensure)
 +  (eglot-managed-mode . (lambda () (flycheck-eglot-mode 1)))
@@ -196,15 +212,15 @@ configured in this way:
 ```diff
  (use-package ocaml-eglot
    :ensure t
-   :after tuareg
+   :after neocaml
    :hook
-   (tuareg-mode . ocaml-eglot-mode)
+   (neocaml-base-mode . ocaml-eglot-mode)
 -  (ocaml-eglot-mode . eglot-ensure))
 +  (ocaml-eglot-mode . eglot-ensure)
 +  :config
 +  (with-eval-after-load 'eglot
 +    (add-to-list 'eglot-server-programs
-+                 '(tuareg-mode . ("ocamllsp" "--fallback-read-dot-merlin")))))
++                 '(neocaml-base-mode . ("ocamllsp" "--fallback-read-dot-merlin")))))
 ```
 
 ### `merlin.el` window behavior
@@ -226,7 +242,41 @@ configuration:
 ### Recommended minimal configuration
 
 Here is a recommended minimal configuration to take full advantage of
-`ocaml-eglot` via `tuareg` (and a few additional modes):
+`ocaml-eglot` via `neocaml`:
+
+```elisp
+;; Configure Flymake for verbose diagnostics
+(use-package flymake
+  :ensure t
+  :pin gnu
+  :config
+  (setq flymake-diagnostic-format-alist
+        '((t . (origin code message)))))
+
+;; Configure neocaml
+(use-package neocaml
+  :ensure t)
+
+;; Configure OCaml-eglot
+(use-package ocaml-eglot
+  :ensure t
+  :after neocaml
+  :hook
+  (neocaml-base-mode . ocaml-eglot-mode)
+  (ocaml-eglot-mode . eglot-ensure)
+  (ocaml-eglot-mode . (lambda () (add-hook #'before-save-hook #'eglot-format nil t)))
+  :config
+  (setq ocaml-eglot-syntax-checker 'flymake))
+
+;; Additional modes configuration
+(use-package opam-switch-mode
+  :ensure t
+  :hook
+  (neocaml-base-mode . opam-switch-mode))
+```
+
+<details>
+<summary>Using Tuareg instead of neocaml</summary>
 
 ```elisp
 ;; Configure Flymake for verbose diagnostics
@@ -267,6 +317,8 @@ Here is a recommended minimal configuration to take full advantage of
   :config
   (add-hook 'ocaml-eglot-mode-hook 'ocp-setup-indent))
 ```
+
+</details>
 
 Using this configuration should provide a pleasant OCaml development
 experience in Emacs!
