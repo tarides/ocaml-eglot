@@ -429,7 +429,7 @@ During a "type enclosing" session the following commands are available:
   expression
 - `ocaml-eglot-type-enclosing-shrink` (<kbd>C-↓</kbd>): to shrink the
   expression
-- `ocaml-eglot-type-enclosing-copy` (<kbd>C-w</kbd>): to copy the
+- `ocaml-eglot-type-enclosing-copy` (<kbd>C-w</kbd> or <kbd>M-w</kbd>): to copy the
   type expression to the _kill-ring_ (clipboard)
 - `ocaml-eglot-type-enclosing-annotate` (<kbd>C-;</kbd>): to annotate
   (with type) the current enclosing

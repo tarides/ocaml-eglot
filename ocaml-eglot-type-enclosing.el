@@ -46,6 +46,7 @@
     (define-key keymap (kbd "C-<up>") #'ocaml-eglot-type-enclosing-grow)
     (define-key keymap (kbd "C-<down>") #'ocaml-eglot-type-enclosing-shrink)
     (define-key keymap (kbd "C-w") #'ocaml-eglot-type-enclosing-copy)
+    (define-key keymap (kbd "M-w") #'ocaml-eglot-type-enclosing-copy)
     (define-key keymap (kbd "C-c C-t") #'ocaml-eglot-type-enclosing-increase-verbosity)
     (define-key keymap (kbd "C-<right>") #'ocaml-eglot-type-enclosing-increase-verbosity)
     (define-key keymap (kbd "C-<left>") #'ocaml-eglot-type-enclosing-decrease-verbosity)

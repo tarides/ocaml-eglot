@@ -10,6 +10,7 @@ Unreleased
 - Avoid re-initializing major mode on every type display update ([#90](https://github.com/tarides/ocaml-eglot/pull/90))
 - Remove `ocaml-eglot-objinfo` in favor to `neocaml-objinfo` ([#92](https://github.com/tarides/ocaml-eglot/pull/92))
 - Rename minor mode from `ocaml-eglot` to `ocaml-eglot-mode` (old name kept as alias)
+- Add `M-w` as a shortcut for copying types in the kill-ring
 
 ocaml-eglot 1.3.0
 ======================
