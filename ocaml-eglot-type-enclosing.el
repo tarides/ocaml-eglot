@@ -54,6 +54,13 @@
     keymap)
   "Keymap for OCaml-eglot's type enclosing transient mode.")
 
+(defvar ocaml-eglot-type-enclosing-buffer-map
+  (let ((keymap (make-sparse-keymap)))
+    (set-keymap-parent keymap special-mode-map)
+    (define-key keymap "g" nil)
+    keymap)
+  "Keymap for the Type Enclosing Buffer.")
+
 ;;; Internal functions
 
 (defun ocaml-eglot-type-enclosing-copy ()
@@ -126,6 +133,7 @@ If PREV-VERB is given, the verbosity change ensure that the type is different."
       (insert type-expr)
       (goto-char (point-min))
       (read-only-mode 1)
+      (use-local-map ocaml-eglot-type-enclosing-buffer-map)
       (setq default-directory curr-dir))))
 
 (defun ocaml-eglot-type-enclosing--display (type-expr &optional current)

@@ -11,6 +11,7 @@ Unreleased
 - Remove `ocaml-eglot-objinfo` in favor to `neocaml-objinfo` ([#92](https://github.com/tarides/ocaml-eglot/pull/92))
 - Rename minor mode from `ocaml-eglot` to `ocaml-eglot-mode` (old name kept as alias)
 - Add `M-w` as a shortcut for copying types in the kill-ring
+- Add `q` as a shortcut for closing ocaml-eglot-temporary buffer
 
 ocaml-eglot 1.3.0
 ======================
