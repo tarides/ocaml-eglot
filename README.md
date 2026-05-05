@@ -35,6 +35,7 @@ user experience as close as possible to that offered by the Emacs mode
     - [Configure `flymake`](#configure-flymake)
     - [Using `flycheck` instead of `flymake`](#using-flycheck-instead-of-flymake)
     - [Using Merlin-configuration](#using-merlin-configuration)
+    - [`merlin.el` window behavior](#merlinel-window-behavior)
     - [Recommended minimal configuration](#recommended-minimal-configuration)
     - [Usage with `dune pkg`](#usage-with-dune-pkg)
   - [Features](#features)
@@ -43,9 +44,8 @@ user experience as close as possible to that offered by the Emacs mode
     - [Jump to definition/declaration](#jump-to-definitiondeclaration)
       - [Definition and Declaration](#definition-and-declaration)
     - [Find identifier definition/declaration](#find-identifier-definitiondeclaration)
-    - [Jump to type definition  of an expression](#jump-to-type-definition--of-an-expression)
+    - [Jump to type definition of an expression](#jump-to-type-definition-of-an-expression)
     - [Find occurrences](#find-occurrences)
-    - [Renaming](#renaming)
     - [Infer Interface](#infer-interface)
     - [Find Alternate file](#find-alternate-file)
     - [Get Documentation](#get-documentation)
@@ -53,7 +53,9 @@ user experience as close as possible to that offered by the Emacs mode
     - [Destruct (or case-analysis)](#destruct-or-case-analysis)
     - [Source Browsing](#source-browsing)
     - [Search for values](#search-for-values)
-    - [Opening up build artefacts](#opening-up-build-artefacts)
+    - [Refactoring](#refactoring)
+      - [Renaming](#renaming)
+      - [Extract expression as toplevel expression ](#extract-expression-as-toplevel-expression)
   - [Comparison of Merlin and OCaml-eglot commands](#comparison-of-merlin-and-ocaml-eglot-commands)
 
 <!-- markdown-toc end -->
@@ -433,12 +435,12 @@ During a "type enclosing" session the following commands are available:
   type expression to the _kill-ring_ (clipboard)
 - `ocaml-eglot-type-enclosing-annotate` (<kbd>C-;</kbd>): to annotate
   (with type) the current enclosing
+- `ocaml-eglot-type-enclosing-refactor-extract-at-toplevel` (<kbd>C-x</kbd>): to extract the enclosing inside a toplevel definition
 
 You can also enter an expression in the mini-buffer for which you want
 to display the type:
 
 - `ocaml-eglot-type-expression` (<kbd>C-u</kbd> <kbd>C-c</kbd> <kbd>C-t</kbd>)
-- `ocaml-eglot-type-annotate` Add type annotation under the cursor
 
 
 ![Type Enclosings example](media/type-enclosing.gif)
@@ -499,14 +501,6 @@ project, it requires an index. This index can be created by running
 
 ![Occurrences example](media/occurences.gif)
 
-### Renaming
-
-Use `ocaml-eglot-rename` to rename the symbol under the
-cursor. Starting with OCaml 5.3 it is possible to rename a symbol
-across multiple files after building an up-to-date index with `dune
-build @ocaml-index`.
-
-![Rename example](media/rename.gif)
 
 ### Infer Interface
 
@@ -620,34 +614,58 @@ Alternatively, you can search for a definition or declaration:
 
 ![Search Definition or Declaration Example](media/search-def.gif)
 
+### Refactoring
+
+#### Renaming
+
+Use `ocaml-eglot-rename` to rename the symbol under the
+cursor. Starting with OCaml 5.3 it is possible to rename a symbol
+across multiple files after building an up-to-date index with `dune
+build @ocaml-index`.
+
+![Rename example](media/rename.gif)
+
+#### Extract expression as toplevel expression 
+
+Extract the selected region into a top-level variable. If a prefix is
+provided, the command allows entering a name and passing free
+variables (_after extraction_) as arguments:
+
+![Extract Example](media/refactor-1.gif)
+
+It can be used through **type-enclosing**:
+
+![Extract Example with enclosings](media/refactor-2.gif)
+
 
 ## Comparison of Merlin and OCaml-eglot commands
 
-| `merlin`                    | `ocaml-eglot`                      | Note                                                                                                         |
-|-----------------------------|------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| `merlin-error-check`        | —                                  | The functionality is supported by `eglot` diagnostics (via LSP).                                             |
-| `merlin-error-next`         | `ocaml-eglot-error-next`           |                                                                                                              |
-| `merlin-error-prev`         | `ocaml-eglot-error-prev`           |                                                                                                              |
-| `merlin-type-enclosing`     | `ocaml-eglot-type-enclosing`       |                                                                                                              |
-| `merlin-type-expr`          | `ocaml-eglot-type-expression`      |                                                                                                              |
-| ❌                          | `ocaml-eglot-type-annotate` |                                                                          |
-| `merlin-locate`             | `ocaml-eglot-find-declaration`     |                                                                                                              |
-|  —                          | `ocaml-eglot-find-definition`      | Available in Merlin by configuration                                                                         |
-| ❌                          | `ocaml-eglot-find-type-definition` |                                                                          |
-| ❌                          | `ocaml-eglot-find-identifier-in-alternate-file` |                                                                          |
-| `merlin-locate-ident`       | `ocaml-eglot-find-identifier-definition`, `ocaml-eglot-find-identifier-declaration`                                 |                                                                                                              |
-| `merlin-occurences`         | `ocaml-eglot-occurrences`          |                                                                                                              |
-| `merlin-project-occurences` | —                                  | Handled by `ocaml-eglot-occurrences` (if `ocaml-version >= 5.2` and need an index, `dune build @ocaml-index`) |
-| `merlin-iedit-occurrences`  | `ocaml-eglot-rename`               |                                                                                                              |
-| `merlin-document`           | `ocaml-eglot-document`             | also `ocaml-eglot-document-identifier`                                                                       |
-| `merlin-phrase-next`        | `ocaml-eglot-phrase-next`          |                                                                                                              |
-| `merlin-phrase-prev`        | `ocaml-eglot-phrase-prev`          |                                                                                                              |
-| `merlin-switch-to-ml`       | `ocaml-eglot-alternate-file`       |                                                                                                              |
-| `merlin-switch-to-mli`      | `ocaml-eglot-alternate-file`       |                                                                                                              |
-| ❌                          | `ocaml-eglot-infer-interface`      | It was supported by `Tuareg` (and a bit ad-hoc)                                                              |
-| `merlin-jump`               | `ocaml-eglot-jump`                 |                                                                                                              |
-| `merlin-destruct`           | `ocaml-eglot-destruct`             |                                                                                                              |
-| `merlin-construct`          | `ocaml-eglot-construct`            |                                                                                                              |
-| `merlin-next-hole`          | `ocaml-eglot-hole-next`            |                                                                                                              |
-| `merlin-previous-hole`      | `ocaml-eglot-hole-prev`            |                                                                                                              |
-| `merlin-toggle-view-errors` | —                                  | An `eglot` configuration                                                                                     |
+| `merlin`                    | `ocaml-eglot`                                                                       | Note                                                                                                          |
+|-----------------------------|-------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
+| `merlin-error-check`        | —                                                                                   | The functionality is supported by `eglot` diagnostics (via LSP).                                              |
+| `merlin-error-next`         | `ocaml-eglot-error-next`                                                            |                                                                                                               |
+| `merlin-error-prev`         | `ocaml-eglot-error-prev`                                                            |                                                                                                               |
+| `merlin-type-enclosing`     | `ocaml-eglot-type-enclosing`                                                        |                                                                                                               |
+| `merlin-type-expr`          | `ocaml-eglot-type-expression`                                                       |                                                                                                               |
+| ❌                          | `ocaml-eglot-type-annotate`                                                         |                                                                                                               |
+| `merlin-locate`             | `ocaml-eglot-find-declaration`                                                      |                                                                                                               |
+| —                           | `ocaml-eglot-find-definition`                                                       | Available in Merlin by configuration                                                                          |
+| ❌                          | `ocaml-eglot-find-type-definition`                                                  |                                                                                                               |
+| ❌                          | `ocaml-eglot-find-identifier-in-alternate-file`                                     |                                                                                                               |
+| `merlin-locate-ident`       | `ocaml-eglot-find-identifier-definition`, `ocaml-eglot-find-identifier-declaration` |                                                                                                               |
+| `merlin-occurences`         | `ocaml-eglot-occurrences`                                                           |                                                                                                               |
+| `merlin-project-occurences` | —                                                                                   | Handled by `ocaml-eglot-occurrences` (if `ocaml-version >= 5.2` and need an index, `dune build @ocaml-index`) |
+| `merlin-iedit-occurrences`  | `ocaml-eglot-rename`                                                                |                                                                                                               |
+| `merlin-document`           | `ocaml-eglot-document`                                                              | also `ocaml-eglot-document-identifier`                                                                        |
+| `merlin-phrase-next`        | `ocaml-eglot-phrase-next`                                                           |                                                                                                               |
+| `merlin-phrase-prev`        | `ocaml-eglot-phrase-prev`                                                           |                                                                                                               |
+| `merlin-switch-to-ml`       | `ocaml-eglot-alternate-file`                                                        |                                                                                                               |
+| `merlin-switch-to-mli`      | `ocaml-eglot-alternate-file`                                                        |                                                                                                               |
+| ❌                          | `ocaml-eglot-infer-interface`                                                       | It was supported by `Tuareg` (and a bit ad-hoc)                                                               |
+| `merlin-jump`               | `ocaml-eglot-jump`                                                                  |                                                                                                               |
+| `merlin-destruct`           | `ocaml-eglot-destruct`                                                              |                                                                                                               |
+| `merlin-construct`          | `ocaml-eglot-construct`                                                             |                                                                                                               |
+| `merlin-next-hole`          | `ocaml-eglot-hole-next`                                                             |                                                                                                               |
+| `merlin-previous-hole`      | `ocaml-eglot-hole-prev`                                                             |                                                                                                               |
+| `merlin-toggle-view-errors` | —                                                                                   | An `eglot` configuration                                                                                      |
+| ❌                          | `ocaml-eglot-refactor-extract-at-toplevel`                                          |                                                                                                               |

@@ -12,6 +12,7 @@ Unreleased
 - Rename minor mode from `ocaml-eglot` to `ocaml-eglot-mode` (old name kept as alias)
 - Add `M-w` as a shortcut for copying types in the kill-ring
 - Add `q` as a shortcut for closing ocaml-eglot-temporary buffer
+ Add `ocaml-eglot-refactor-extract` to extract region a local definition and attach the feature to `type-enclosing`
 
 ocaml-eglot 1.3.0
 ======================
