@@ -46,12 +46,21 @@
     (define-key keymap (kbd "C-<up>") #'ocaml-eglot-type-enclosing-grow)
     (define-key keymap (kbd "C-<down>") #'ocaml-eglot-type-enclosing-shrink)
     (define-key keymap (kbd "C-w") #'ocaml-eglot-type-enclosing-copy)
+    (define-key keymap (kbd "M-w") #'ocaml-eglot-type-enclosing-copy)
     (define-key keymap (kbd "C-c C-t") #'ocaml-eglot-type-enclosing-increase-verbosity)
     (define-key keymap (kbd "C-<right>") #'ocaml-eglot-type-enclosing-increase-verbosity)
     (define-key keymap (kbd "C-<left>") #'ocaml-eglot-type-enclosing-decrease-verbosity)
     (define-key keymap (kbd "C-;") #'ocaml-eglot-type-enclosing-annotate)
+    (define-key keymap (kbd "C-x") #'ocaml-eglot-type-enclosing-refactor-extract-at-toplevel)
     keymap)
   "Keymap for OCaml-eglot's type enclosing transient mode.")
+
+(defvar ocaml-eglot-type-enclosing-buffer-map
+  (let ((keymap (make-sparse-keymap)))
+    (set-keymap-parent keymap special-mode-map)
+    (define-key keymap "g" nil)
+    keymap)
+  "Keymap for the Type Enclosing Buffer.")
 
 ;;; Internal functions
 
@@ -111,6 +120,18 @@ If PREV-VERB is given, the verbosity change ensure that the type is different."
                (length ocaml-eglot-type-enclosing-types)))
     (ocaml-eglot-type-enclosing--with-fixed-offset)))
 
+(defun ocaml-eglot-type-enclosing-refactor-extract-at-toplevel ()
+  "Extract the current enclosing as a toplevel expression."
+  (interactive)
+  (ocaml-eglot-req--server-capable :experimental :ocamllsp :handleRefactorExtract)
+  (when (and ocaml-eglot-type-enclosing-types
+             (>= (length ocaml-eglot-type-enclosing-types)
+                 ocaml-eglot-type-enclosing-offset))
+    (let* ((enclosing (aref ocaml-eglot-type-enclosing-types
+                            ocaml-eglot-type-enclosing-offset))
+           (result (ocaml-eglot-req--refactor-extract enclosing)))
+      (ocaml-eglot-util--perform-extraction result))))
+
 (defun ocaml-eglot-type-enclosing--type-buffer (type-expr)
   "Create buffer with content TYPE-EXPR of the enclosing type buffer."
   ;; We use the current major mode in the type buffer for syntax
@@ -125,6 +146,7 @@ If PREV-VERB is given, the verbosity change ensure that the type is different."
       (insert type-expr)
       (goto-char (point-min))
       (read-only-mode 1)
+      (use-local-map ocaml-eglot-type-enclosing-buffer-map)
       (setq default-directory curr-dir))))
 
 (defun ocaml-eglot-type-enclosing--display (type-expr &optional current)

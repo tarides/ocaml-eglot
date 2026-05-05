@@ -24,6 +24,10 @@
 
 ;; Generic util
 
+(defun ocaml-eglot-util--nil-if-blank (term)
+  "Return nil if a TERM is blank."
+  (when (and term (not (string-blank-p term))) term))
+
 (defun ocaml-eglot-util--goto-char (target)
   "Goto the point TARGET."
   (when (or (< target (point-min))
@@ -222,6 +226,31 @@ current window otherwise."
 (defun ocaml-eglot-util--as-json (str)
   "Parse a string STR as a Json object."
   (json-parse-string str :object-type 'plist))
+
+(defun ocaml-eglot-util--select-range (range)
+  "Active mark for the given RANGE."
+  (let ((beg (eglot--lsp-position-to-point (cl-getf range :start)))
+        (end (eglot--lsp-position-to-point (cl-getf range :end))))
+    (goto-char beg)
+    (set-mark beg)
+    (goto-char end)
+    (activate-mark)))
+
+(defun ocaml-eglot-util--substitute-content-with-selection
+    (deletion-range content selection-range)
+  "Replace the DELETION-RANGE with CONTENT and select the SELECTION-RANGE."
+  (let ((deactivate-mark nil))
+    (ocaml-eglot-util--replace-region deletion-range content))
+  (ocaml-eglot-util--select-range selection-range))
+
+(defun ocaml-eglot-util--perform-extraction (result)
+  "Perform a refactoring extraction based on RESULT."
+  (if result
+      (let ((del (cl-getf result :position))
+            (ctn (cl-getf result :content))
+            (sel (cl-getf result :selection_range)))
+        (ocaml-eglot-util--substitute-content-with-selection del ctn sel))
+    (eglot--error "Nothing to extract")))
 
 (defun ocaml-eglot-util--merlin-call-result (result)
   "Extract the RESULT of a Merlin Call Compatible request."

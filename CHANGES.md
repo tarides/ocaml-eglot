@@ -9,7 +9,10 @@ Unreleased
 - Simplify `on-interface` to avoid redundant extension check ([#90](https://github.com/tarides/ocaml-eglot/pull/90))
 - Avoid re-initializing major mode on every type display update ([#90](https://github.com/tarides/ocaml-eglot/pull/90))
 - Remove `ocaml-eglot-objinfo` in favor to `neocaml-objinfo` ([#92](https://github.com/tarides/ocaml-eglot/pull/92))
-- Rename minor mode from `ocaml-eglot` to `ocaml-eglot-mode` (old name kept as alias)
+- Rename minor mode from `ocaml-eglot` to `ocaml-eglot-mode` (old name kept as alias) ([#93](https://github.com/tarides/ocaml-eglot/pull/93))
+- Add `M-w` as a shortcut for copying types in the kill-ring ([#96](https://github.com/tarides/ocaml-eglot/pull/96))
+- Add `q` as a shortcut for closing ocaml-eglot-temporary buffer ([#96](https://github.com/tarides/ocaml-eglot/pull/96))
+ Add `ocaml-eglot-refactor-extract` to extract region a local definition and attach the feature to `type-enclosing` ([#96](https://github.com/tarides/ocaml-eglot/pull/96))
 
 ocaml-eglot 1.3.0
 ======================
