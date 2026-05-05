@@ -51,6 +51,7 @@
     (define-key keymap (kbd "C-<right>") #'ocaml-eglot-type-enclosing-increase-verbosity)
     (define-key keymap (kbd "C-<left>") #'ocaml-eglot-type-enclosing-decrease-verbosity)
     (define-key keymap (kbd "C-;") #'ocaml-eglot-type-enclosing-annotate)
+    (define-key keymap (kbd "C-x") #'ocaml-eglot-type-enclosing-refactor-extract-at-toplevel)
     keymap)
   "Keymap for OCaml-eglot's type enclosing transient mode.")
 
@@ -118,6 +119,18 @@ If PREV-VERB is given, the verbosity change ensure that the type is different."
           (mod (1- ocaml-eglot-type-enclosing-offset)
                (length ocaml-eglot-type-enclosing-types)))
     (ocaml-eglot-type-enclosing--with-fixed-offset)))
+
+(defun ocaml-eglot-type-enclosing-refactor-extract-at-toplevel ()
+  "Extract the current enclosing as a toplevel expression."
+  (interactive)
+  (ocaml-eglot-req--server-capable :experimental :ocamllsp :handleRefactorExtract)
+  (when (and ocaml-eglot-type-enclosing-types
+             (>= (length ocaml-eglot-type-enclosing-types)
+                 ocaml-eglot-type-enclosing-offset))
+    (let* ((enclosing (aref ocaml-eglot-type-enclosing-types
+                            ocaml-eglot-type-enclosing-offset))
+           (result (ocaml-eglot-req--refactor-extract enclosing)))
+      (ocaml-eglot-util--perform-extraction result))))
 
 (defun ocaml-eglot-type-enclosing--type-buffer (type-expr)
   "Create buffer with content TYPE-EXPR of the enclosing type buffer."

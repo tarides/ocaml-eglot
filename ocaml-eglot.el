@@ -627,6 +627,20 @@ and print its type."
   (interactive)
   (call-interactively #'eglot-rename))
 
+;;; Refactoring
+
+(defun ocaml-eglot-refactor-extract-at-toplevel (&optional prefix)
+  "Extract the current region as a toplevel definition.
+PREFIX is used to give a name to the extraction."
+  (interactive "P")
+  (ocaml-eglot-req--server-capable :experimental :ocamllsp :handleRefactorExtract)
+  (if (region-active-p)
+      (let* ((input-name (if prefix (read-string "Name: ")))
+             (extract-name (ocaml-eglot-util--nil-if-blank input-name))
+             (range (ocaml-eglot-util--current-range))
+             (result (ocaml-eglot-req--refactor-extract range extract-name)))
+        (ocaml-eglot-util--perform-extraction result))))
+
 ;;; Custom command handler
 
 (defun ocaml-eglot--command-next-hole (arguments)

@@ -181,7 +181,7 @@ under the cursor.  The MARKUP-KIND can also be configured."
                  markup-kind)))
     (ocaml-eglot-req--send :ocamllsp/getDocumentation params)))
 
-(defun ocaml-eglot-req--locate-fallback (err)
+(defun ocaml-eglot-req--err-fallback (err)
   "A fallback for printing ERR from locate queries."
   (let ((error-data (alist-get 'jsonrpc-error-data err)))
     (eglot--error "%s" error-data)))
@@ -190,7 +190,7 @@ under the cursor.  The MARKUP-KIND can also be configured."
   "Execute the `textDocument/typeDefinition' request for the current point."
   (let ((params (ocaml-eglot-req--TextDocumentPositionParams)))
     (ocaml-eglot-req--send :textDocument/typeDefinition params
-                           :fallback 'ocaml-eglot-req--locate-fallback)))
+                           :fallback 'ocaml-eglot-req--err-fallback)))
 
 (defun ocaml-eglot-req--type-enclosings (at index verbosity)
   "Execute the `ocamllsp/typeEnclosing' request for the current point.
@@ -243,6 +243,15 @@ ARGV is the list of arguments."
   (let ((params (append (ocaml-eglot-req--TextDocumentPositionParams)
                         `(:expression, expression))))
     (ocaml-eglot-req--send :ocamllsp/typeExpression params)))
+
+(defun ocaml-eglot-req--refactor-extract (range &optional name)
+  "Extract the given RANGE as a toplevel expression named NAME.
+If NAME is empty, it will be computed."
+  (let ((params (append (ocaml-eglot-req--TextDocumentIdentifier)
+                        `(:range, range)
+                        `(:extract_name, name))))
+    (ocaml-eglot-req--send :ocamllsp/refactorExtract params
+                           :fallback 'ocaml-eglot-req--err-fallback)))
 
 (provide 'ocaml-eglot-req)
 ;;; ocaml-eglot-req.el ends here
