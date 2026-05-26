@@ -68,8 +68,8 @@
   "Copy the type of the current enclosing to the Kill-ring."
   (interactive)
   (when ocaml-eglot-type-enclosing-current-type
-    (eglot--message "Copied `%s' to kill-ring"
-                    ocaml-eglot-type-enclosing-current-type)
+    (message (substitute-quotes "Copied `%s' to kill-ring")
+             ocaml-eglot-type-enclosing-current-type)
     (kill-new ocaml-eglot-type-enclosing-current-type)))
 
 (defun ocaml-eglot-type-enclosing--with-fixed-offset (&optional prev-verb)
