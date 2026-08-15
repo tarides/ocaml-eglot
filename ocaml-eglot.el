@@ -746,5 +746,21 @@ OCaml Eglot provides standard implementations of the various custom-requests
 (defvaralias 'ocaml-eglot-map 'ocaml-eglot-mode-map)
 (make-obsolete-variable 'ocaml-eglot-map 'ocaml-eglot-mode-map "1.4.0")
 
+;;; Server program registration
+
+;; Register `ocamllsp' via `opam exec' so that Eglot can find the
+;; language server regardless of whether the opam switch's bin
+;; directory is in `exec-path'.  This covers all known OCaml major
+;; modes, including neocaml.
+
+(add-to-list 'eglot-server-programs
+             '(((caml-mode :language-id "ocaml")
+                (neocaml-mode :language-id "ocaml")
+                (neocaml-interface-mode :language-id "ocaml.interface")
+                (ocaml-ts-mode :language-id "ocaml")
+                (tuareg-mode :language-id "ocaml")
+                reason-mode)
+               "opam" "exec" "--" "ocamllsp"))
+
 (provide 'ocaml-eglot)
 ;;; ocaml-eglot.el ends here
