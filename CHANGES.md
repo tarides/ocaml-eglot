@@ -13,6 +13,7 @@ Unreleased
 - Add `M-w` as a shortcut for copying types in the kill-ring ([#96](https://github.com/tarides/ocaml-eglot/pull/96))
 - Add `q` as a shortcut for closing ocaml-eglot-temporary buffer ([#96](https://github.com/tarides/ocaml-eglot/pull/96))
  Add `ocaml-eglot-refactor-extract` to extract region a local definition and attach the feature to `type-enclosing` ([#96](https://github.com/tarides/ocaml-eglot/pull/96))
+- Detect typed holes on left of cursor ([#100](https://github.com/tarides/ocaml-eglot/pull/100))
 
 ocaml-eglot 1.3.0
 ======================
