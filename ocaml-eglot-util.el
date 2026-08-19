@@ -148,7 +148,7 @@ A nil position is considered less than a non-nil one."
     (list :line (1- line) :character col)))
 
 (defun ocaml-eglot-util--position-adjust (pos adjust)
-  "Ajust a new position (POS) by ADJUST."
+  "Adjust a new position (POS) by ADJUST."
   (let* ((line (cl-getf pos :line))
          (character (cl-getf pos :character))
          (new-char (+ character adjust))
