@@ -530,7 +530,11 @@ of results (LIMIT)."
 Use ARG to include local values."
   (interactive "P")
   (ocaml-eglot-req--server-capable-or-lose :experimental :ocamllsp :handleConstruct)
-  (let* ((current-range (ocaml-eglot-util--current-range))
+  (let* (
+        ; When region is not active, we extend the current pos by one char
+        ; before and after to be sure to capture the hole at point if the
+        ; cursor is right before, or right after.
+         (current-range (ocaml-eglot-util--current-range-or-adjust 1 1))
          (start (cl-getf current-range :start))
          (end (cl-getf current-range :end))
          (hole (ocaml-eglot--get-first-hole-in start end)))
@@ -637,7 +641,7 @@ PREFIX is used to give a name to the extraction."
   (if (region-active-p)
       (let* ((input-name (if prefix (read-string "Name: ")))
              (extract-name (ocaml-eglot-util--nil-if-blank input-name))
-             (range (ocaml-eglot-util--current-range))
+             (range (ocaml-eglot-util--current-range-or-nil))
              (result (ocaml-eglot-req--refactor-extract range extract-name)))
         (ocaml-eglot-util--perform-extraction result))))
 

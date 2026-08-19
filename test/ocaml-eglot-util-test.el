@@ -122,12 +122,12 @@
           (expect (cl-getf range :start) :not :to-be nil)
           (expect (cl-getf range :end) :not :to-be nil)))))
 
-  (describe "current-range"
-    (it "returns a single-char range when no region is active"
+  (describe "current-range-or-adjust"
+    (it "returns a range adjusted from the curstor when no region is active"
       (with-temp-buffer
         (insert "hello")
         (goto-char 1)
-        (let ((range (ocaml-eglot-util--current-range)))
+        (let ((range (ocaml-eglot-util--current-range-or-adjust 1 1)))
           (expect (cl-getf range :start) :not :to-be nil)
           (expect (cl-getf range :end) :not :to-be nil))))
     (it "returns region range when region is active"
@@ -137,7 +137,7 @@
         (set-mark 1)
         (goto-char 6)
         (activate-mark)
-        (let ((range (ocaml-eglot-util--current-range)))
+        (let ((range (ocaml-eglot-util--current-range-or-adjust 1 1)))
           (expect (cl-getf range :start) :not :to-be nil)
           (expect (cl-getf range :end) :not :to-be nil))))))
 

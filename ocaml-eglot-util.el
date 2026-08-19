@@ -147,12 +147,17 @@ A nil position is considered less than a non-nil one."
          (col (cl-getf pos :col)))
     (list :line (1- line) :character col)))
 
-(defun ocaml-eglot-util--position-increase-char (pos content)
-  "Compute a new position (POS) after inserting text CONTENT."
+(defun ocaml-eglot-util--position-adjust (pos adjust)
+  "Adjust a new position (POS) by ADJUST."
   (let* ((line (cl-getf pos :line))
          (character (cl-getf pos :character))
-         (new-char (+ character (length content))))
+         (new-char (+ character adjust))
+         (new-char (max 0 new-char)))
     `(:line ,line :character ,new-char)))
+
+(defun ocaml-eglot-util--position-increase-char (pos content)
+  "Compute a new position (POS) after inserting text CONTENT."
+  (ocaml-eglot-util--position-adjust pos (length content)))
 
 (defun ocaml-eglot-util--current-uri ()
   "Return the uri of the document currently being visited."
@@ -185,16 +190,17 @@ A nil position is considered less than a non-nil one."
       (list :start (eglot--pos-to-lsp-position region-start)
             :end (eglot--pos-to-lsp-position region-stop)))))
 
-(defun ocaml-eglot-util--current-range ()
-  "Return the current active range."
+(defun ocaml-eglot-util--current-range-or-adjust (adjust-begin adjust-end)
+  "Return the current active range, or the current position adjusted.
+Adjusts is ADJUST-BEGIN before and ADJUST-END after."
   (if (region-active-p)
       (let ((region-start (region-beginning))
             (region-stop  (region-end)))
         (list :start (eglot--pos-to-lsp-position region-start)
               :end (eglot--pos-to-lsp-position region-stop)))
-    (let ((start (eglot--pos-to-lsp-position)))
-      (list :start start
-            :end (ocaml-eglot-util--position-increase-char start "_")))))
+    (let ((current-pos (eglot--pos-to-lsp-position)))
+      (list :start (ocaml-eglot-util--position-adjust current-pos (- adjust-begin))
+            :end (ocaml-eglot-util--position-adjust current-pos adjust-end)))))
 
 (defun ocaml-eglot-util--current-position-or-range ()
   "Return the current position or a range if the region is active."
