@@ -179,12 +179,18 @@ If CURRENT is set, the range of the enclosing will be highlighted."
          (at (ocaml-eglot-util--current-position-or-range))
          (result (ocaml-eglot-req--type-enclosings at index verbosity))
          (type (cl-getf result :type))
-         (enclosings (cl-getf result :enclosings)))
+         (enclosings (cl-getf result :enclosings))
+         (buffer (current-buffer)))
     (setq ocaml-eglot-type-enclosing-types enclosings)
     (setq ocaml-eglot-type-enclosing-current-type type)
     (ocaml-eglot-type-enclosing--display type t)
     (set-transient-map ocaml-eglot-type-enclosing-map t
-                       'ocaml-eglot-type-enclosing--reset)))
+                       ;; The state is buffer-local, and a command in
+                       ;; the map may have switched to another buffer.
+                       (lambda ()
+                         (when (buffer-live-p buffer)
+                           (with-current-buffer buffer
+                             (ocaml-eglot-type-enclosing--reset)))))))
 
 (defun ocaml-eglot-type-enclosing-annotate ()
   "Type annotate the expression of the current enclosing with its type."

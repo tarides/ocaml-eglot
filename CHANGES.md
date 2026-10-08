@@ -14,6 +14,7 @@ Unreleased
 - Add `q` as a shortcut for closing ocaml-eglot-temporary buffer ([#96](https://github.com/tarides/ocaml-eglot/pull/96))
  Add `ocaml-eglot-refactor-extract` to extract region a local definition and attach the feature to `type-enclosing` ([#96](https://github.com/tarides/ocaml-eglot/pull/96))
 - Detect typed holes on left of cursor ([#100](https://github.com/tarides/ocaml-eglot/pull/100))
+- Fix type-enclosing state not being reset when a command in its transient map switches buffer
 
 ocaml-eglot 1.3.0
 ======================
