@@ -52,6 +52,7 @@
     (define-key keymap (kbd "C-<left>") #'ocaml-eglot-type-enclosing-decrease-verbosity)
     (define-key keymap (kbd "C-;") #'ocaml-eglot-type-enclosing-annotate)
     (define-key keymap (kbd "C-x") #'ocaml-eglot-type-enclosing-refactor-extract-at-toplevel)
+    (define-key keymap (kbd "C-d") #'ocaml-eglot-type-enclosing-destruct)
     keymap)
   "Keymap for OCaml-eglot's type enclosing transient mode.")
 
@@ -71,6 +72,16 @@
     (message (substitute-quotes "Copied `%s' to kill-ring")
              ocaml-eglot-type-enclosing-current-type)
     (kill-new ocaml-eglot-type-enclosing-current-type)))
+
+(defun ocaml-eglot-type-enclosing-destruct ()
+  "Perform case-analysis on the current enclosing."
+  (interactive)
+  (when-let* ((types ocaml-eglot-type-enclosing-types)
+              (_ (length> types 0)))
+    (pcase-let ((`(,beg . ,end)
+                 (ocaml-eglot-util--range-region
+                  (aref types ocaml-eglot-type-enclosing-offset))))
+      (ocaml-eglot-req--destruct beg end))))
 
 (defun ocaml-eglot-type-enclosing--with-fixed-offset (&optional prev-verb)
   "Compute the type enclosing for a dedicated offset.
