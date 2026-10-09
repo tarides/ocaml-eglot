@@ -436,6 +436,8 @@ During a "type enclosing" session the following commands are available:
 - `ocaml-eglot-type-enclosing-annotate` (<kbd>C-;</kbd>): to annotate
   (with type) the current enclosing
 - `ocaml-eglot-type-enclosing-refactor-extract-at-toplevel` (<kbd>C-x</kbd>): to extract the enclosing inside a toplevel definition
+- `ocaml-eglot-type-enclosing-destruct` (<kbd>C-d</kbd>): to perform
+  case-analysis on the current enclosing
 
 You can also enter an expression in the mini-buffer for which you want
 to display the type:

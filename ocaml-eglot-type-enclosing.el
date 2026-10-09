@@ -52,6 +52,7 @@
     (define-key keymap (kbd "C-<left>") #'ocaml-eglot-type-enclosing-decrease-verbosity)
     (define-key keymap (kbd "C-;") #'ocaml-eglot-type-enclosing-annotate)
     (define-key keymap (kbd "C-x") #'ocaml-eglot-type-enclosing-refactor-extract-at-toplevel)
+    (define-key keymap (kbd "C-d") #'ocaml-eglot-type-enclosing-destruct)
     keymap)
   "Keymap for OCaml-eglot's type enclosing transient mode.")
 
@@ -71,6 +72,16 @@
     (message (substitute-quotes "Copied `%s' to kill-ring")
              ocaml-eglot-type-enclosing-current-type)
     (kill-new ocaml-eglot-type-enclosing-current-type)))
+
+(defun ocaml-eglot-type-enclosing-destruct ()
+  "Perform case-analysis on the current enclosing."
+  (interactive)
+  (when-let* ((types ocaml-eglot-type-enclosing-types)
+              (_ (length> types 0)))
+    (pcase-let ((`(,beg . ,end)
+                 (ocaml-eglot-util--range-region
+                  (aref types ocaml-eglot-type-enclosing-offset))))
+      (ocaml-eglot-req--destruct beg end))))
 
 (defun ocaml-eglot-type-enclosing--with-fixed-offset (&optional prev-verb)
   "Compute the type enclosing for a dedicated offset.
@@ -179,12 +190,30 @@ If CURRENT is set, the range of the enclosing will be highlighted."
          (at (ocaml-eglot-util--current-position-or-range))
          (result (ocaml-eglot-req--type-enclosings at index verbosity))
          (type (cl-getf result :type))
-         (enclosings (cl-getf result :enclosings)))
+         (enclosings (cl-getf result :enclosings))
+         (buffer (current-buffer)))
     (setq ocaml-eglot-type-enclosing-types enclosings)
     (setq ocaml-eglot-type-enclosing-current-type type)
     (ocaml-eglot-type-enclosing--display type t)
     (set-transient-map ocaml-eglot-type-enclosing-map t
-                       'ocaml-eglot-type-enclosing--reset)))
+                       ;; The state is buffer-local, and a command in
+                       ;; the map may have switched to another buffer.
+                       (lambda ()
+                         (when (buffer-live-p buffer)
+                           (with-current-buffer buffer
+                             (ocaml-eglot-type-enclosing--reset)))))))
+
+(defun ocaml-eglot-type-enclosing-type (&optional verbosity)
+  "Return the type of the current enclosing as a string, or nil.
+While the transient map of `ocaml-eglot-type-enclosing' is active,
+return the type currently displayed.  Otherwise, query the server for
+the type of the innermost expression at point, or of the region if it
+is active, at VERBOSITY (default 0)."
+  (or ocaml-eglot-type-enclosing-current-type
+      (cl-getf (ocaml-eglot-req--type-enclosings
+                (ocaml-eglot-util--current-position-or-range)
+                0 (or verbosity 0))
+               :type)))
 
 (defun ocaml-eglot-type-enclosing-annotate ()
   "Type annotate the expression of the current enclosing with its type."
