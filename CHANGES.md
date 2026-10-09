@@ -1,5 +1,6 @@
-Unreleased
+ocaml-eglot 1.4.0
 ======================
+Fri Oct 09 09:10:00 PM CET 2026
 
 - Replace `makel` with `Eldev` as the build tool ([#91](https://github.com/tarides/ocaml-eglot/pull/91))
 - Switch test framework from ERT to Buttercup and extend test suite ([#91](https://github.com/tarides/ocaml-eglot/pull/91))
@@ -12,11 +13,11 @@ Unreleased
 - Rename minor mode from `ocaml-eglot` to `ocaml-eglot-mode` (old name kept as alias) ([#93](https://github.com/tarides/ocaml-eglot/pull/93))
 - Add `M-w` as a shortcut for copying types in the kill-ring ([#96](https://github.com/tarides/ocaml-eglot/pull/96))
 - Add `q` as a shortcut for closing ocaml-eglot-temporary buffer ([#96](https://github.com/tarides/ocaml-eglot/pull/96))
- Add `ocaml-eglot-refactor-extract` to extract region a local definition and attach the feature to `type-enclosing` ([#96](https://github.com/tarides/ocaml-eglot/pull/96))
+- Add `ocaml-eglot-refactor-extract` to extract region a local definition and attach the feature to `type-enclosing` ([#96](https://github.com/tarides/ocaml-eglot/pull/96))
 - Detect typed holes on left of cursor ([#100](https://github.com/tarides/ocaml-eglot/pull/100))
-- Fix type-enclosing state not being reset when a command in its transient map switches buffer
-- Add `ocaml-eglot-type-enclosing-type`
-- Add `ocaml-eglot-type-enclosing-destruct` (`C-d` for case-analysis of the current enclosing)
+- Fix type-enclosing state not being reset when a command in its transient map switches buffer ([#101](https://github.com/tarides/ocaml-eglot/pull/101))
+- Add `ocaml-eglot-type-enclosing-type` ([#101](https://github.com/tarides/ocaml-eglot/pull/101))
+- Add `ocaml-eglot-type-enclosing-destruct` (`C-d` for case-analysis of the current enclosing) ([#101](https://github.com/tarides/ocaml-eglot/pull/101))
 
 ocaml-eglot 1.3.0
 ======================
