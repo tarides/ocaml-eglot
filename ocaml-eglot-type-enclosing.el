@@ -51,7 +51,7 @@
     (define-key keymap (kbd "C-<right>") #'ocaml-eglot-type-enclosing-increase-verbosity)
     (define-key keymap (kbd "C-<left>") #'ocaml-eglot-type-enclosing-decrease-verbosity)
     (define-key keymap (kbd "C-;") #'ocaml-eglot-type-enclosing-annotate)
-    (define-key keymap (kbd "C-x") #'ocaml-eglot-type-enclosing-refactor-extract-at-toplevel)
+    (define-key keymap (kbd "C-e") #'ocaml-eglot-type-enclosing-refactor-extract-at-toplevel)
     (define-key keymap (kbd "C-d") #'ocaml-eglot-type-enclosing-destruct)
     keymap)
   "Keymap for OCaml-eglot's type enclosing transient mode.")

@@ -1,3 +1,8 @@
+unreleased
+======================
+
+- Replace `C-x` for `extract at toplevel` _in enclosing_ by `C-e`
+
 ocaml-eglot 1.4.0
 ======================
 Fri Oct 09 09:10:00 PM CET 2026
