@@ -2,6 +2,7 @@ unreleased
 ======================
 
 - Replace `C-x` for `extract at toplevel` _in enclosing_ by `C-e`
+- Fix `xref` definitions/declarations with `Eglot >= 1.26` (removal of `eglot--lsp-xrefs-for-method`) ([#102](https://github.com/tarides/ocaml-eglot/issues/102), [#103](https://github.com/tarides/ocaml-eglot/issues/103))
 
 ocaml-eglot 1.4.0
 ======================
