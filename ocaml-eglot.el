@@ -40,6 +40,7 @@
 (require 'ocaml-eglot-req)
 (require 'ocaml-eglot-type-enclosing)
 (require 'ocaml-eglot-xref)
+(require 'ocaml-eglot-completion)
 (require 'eglot)
 
 (declare-function flycheck-next-error "ext:flycheck")

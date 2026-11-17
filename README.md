@@ -399,6 +399,26 @@ illustrations of each command in the next section.).
 | `ocaml-eglot-rename` | |
 
 
+### Completion
+
+`ocaml-eglot-completion-at-point` is a `completion-at-point` function
+using ocaml-lsp's `ocamllsp/completePrefixAtPos` custom request.  It
+completes one component of a module path at a time, which works well
+with the `partial-completion` completion style: for example, `Li.ma`
+can complete to `List.map`.  To use it instead of Eglot's default
+completion:
+
+```elisp
+(add-hook 'eglot-managed-mode-hook
+          (lambda ()
+            (when ocaml-eglot-mode
+              (if (eglot-managed-p)
+                  (add-hook 'completion-at-point-functions
+                            #'ocaml-eglot-completion-at-point nil t)
+                (remove-hook 'completion-at-point-functions
+                             #'ocaml-eglot-completion-at-point t)))))
+```
+
 ### Browsing errors
 
 Eglot relies on

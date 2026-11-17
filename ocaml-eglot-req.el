@@ -244,6 +244,18 @@ ARGV is the list of arguments."
                         `(:expression, expression))))
     (ocaml-eglot-req--send :ocamllsp/typeExpression params)))
 
+(cl-defun ocaml-eglot-req--complete-prefix-at-pos
+    (position prefix &key cancel-on-input cancel-on-input-retval)
+  "Execute the `ocamllsp/completePrefixAtPos' request for PREFIX at POSITION.
+POSITION is a position in the current buffer.  CANCEL-ON-INPUT and
+CANCEL-ON-INPUT-RETVAL are passed to `ocaml-eglot-req--send'."
+  (let ((params (list :textDocument (ocaml-eglot-req--TextDocumentIdentifier)
+                      :position (eglot--pos-to-lsp-position position)
+                      :prefix prefix)))
+    (ocaml-eglot-req--send :ocamllsp/completePrefixAtPos params
+                           :cancel-on-input cancel-on-input
+                           :cancel-on-input-retval cancel-on-input-retval)))
+
 (defun ocaml-eglot-req--refactor-extract (range &optional name)
   "Extract the given RANGE as a toplevel expression named NAME.
 If NAME is empty, it will be computed."
