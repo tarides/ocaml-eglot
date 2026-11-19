@@ -562,13 +562,40 @@ Use ARG to include local values."
 
 ;; Get Documentation
 
+(defun ocaml-eglot--display-documentation (doc)
+  "Display DOC, the formatted documentation of an identifier.
+Short documentation is displayed in the echo area.  Longer documentation
+is displayed in the buffer named by `ocaml-eglot-type-buffer-name'."
+  (if (let ((width (window-max-chars-per-line (minibuffer-window))))
+        ;; Count lines as they will be displayed in the echo area, not
+        ;; by newlines, because formatting Markdown joins each
+        ;; paragraph into a single long line.
+        (<= (cl-loop for line in (split-string doc "\n")
+                     sum (max 1 (ceiling (string-width line) width)))
+            8))
+      (message "%s" doc)
+    (let ((curr-dir default-directory))
+      (with-current-buffer (get-buffer-create ocaml-eglot-type-buffer-name)
+        ;; DOC is already fontified, so use a major mode which will
+        ;; not refontify it.
+        (unless (eq major-mode 'special-mode)
+          (special-mode))
+        (let ((inhibit-read-only t))
+          (erase-buffer)
+          (insert doc))
+        (goto-char (point-min))
+        (use-local-map ocaml-eglot-type-enclosing-buffer-map)
+        (setq default-directory curr-dir)))
+    (display-buffer ocaml-eglot-type-buffer-name)))
+
 (defun ocaml-eglot--document-aux (identifier)
   "Displays the OCaml documentation for the IDENTIFIER under the cursor."
-  (when-let* ((result (ocaml-eglot-req--get-documentation
-                       identifier ocaml-eglot-preferred-markupkind))
-              (doc-value (cl-getf result :doc))
-              (formated-value (ocaml-eglot-util--format-markup doc-value)))
-    (message "%s" formated-value)))
+  (if-let* ((result (ocaml-eglot-req--get-documentation
+                     identifier ocaml-eglot-preferred-markupkind))
+            (doc-value (cl-getf result :doc)))
+      (ocaml-eglot--display-documentation
+       (ocaml-eglot-util--format-markup doc-value))
+    (message "No documentation available")))
 
 (defun ocaml-eglot-document ()
   "Displays the OCaml documentation for the identifier under the cursor."
