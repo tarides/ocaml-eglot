@@ -91,6 +91,14 @@ Otherwise, `ocaml-eglot-construct' only includes constructors."
                        (featurep 'flycheck-eglot))
               '((const :tag "Use Flycheck" flycheck)))))
 
+(defcustom ocaml-eglot-use-completion-at-point nil
+  "If non-nil, use `ocaml-eglot-completion-at-point' for completion.
+This replaces Eglot's default completion in buffers where
+`ocaml-eglot-mode' is enabled.  It takes effect when Eglot starts
+managing a buffer, so set it before visiting any OCaml files."
+  :group 'ocaml-eglot
+  :type 'boolean)
+
 
 ;;; Faces
 
@@ -731,6 +739,17 @@ PREFIX is used to give a name to the extraction."
   (when eglot--managed-mode
     (add-hook 'xref-backend-functions #'ocaml-eglot-xref-backend nil t)))
 
+;;; Handle completion
+
+(defun ocaml-eglot--setup-completion ()
+  "Add or remove `ocaml-eglot-completion-at-point' as appropriate.
+See `ocaml-eglot-use-completion-at-point'."
+  (if (and ocaml-eglot-use-completion-at-point eglot--managed-mode)
+      (add-hook 'completion-at-point-functions
+                #'ocaml-eglot-completion-at-point nil t)
+    (remove-hook 'completion-at-point-functions
+                 #'ocaml-eglot-completion-at-point t)))
+
 ;;; Mode
 
 (defvar ocaml-eglot-mode-map
@@ -751,12 +770,14 @@ PREFIX is used to give a name to the extraction."
 (defun ocaml-eglot--setup ()
   "Setup OCaml-eglot."
   (add-hook 'find-file-hook #'ocaml-eglot--file-hook)
-  (add-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend nil t))
+  (add-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend nil t)
+  (add-hook 'eglot-managed-mode-hook #'ocaml-eglot--setup-completion nil t))
 
 (defun ocaml-eglot--clean ()
   "Clean registered hooks and advice."
   (remove-hook 'find-file-hook #'ocaml-eglot--file-hook)
-  (remove-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend t))
+  (remove-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend t)
+  (remove-hook 'eglot-managed-mode-hook #'ocaml-eglot--setup-completion t))
 
 ;;;###autoload
 (define-minor-mode ocaml-eglot-mode

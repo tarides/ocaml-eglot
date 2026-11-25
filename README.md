@@ -406,17 +406,11 @@ using ocaml-lsp's `ocamllsp/completePrefixAtPos` custom request.  It
 completes one component of a module path at a time, which works well
 with the `partial-completion` completion style: for example, `Li.ma`
 can complete to `List.map`.  To use it instead of Eglot's default
-completion:
+completion, set `ocaml-eglot-use-completion-at-point` before visiting
+any OCaml files:
 
 ```elisp
-(add-hook 'eglot-managed-mode-hook
-          (lambda ()
-            (when ocaml-eglot-mode
-              (if (eglot-managed-p)
-                  (add-hook 'completion-at-point-functions
-                            #'ocaml-eglot-completion-at-point nil t)
-                (remove-hook 'completion-at-point-functions
-                             #'ocaml-eglot-completion-at-point t)))))
+(setopt ocaml-eglot-use-completion-at-point t)
 ```
 
 ### Browsing errors
