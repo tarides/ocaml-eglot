@@ -20,6 +20,8 @@
 (require 'ocaml-eglot-util)
 (require 'ocaml-eglot-req)
 
+(declare-function xref-backend-xrefs-by-kind "xref" (backend identifier kind))
+
 (defcustom ocaml-eglot-locate-preference 'ml
   "Determine whether locate should in priority look in ml or mli files."
   :group 'ocaml-eglot
@@ -57,6 +59,18 @@ than a character offset, so we can't use `xref-make-file-location'."
                 (ocaml-eglot-util--pos-to-point
                  (ocaml-eglot-xref-location-merlin-pos l)))))
     (move-marker (make-marker) pos buffer)))
+
+(defun ocaml-eglot-xref--lsp-definitions (symbol)
+  "Ask the LSP server for the definition (or declaration) of SYMBOL at point."
+  (cond
+   ((not (eq ocaml-eglot-locate-preference 'mli))
+    (xref-backend-definitions 'eglot symbol))
+   ;; Eglot < 1.26
+   ((fboundp 'eglot--lsp-xrefs-for-method)
+    (with-no-warnings
+      (eglot--lsp-xrefs-for-method :textDocument/declaration)))
+   ;; Eglot >= 1.26
+   (t (xref-backend-xrefs-by-kind 'eglot symbol 'declaration))))
 
 (defun ocaml-eglot-xref--call-locate (symbol)
   "Locate an identifier based on SYMBOL used for xref."
@@ -101,10 +115,7 @@ Requires that the current buffer be the buffer of FILE."
       ;; minibuffer its text properties would have been stripped (see
       ;; `minibuffer-allow-text-properties').  Call the LSP/eglot method which is
       ;; hardcoded to use the identifier at point.
-      (eglot--lsp-xrefs-for-method
-       (if (eq ocaml-eglot-locate-preference 'mli)
-           :textDocument/declaration
-         :textDocument/definition))
+      (ocaml-eglot-xref--lsp-definitions symbol)
     (let* ((result (ocaml-eglot-xref--call-locate symbol))
            (loc (ocaml-eglot-util--merlin-call-result result)))
       (unless loc (error "Not found.  (Check *Messages* for potential errors)"))
