@@ -454,13 +454,21 @@ atom."
       (setq atom-end (point)))
     (cons atom-start atom-end)))
 
+(defun ocaml-eglot-completion--available-p ()
+  "Return non-nil if the server handles `ocamllsp/completePrefixAtPos'.
+This request is only available since ocaml-lsp 1.28.1."
+  (ocaml-eglot-req--server-capable
+   :experimental :ocamllsp :handleCompletePrefixAtPos))
+
 ;; Public functions
 
 (defun ocaml-eglot-completion-at-point ()
   "Perform completion at point for OCaml using ocaml-lsp.
 
 This is meant to be added to `completion-at-point-functions' in
-buffers managed by Eglot.
+buffers managed by Eglot.  If the server does not handle the
+`ocamllsp/completePrefixAtPos' request, return nil so that the next
+function in `completion-at-point-functions' is used instead.
 
 This completes only on the current fragment; e.g., with point at
 the end of \"Aaa.bbb.ccc\", the current fragment is \"ccc\", and

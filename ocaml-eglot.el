@@ -99,6 +99,10 @@ managing a buffer, so set it before visiting any OCaml files."
   :group 'ocaml-eglot
   :type 'boolean)
 
+(defcustom ocaml-eglot-docs-buffer-name "*ocaml-eglot-docs*"
+  "The name of the buffer showing documentation."
+  :group 'ocaml-eglot
+  :type 'string)
 
 ;;; Faces
 
@@ -573,7 +577,7 @@ Use ARG to include local values."
 (defun ocaml-eglot--display-documentation (doc)
   "Display DOC, the formatted documentation of an identifier.
 Short documentation is displayed in the echo area.  Longer documentation
-is displayed in the buffer named by `ocaml-eglot-type-buffer-name'."
+is displayed in the buffer named by `ocaml-eglot-docs-buffer-name'."
   (if (let ((width (window-max-chars-per-line (minibuffer-window))))
         ;; Count lines as they will be displayed in the echo area, not
         ;; by newlines, because formatting Markdown joins each
@@ -583,7 +587,7 @@ is displayed in the buffer named by `ocaml-eglot-type-buffer-name'."
             8))
       (message "%s" doc)
     (let ((curr-dir default-directory))
-      (with-current-buffer (get-buffer-create ocaml-eglot-type-buffer-name)
+      (with-current-buffer (get-buffer-create ocaml-eglot-docs-buffer-name)
         ;; DOC is already fontified, so use a major mode which will
         ;; not refontify it.
         (unless (eq major-mode 'special-mode)
@@ -594,7 +598,7 @@ is displayed in the buffer named by `ocaml-eglot-type-buffer-name'."
         (goto-char (point-min))
         (use-local-map ocaml-eglot-type-enclosing-buffer-map)
         (setq default-directory curr-dir)))
-    (display-buffer ocaml-eglot-type-buffer-name)))
+    (display-buffer ocaml-eglot-docs-buffer-name)))
 
 (defun ocaml-eglot--document-aux (identifier)
   "Displays the OCaml documentation for the IDENTIFIER under the cursor."
