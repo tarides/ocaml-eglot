@@ -39,6 +39,7 @@ user experience as close as possible to that offered by the Emacs mode
     - [Recommended minimal configuration](#recommended-minimal-configuration)
     - [Usage with `dune pkg`](#usage-with-dune-pkg)
   - [Features](#features)
+    - [Completion](#completion)
     - [Browsing errors](#browsing-errors)
     - [Type Enclosings](#type-enclosings)
     - [Jump to definition/declaration](#jump-to-definitiondeclaration)
