@@ -3,6 +3,9 @@ unreleased
 
 - Replace `C-x` for `extract at toplevel` _in enclosing_ by `C-e`
 - Fix `xref` definitions/declarations with `Eglot >= 1.26` (removal of `eglot--lsp-xrefs-for-method`) ([#102](https://github.com/tarides/ocaml-eglot/issues/102), [#103](https://github.com/tarides/ocaml-eglot/issues/103))
+- Add `ocaml-eglot-completion-at-point`, a `completion-at-point` function using the `ocamllsp/completePrefixAtPos` custom request, and use it for `xref-backend-identifier-completion-table`; set `ocaml-eglot-use-completion-at-point` to use it for completion
+- Display long documentation from `ocaml-eglot-document` in a dedicated buffer (`ocaml-eglot-docs-buffer-name`) instead of truncating it in the echo area
+- Make `ocaml-eglot-document` report when there is no documentation
 
 ocaml-eglot 1.4.0
 ======================

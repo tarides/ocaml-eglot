@@ -40,6 +40,7 @@
 (require 'ocaml-eglot-req)
 (require 'ocaml-eglot-type-enclosing)
 (require 'ocaml-eglot-xref)
+(require 'ocaml-eglot-completion)
 (require 'eglot)
 
 (declare-function flycheck-next-error "ext:flycheck")
@@ -90,6 +91,18 @@ Otherwise, `ocaml-eglot-construct' only includes constructors."
                        (featurep 'flycheck-eglot))
               '((const :tag "Use Flycheck" flycheck)))))
 
+(defcustom ocaml-eglot-use-completion-at-point nil
+  "If non-nil, use `ocaml-eglot-completion-at-point' for completion.
+This replaces Eglot's default completion in buffers where
+`ocaml-eglot-mode' is enabled.  It takes effect when Eglot starts
+managing a buffer, so set it before visiting any OCaml files."
+  :group 'ocaml-eglot
+  :type 'boolean)
+
+(defcustom ocaml-eglot-docs-buffer-name "*ocaml-eglot-docs*"
+  "The name of the buffer showing documentation."
+  :group 'ocaml-eglot
+  :type 'string)
 
 ;;; Faces
 
@@ -561,13 +574,40 @@ Use ARG to include local values."
 
 ;; Get Documentation
 
+(defun ocaml-eglot--display-documentation (doc)
+  "Display DOC, the formatted documentation of an identifier.
+Short documentation is displayed in the echo area.  Longer documentation
+is displayed in the buffer named by `ocaml-eglot-docs-buffer-name'."
+  (if (let ((width (window-max-chars-per-line (minibuffer-window))))
+        ;; Count lines as they will be displayed in the echo area, not
+        ;; by newlines, because formatting Markdown joins each
+        ;; paragraph into a single long line.
+        (<= (cl-loop for line in (split-string doc "\n")
+                     sum (max 1 (ceiling (string-width line) width)))
+            8))
+      (message "%s" doc)
+    (let ((curr-dir default-directory))
+      (with-current-buffer (get-buffer-create ocaml-eglot-docs-buffer-name)
+        ;; DOC is already fontified, so use a major mode which will
+        ;; not refontify it.
+        (unless (eq major-mode 'special-mode)
+          (special-mode))
+        (let ((inhibit-read-only t))
+          (erase-buffer)
+          (insert doc))
+        (goto-char (point-min))
+        (use-local-map ocaml-eglot-type-enclosing-buffer-map)
+        (setq default-directory curr-dir)))
+    (display-buffer ocaml-eglot-docs-buffer-name)))
+
 (defun ocaml-eglot--document-aux (identifier)
   "Displays the OCaml documentation for the IDENTIFIER under the cursor."
-  (when-let* ((result (ocaml-eglot-req--get-documentation
-                       identifier ocaml-eglot-preferred-markupkind))
-              (doc-value (cl-getf result :doc))
-              (formated-value (ocaml-eglot-util--format-markup doc-value)))
-    (message "%s" formated-value)))
+  (if-let* ((result (ocaml-eglot-req--get-documentation
+                     identifier ocaml-eglot-preferred-markupkind))
+            (doc-value (cl-getf result :doc)))
+      (ocaml-eglot--display-documentation
+       (ocaml-eglot-util--format-markup doc-value))
+    (message "No documentation available")))
 
 (defun ocaml-eglot-document ()
   "Displays the OCaml documentation for the identifier under the cursor."
@@ -703,6 +743,17 @@ PREFIX is used to give a name to the extraction."
   (when eglot--managed-mode
     (add-hook 'xref-backend-functions #'ocaml-eglot-xref-backend nil t)))
 
+;;; Handle completion
+
+(defun ocaml-eglot--setup-completion ()
+  "Add or remove `ocaml-eglot-completion-at-point' as appropriate.
+See `ocaml-eglot-use-completion-at-point'."
+  (if (and ocaml-eglot-use-completion-at-point eglot--managed-mode)
+      (add-hook 'completion-at-point-functions
+                #'ocaml-eglot-completion-at-point nil t)
+    (remove-hook 'completion-at-point-functions
+                 #'ocaml-eglot-completion-at-point t)))
+
 ;;; Mode
 
 (defvar ocaml-eglot-mode-map
@@ -723,12 +774,14 @@ PREFIX is used to give a name to the extraction."
 (defun ocaml-eglot--setup ()
   "Setup OCaml-eglot."
   (add-hook 'find-file-hook #'ocaml-eglot--file-hook)
-  (add-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend nil t))
+  (add-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend nil t)
+  (add-hook 'eglot-managed-mode-hook #'ocaml-eglot--setup-completion nil t))
 
 (defun ocaml-eglot--clean ()
   "Clean registered hooks and advice."
   (remove-hook 'find-file-hook #'ocaml-eglot--file-hook)
-  (remove-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend t))
+  (remove-hook 'eglot-managed-mode-hook #'ocaml-eglot--enable-xref-backend t)
+  (remove-hook 'eglot-managed-mode-hook #'ocaml-eglot--setup-completion t))
 
 ;;;###autoload
 (define-minor-mode ocaml-eglot-mode
